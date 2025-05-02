@@ -1,7 +1,13 @@
 #include <iostream>
 
+#include "Engine.hpp"
+
 int main(){
-    std::cout << "hellooo\n";
+
+    Engine engine;
+    engine.init();
+    engine.game_loop();
+    
     return 0;
 }
 

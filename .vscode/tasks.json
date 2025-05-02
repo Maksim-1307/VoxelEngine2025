@@ -1,0 +1,19 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build with CMake",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-c",
+                "if [[ $(basename \"$PWD\") != \"build\" ]; then mkdir -p build && cd build; else echo \"Already in build dir\"; fi && cmake .. && make && open VoxelEngine"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}

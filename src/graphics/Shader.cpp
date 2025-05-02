@@ -1,7 +1,10 @@
 #include "Shader.hpp"
 
-Shader::Shader(const std::string &vertexSource, const std::string &fragmentSource)
+Shader::Shader(std::string vertexPath, std::string fragmentPath)
 {
+
+    std::string vertexSource = utils::read_file(vertexPath);
+    std::string fragmentSource = utils::read_file(fragmentPath);
 
     GLuint shaderProgram;
     shaderProgram = glCreateProgram();

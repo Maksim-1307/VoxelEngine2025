@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <GL/glew.h>
+#include "../logic/utils.hpp"
 
 #define GLM_FORCE_CTOR_INIT
 
@@ -10,12 +11,11 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-
 class Shader
 {
 
 public:
-    Shader(const std::string &vertexSource, const std::string &fragmentSource);
+    Shader(std::string vertexPath, std::string fragmentPath);
     ~Shader();
 
     GLuint getID();

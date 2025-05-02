@@ -36,20 +36,8 @@ void Engine::game_loop(){
 
         // TEST
 
-        Shader shader ("#version 330 core\
-            layout(location=0) in vec3 position;\
-            layout(location=1) in vec2 texCoord;\
-            out vec2 TexCoord;\
-            void main(){\
-            TexCoord = texCoord;\
-            vec4 vertex = vec4(position.x, position.y, position.z, 1.0f);\
-            gl_Position = vertex;\
-            }", 
-            "#version 330 core\
-            in vec2 TexCoord;\
-            out vec4 color;\
-            void main()\
-            {color = vec4(1, 0, 0, 1);}");
+        Shader shader("res/shaders/shader.vert",
+                      "res/shaders/shader.frag");
 
         shader.use();
 

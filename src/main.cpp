@@ -1,8 +1,12 @@
 #include <iostream>
 
 #include "Engine.hpp"
+#include "logic/utils.hpp"
 
-int main(){
+int main(int argc, char **argv)
+{
+
+    utils::set_current_directory(argv);
 
     Engine engine;
     engine.init();
@@ -10,4 +14,3 @@ int main(){
     
     return 0;
 }
-

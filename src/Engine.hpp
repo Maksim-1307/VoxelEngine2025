@@ -1,6 +1,9 @@
 #pragma once
 
 #include "graphics/Window.hpp"
+#include "graphics/Mesh.hpp"
+#include "graphics/MeshRenderer.hpp"
+#include "graphics/Shader.hpp"
 
 class Engine {
     public:
@@ -9,4 +12,7 @@ class Engine {
         void game_loop();
 
         static Window* pWindow;
+        static Shader* pSpriteShader;
+        static Mesh* pMesh;
+        static MeshRenderer* pRenderer;
 };

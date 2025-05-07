@@ -3,11 +3,13 @@
 Window::Window(WindowArgs args)
 {
 
+
     if (!glfwInit())
     {
         std::cerr << "ERROR: failed to initialize GLFW" << std::endl;
         exit(-1);
     }
+
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);

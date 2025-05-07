@@ -19,13 +19,14 @@ enum class MeshType { MESH3D, SPRITE2D, LINE3D };
 
 class MeshRenderer {
     public:
-        MeshRenderer(Mesh* pMesh) {
+        MeshRenderer(Mesh* pMesh, MeshType type) {
             this->pMesh = pMesh;
+            this->gen_buffers(type);
         };
-        void gen_buffers(MeshType type);
         void draw();
 
     private:
+        void gen_buffers(MeshType type);
         Mesh* pMesh;
         GLuint VAO;
         GLuint VBO;

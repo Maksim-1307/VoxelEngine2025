@@ -101,7 +101,7 @@ bool Shader::set_matrix4(std::string uniformName, glm::mat4 matrix)
     GLuint uniformLoc = glGetUniformLocation(this->ID, uniformName.c_str());
     if (uniformLoc == -1)
     {
-        std::cout << "WARNING: uniform named '" << uniformName << "' doesn't exist" << std::endl;
+        std::cerr << "WARNING: uniform named '" << uniformName << "' doesn't exist" << std::endl;
         return false;
     }
     else
@@ -116,7 +116,7 @@ bool Shader::set_texture(std::string uniformName, GLuint textureID)
     GLuint uniformLoc = glGetUniformLocation(this->ID, uniformName.c_str());
     if (uniformLoc == -1)
     {
-        std::cout << "WARNING: uniform named '" << uniformName << "' doesn't exist" << std::endl;
+        std::cerr << "WARNING: uniform named '" << uniformName << "' doesn't exist" << std::endl;
         return false;
     }
     else

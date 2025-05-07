@@ -4,6 +4,7 @@
 #include "graphics/Mesh.hpp"
 #include "graphics/MeshRenderer.hpp"
 #include "graphics/Shader.hpp"
+#include "graphics/Camera.hpp"
 
 class Engine {
     public:
@@ -15,4 +16,5 @@ class Engine {
         static Shader* pSpriteShader;
         static Mesh* pMesh;
         static MeshRenderer* pRenderer;
+        static Camera* pCamera;
 };

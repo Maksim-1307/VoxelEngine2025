@@ -1,15 +1,14 @@
 #include "Window.hpp"
+#include "../Engine.hpp"
 
 Window::Window(WindowArgs args)
 {
-
 
     if (!glfwInit())
     {
         std::cerr << "ERROR: failed to initialize GLFW" << std::endl;
         exit(-1);
     }
-
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -56,10 +55,18 @@ bool Window::should_close(){
 
 void windowSizeCallback(GLFWwindow * pWindow, int width, int height)
 {
-    std::cout << "Window resize\n";
+    /*
+
+    Width and height from argument are two times smaller than values obtained
+    from glfwGetFramebufferSize.
+    Maybe because of retina
+    */
+   
     int window_width = width;
     int window_height = height;
     glfwGetFramebufferSize(pWindow, &window_width, &window_height);
+    Engine::pWindow->set_width(window_width);
+    Engine::pWindow->set_height(window_height);
     glViewport(0, 0, window_width, window_height);
 }
 

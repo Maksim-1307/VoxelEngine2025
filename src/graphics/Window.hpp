@@ -11,11 +11,13 @@
 struct WindowArgs
 {
     std::string name = "OpenGL Window";
-    GLuint width = 600;
-    GLuint height = 480;
+    GLuint width = 800;
+    GLuint height = 600;
     bool isResizable = true;
     glm::vec3 clearColor = glm::vec3(0.0f, 0.0f, 0.0f);
 };
+
+class Engine;
 
 class Window
 {
@@ -38,6 +40,18 @@ public:
     GLuint get_height()
     {
         return this->height;
+    }
+    void set_width(GLuint value)
+    {
+        this->width = value;
+    }
+    void set_height(GLuint value)
+    {
+        this->height = value;
+    }
+    float get_ratio()
+    {
+        return (float)this->width / this->height;
     }
 
 private:

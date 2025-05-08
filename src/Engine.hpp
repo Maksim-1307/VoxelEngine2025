@@ -14,6 +14,7 @@ class Engine {
 
         static Window* pWindow;
         static Shader* pSpriteShader;
+        static Shader* pMeshShader;
         static Mesh* pMesh;
         static MeshRenderer* pRenderer;
         static Camera* pCamera;

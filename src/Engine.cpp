@@ -9,6 +9,7 @@ Engine::Engine(){}
 
 Window*       Engine::pWindow = nullptr;
 Shader*       Engine::pSpriteShader = nullptr;
+Shader*       Engine::pMeshShader = nullptr;
 Mesh*         Engine::pMesh = nullptr;
 MeshRenderer* Engine::pRenderer = nullptr;
 Camera*       Engine::pCamera = nullptr;
@@ -19,15 +20,15 @@ void Engine::init() {
     Engine::pWindow = new Window(wargs);
 
     // TEST
-    Engine::pSpriteShader = nullptr;
-    Engine::pSpriteShader = new Shader("res/shaders/shader.vert", "res/shaders/shader.frag");
+    Engine::pSpriteShader = new Shader("res/shaders/sprite.vert", "res/shaders/sprite.frag");
+    Engine::pMeshShader = new Shader("res/shaders/mesh.vert", "res/shaders/mesh.frag");
 
     Engine::pMesh = new Mesh();
     Engine::pMesh->vertices = {
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-        0.5f,  -0.5f, 0.0f, 0.0f, 0.0f,
-        -0.5f,  0.5f, 0.0f, 0.0f, 0.0f,
-        0.5f,   0.5f, 0.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, 0.0f, 0.0f,
+        0.5f,  -0.5f, 0.0f, 0.0f,
+        -0.5f,  0.5f, 0.0f, 0.0f,
+        0.5f,   0.5f, 0.0f, 0.0f,
          };
     Engine::pMesh->indices = {
         2, 1, 0,

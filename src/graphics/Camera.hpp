@@ -34,13 +34,19 @@ public:
 
     Window &window;
 
+    // view matrix
     mat4 getView();
 
     mat4 getViewFromNull();
 
+    // projection matrix
     mat4 getProjection();
 
+    // orthographic projection (for 2d sprites)
     mat4 get_orthographic_projection();
+
+    // positioning 2d sprite in canvas (for 2d sprites)
+    mat4 get_canvas_positioning(/* enum for positions */);
 
     void move(float x, float y, float z);
 

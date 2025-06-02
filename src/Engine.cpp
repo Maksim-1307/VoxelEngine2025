@@ -13,6 +13,8 @@ Shader*       Engine::pMeshShader = nullptr;
 Mesh*         Engine::pMesh = nullptr;
 MeshRenderer* Engine::pRenderer = nullptr;
 Camera*       Engine::pCamera = nullptr;
+Canvas*       Engine::pCanvas = nullptr;
+Texture*      Engine::pTexture = nullptr;
 
 void Engine::init() {
     WindowArgs wargs;
@@ -25,16 +27,18 @@ void Engine::init() {
 
     Engine::pMesh = new Mesh();
     Engine::pMesh->vertices = {
-        -0.5f, -0.5f, 0.0f, 0.0f,
-        0.5f,  -0.5f, 0.0f, 0.0f,
-        -0.5f,  0.5f, 0.0f, 0.0f,
-        0.5f,   0.5f, 0.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f,
+        1.0f,  0.0f, 1.0f, 0.0f,
+        0.0f,  1.0f, 0.0f, 1.0f,
+        1.0f,   1.0f, 1.0f, 1.0f,
          };
     Engine::pMesh->indices = {
         2, 1, 0,
         2, 3, 1};
+    Engine::pTexture = new Texture("res/textures/test.jpg");
     Engine::pRenderer = new MeshRenderer(Engine::pMesh, MeshType::SPRITE2D);
     Engine::pCamera = new Camera(*Engine::pWindow);
+    Engine::pCanvas = new Canvas(*Engine::pWindow);
     // TEST
 }
 
@@ -55,9 +59,12 @@ void Engine::game_loop(){
 
         Engine::pSpriteShader->use();
 
-        glm::mat4 projection = Engine::pCamera->get_orthographic_projection();
+        glm::mat4 projection = Engine::pCanvas->get_projection();
+        glm::mat4 transform = Engine::pCanvas->get_positioning(POSITION::TOP, 0, POSITION::LEFT, 0);
+        // transform = 
 
-        Engine::pSpriteShader->set_matrix4("projection", projection);
+        Engine::pSpriteShader->set_matrix4("projection", projection * transform);
+        Engine::pSpriteShader->set_texture("theTexture", Engine::pTexture->getID());
         Engine::pRenderer->draw();
 
 

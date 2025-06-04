@@ -46,6 +46,8 @@ void Engine::init()
 void Engine::game_loop()
 {
 
+    FPSCounter* fpsCounter = new FPSCounter();
+
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection = glm::mat4(1.0f);
@@ -62,6 +64,7 @@ void Engine::game_loop()
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        fpsCounter->update(deltaTime);
         Engine::pCameraController->update(deltaTime);
 
         Engine::pMeshShader->use();
@@ -74,8 +77,6 @@ void Engine::game_loop()
         Engine::pMeshShader->set_matrix4("projection", projection);
         Engine::pMeshShader->set_texture("theTexture", Engine::pTexture->getID());
         Engine::pRenderer->draw();
-
-        std::cout << 1.0f / deltaTime << "\n";
 
         glfwSwapBuffers(Engine::pWindow->get_glfw_window());
         glfwPollEvents();

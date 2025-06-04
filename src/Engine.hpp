@@ -8,6 +8,7 @@
 #include "graphics/CameraController.hpp"
 #include "graphics/Canvas.hpp"
 #include "graphics/Texture.hpp"
+#include "logic/FPSCounter.hpp"
 
 class Engine {
     public:

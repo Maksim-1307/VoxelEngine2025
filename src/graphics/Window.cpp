@@ -31,6 +31,7 @@ Window::Window(WindowArgs args)
 
     glfwMakeContextCurrent(GLFWwindow);
     glfwSetWindowSizeCallback(GLFWwindow, windowSizeCallback);
+    glfwSwapInterval(0);
 
     glewExperimental = GL_TRUE;
     GLenum gl_err = glewInit();
@@ -56,7 +57,6 @@ bool Window::should_close(){
 void windowSizeCallback(GLFWwindow * pWindow, int width, int height)
 {
     /*
-
     Width and height from argument are two times smaller than values obtained
     from glfwGetFramebufferSize.
     Maybe because of retina

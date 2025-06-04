@@ -5,6 +5,7 @@
 #include "graphics/MeshRenderer.hpp"
 #include "graphics/Shader.hpp"
 #include "graphics/Camera.hpp"
+#include "graphics/CameraController.hpp"
 #include "graphics/Canvas.hpp"
 #include "graphics/Texture.hpp"
 
@@ -20,6 +21,7 @@ class Engine {
         static Mesh* pMesh;
         static MeshRenderer* pRenderer;
         static Camera* pCamera;
+        static CameraController *pCameraController;
         static Canvas* pCanvas;
         static Texture* pTexture;
 };

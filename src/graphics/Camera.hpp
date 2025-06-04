@@ -21,7 +21,7 @@ class Camera
 public:
     Camera(Window &window);
 
-    vec3 position = vec3(0, 1, 3);
+    vec3 position = vec3(0, 0, 0);
     vec3 front;
     vec3 right;
     vec3 up;
@@ -44,9 +44,6 @@ public:
 
     // orthographic projection (for 2d sprites)
     mat4 get_orthographic_projection();
-
-    // positioning 2d sprite in canvas (for 2d sprites)
-    mat4 get_canvas_positioning(/* enum for positions */);
 
     void move(float x, float y, float z);
 

@@ -66,7 +66,3 @@ mat4 Camera::get_orthographic_projection()
     float aspectRatio = window.get_ratio();
     return ortho(-1.0f, 1.0f, -1.0f / aspectRatio, 1.0f / aspectRatio, -1.0f, 1.0f);
 }
-
-mat4 Camera::get_canvas_positioning(/* enum for positions */){
-    
-}

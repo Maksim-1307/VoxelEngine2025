@@ -11,7 +11,9 @@ Window *Engine::pWindow = nullptr;
 Shader *Engine::pSpriteShader = nullptr;
 Shader *Engine::pMeshShader = nullptr;
 Mesh *Engine::pMesh = nullptr;
+Mesh *Engine::pSprite = nullptr;
 MeshRenderer *Engine::pRenderer = nullptr;
+MeshRenderer *Engine::pSpriteRenderer = nullptr;
 Camera *Engine::pCamera = nullptr;
 CameraController *Engine::pCameraController = nullptr;
 Canvas *Engine::pCanvas = nullptr;
@@ -36,8 +38,20 @@ void Engine::init()
     Engine::pMesh->indices = {
         2, 1, 0,
         2, 3, 1};
+
+    Engine::pSprite = new Mesh();
+    Engine::pSprite->vertices = {
+        0.0f, 0.0f, 0.0f, 0.0f,
+        100.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 100.0f, 0.0f, 1.0f,
+        100.0f, 100.0f, 1.0f, 1.0f};
+    Engine::pSprite->indices = {
+        2, 1, 0,
+        2, 3, 1};
+
     Engine::pTexture = new Texture("res/textures/test.jpg");
     Engine::pRenderer = new MeshRenderer(Engine::pMesh, MeshType::MESH3D);
+    Engine::pSpriteRenderer = new MeshRenderer(Engine::pSprite, MeshType::SPRITE2D);
     Engine::pCamera = new Camera(*Engine::pWindow);
     Engine::pCameraController = new CameraController(*Engine::pCamera, *Engine::pWindow);
     Engine::pCanvas = new Canvas(*Engine::pWindow);
@@ -67,6 +81,7 @@ void Engine::game_loop()
         fpsCounter->update(deltaTime);
         Engine::pCameraController->update(deltaTime);
 
+        // rendering a mesh
         Engine::pMeshShader->use();
 
         view = pCamera->getView();
@@ -77,6 +92,16 @@ void Engine::game_loop()
         Engine::pMeshShader->set_matrix4("projection", projection);
         Engine::pMeshShader->set_texture("theTexture", Engine::pTexture->getID());
         Engine::pRenderer->draw();
+
+        // rendering a sprite
+        Engine::pSpriteShader->use();
+
+        projection = pCanvas->get_projection();
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 10.0f, 0.0f));
+
+        Engine::pSpriteShader->set_matrix4("projection", projection * transform);
+        Engine::pSpriteShader->set_texture("theTexture", Engine::pTexture->getID());
+        Engine::pSpriteRenderer->draw();
 
         glfwSwapBuffers(Engine::pWindow->get_glfw_window());
         glfwPollEvents();

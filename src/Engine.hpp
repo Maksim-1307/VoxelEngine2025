@@ -20,7 +20,9 @@ class Engine {
         static Shader* pSpriteShader;
         static Shader* pMeshShader;
         static Mesh* pMesh;
+        static Mesh* pSprite;
         static MeshRenderer* pRenderer;
+        static MeshRenderer *pSpriteRenderer;
         static Camera* pCamera;
         static CameraController *pCameraController;
         static Canvas* pCanvas;

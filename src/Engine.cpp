@@ -18,6 +18,7 @@ Camera *Engine::pCamera = nullptr;
 CameraController *Engine::pCameraController = nullptr;
 Canvas *Engine::pCanvas = nullptr;
 Texture *Engine::pTexture = nullptr;
+Text *Engine::pText = nullptr;
 
 void Engine::init()
 {
@@ -55,6 +56,8 @@ void Engine::init()
     Engine::pCamera = new Camera(*Engine::pWindow);
     Engine::pCameraController = new CameraController(*Engine::pCamera, *Engine::pWindow);
     Engine::pCanvas = new Canvas(*Engine::pWindow);
+    std::string ss = "sfdsfsd";
+    Engine::pText = new Text(ss);
 }
 
 void Engine::game_loop()
@@ -101,7 +104,10 @@ void Engine::game_loop()
 
         Engine::pSpriteShader->set_matrix4("projection", projection * transform);
         Engine::pSpriteShader->set_texture("theTexture", Engine::pTexture->getID());
-        Engine::pSpriteRenderer->draw();
+        // Engine::pSpriteRenderer->draw();
+
+        Engine::pSpriteShader->set_texture("theTexture", Engine::pText->get_texture()->getID());
+        Engine::pText->draw();
 
         glfwSwapBuffers(Engine::pWindow->get_glfw_window());
         glfwPollEvents();

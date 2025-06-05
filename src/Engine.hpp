@@ -8,7 +8,9 @@
 #include "graphics/CameraController.hpp"
 #include "graphics/Canvas.hpp"
 #include "graphics/Texture.hpp"
+#include "graphics/Font.hpp"
 #include "logic/FPSCounter.hpp"
+
 
 class Engine {
     public:
@@ -27,4 +29,5 @@ class Engine {
         static CameraController *pCameraController;
         static Canvas* pCanvas;
         static Texture* pTexture;
+        static Text* pText;
 };

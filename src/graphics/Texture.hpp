@@ -7,7 +7,7 @@ class Texture
 {
 
 public:
-    Texture(std::string texturePath);
+    Texture(std::string texturePath, bool alpha=false);
     Texture(){};
     ~Texture();
 

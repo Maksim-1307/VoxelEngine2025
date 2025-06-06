@@ -2,15 +2,15 @@
 
 #include <iostream>
 
-#include "Window.hpp"
-#include "Camera.hpp"
+#include "src/graphics/Window.hpp"
+#include "src/graphics/Camera.hpp"
 
 using namespace glm;
 
-class CameraController
+class InputController
 {
 public:
-    CameraController(Camera &camera, Window &window);
+    InputController(Camera &camera, Window &window);
     void update(float deltaTime);
 
 private:

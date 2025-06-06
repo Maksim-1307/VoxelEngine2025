@@ -1,7 +1,7 @@
 #include "Texture.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "lib/stb_image.h"
+#include "include/stb_image.h"
 
 Texture::Texture(std::string texturePath, bool alpha){
 

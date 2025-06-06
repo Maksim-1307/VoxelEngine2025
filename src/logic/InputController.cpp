@@ -1,12 +1,13 @@
-#include "CameraController.hpp"
+#include "InputController.hpp"
 
-CameraController::CameraController(Camera &camera, Window &window)
+InputController::InputController(Camera &camera, Window &window)
 {
     this->pCamera = &camera;
     this->pWindow = &window;
 }
 
-void CameraController::update(float deltaTime){
+void InputController::update(float deltaTime)
+{
     float speed = 1.0f;
     if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_W)) 
         pCamera->move(0, 0, -speed*deltaTime);

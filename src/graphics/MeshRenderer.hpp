@@ -23,10 +23,14 @@ class MeshRenderer {
             this->pMesh = pMesh;
             this->gen_buffers(type);
         };
+        ~MeshRenderer(){
+            clear_data();
+        }
         void draw();
 
     private:
         void gen_buffers(MeshType type);
+        void clear_data();
         Mesh* pMesh;
         GLuint VAO;
         GLuint VBO;

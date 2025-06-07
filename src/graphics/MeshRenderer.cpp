@@ -66,3 +66,9 @@ void MeshRenderer::draw(){
     glBindVertexArray(0);
 
 }
+
+void MeshRenderer::clear_data(){
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+    glDeleteVertexArrays(1, &VAO);
+}

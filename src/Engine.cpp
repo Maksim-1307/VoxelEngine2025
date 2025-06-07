@@ -85,6 +85,7 @@ void Engine::game_loop()
 
         fpsCounter->update(deltaTime);
         Engine::pInputController->update(deltaTime);
+        Engine::pText->update("Day 2\nMaking a Minecraft clone on OpenGL");
 
         // rendering a mesh
         Engine::pMeshShader->use();

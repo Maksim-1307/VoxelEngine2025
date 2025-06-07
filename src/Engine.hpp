@@ -8,8 +8,10 @@
 #include "graphics/Canvas.hpp"
 #include "graphics/Texture.hpp"
 #include "graphics/Text.hpp"
+#include "graphics/ChunkMeshBuilder.hpp"
 #include "logic/FPSCounter.hpp"
 #include "logic/InputController.hpp"
+#include "voxels/Chunk.hpp"
 
 
 class Engine {
@@ -31,4 +33,6 @@ class Engine {
         static Canvas* pCanvas;
         static Texture* pTexture;
         static Text* pText;
+        static Chunk* pChunk;
+        static ChunkMeshBuilder *pChunkMeshBuilder;
 };

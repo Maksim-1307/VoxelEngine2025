@@ -20,6 +20,8 @@ InputController *Engine::pInputController = nullptr;
 Canvas *Engine::pCanvas = nullptr;
 Texture *Engine::pTexture = nullptr;
 Text *Engine::pText = nullptr;
+Chunk *Engine::pChunk = nullptr;
+ChunkMeshBuilder *Engine::pChunkMeshBuilder = nullptr;
 
 void Engine::init()
 {
@@ -32,15 +34,15 @@ void Engine::init()
     Engine::pMeshShader = new Shader("res/shaders/mesh.vert", "res/shaders/mesh.frag");
 
     Engine::pMesh = new Mesh();
-    Engine::pMesh->vertices = {
-        0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-        1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-        0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 1.0f, 1.0f, 1.0f, 1.0f
-    };
-    Engine::pMesh->indices = {
-        2, 1, 0,
-        2, 3, 1};
+    // Engine::pMesh->vertices = {
+    //     0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+    //     1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+    //     0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+    //     1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+    // };
+    // Engine::pMesh->indices = {
+    //     2, 1, 0,
+    //     2, 3, 1};
 
     Engine::pSprite = new Mesh();
     Engine::pSprite->vertices = {
@@ -52,13 +54,19 @@ void Engine::init()
         2, 1, 0,
         2, 3, 1};
 
+    Engine::pChunk = new Chunk();
+    Engine::pChunk->set_voxel(0, 0, 0, {1, 0});
+    Engine::pChunk->set_voxel(2, 0, 0, {1, 0});
+    Engine::pChunkMeshBuilder = new ChunkMeshBuilder();
+
+    Engine::pMesh = Engine::pChunkMeshBuilder->buildMesh(*Engine::pChunk);
     Engine::pTexture = new Texture("res/textures/test.jpg");
     Engine::pRenderer = new MeshRenderer(Engine::pMesh, MeshType::MESH3D);
     Engine::pSpriteRenderer = new MeshRenderer(Engine::pSprite, MeshType::SPRITE2D);
     Engine::pCamera = new Camera(*Engine::pWindow);
     Engine::pInputController = new InputController(*Engine::pCamera, *Engine::pWindow);
     Engine::pCanvas = new Canvas(*Engine::pWindow);
-    std::string ss = "Day 2\nMaking a Minecraft clone on OpenGL";
+    std::string ss = "Day 3\nMaking a Minecraft clone on OpenGL";
     Engine::pText = new Text(ss);
 }
 
@@ -85,7 +93,7 @@ void Engine::game_loop()
 
         fpsCounter->update(deltaTime);
         Engine::pInputController->update(deltaTime);
-        Engine::pText->update("Day 2\nMaking a Minecraft clone on OpenGL");
+        Engine::pText->update("Day 3\nMaking a Minecraft clone on OpenGL");
 
         // rendering a mesh
         Engine::pMeshShader->use();

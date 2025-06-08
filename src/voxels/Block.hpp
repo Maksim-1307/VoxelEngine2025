@@ -18,8 +18,11 @@ public:
     {
         return blocks[id];
     }
+    std::array<bool, 6> opened_faces(int x, int y, int z){
+        return {0, 0, 0, 0, 0, 0};
+    }
 
-private:  
+    private : 
     const BlockModel model;
     uint8_t VoxelId : ID_SIZE;
     // stores blocks data in format blocks[voxelId] -> Block

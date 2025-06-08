@@ -55,8 +55,10 @@ void Engine::init()
         2, 3, 1};
 
     Engine::pChunk = new Chunk();
-    Engine::pChunk->set_voxel(0, 0, 0, {1, 0});
-    Engine::pChunk->set_voxel(2, 0, 0, {1, 0});
+    Engine::pChunk->set_voxel(2, 2, 2, {1, 0});
+    Engine::pChunk->set_voxel(2, 3, 3, {1, 0});
+    Engine::pChunk->set_voxel(3, 2, 3, {1, 0});
+    Engine::pChunk->set_voxel(2, 2, 3, {1, 0});
     Engine::pChunkMeshBuilder = new ChunkMeshBuilder();
 
     Engine::pMesh = Engine::pChunkMeshBuilder->buildMesh(*Engine::pChunk);

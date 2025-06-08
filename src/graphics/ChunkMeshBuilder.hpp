@@ -8,6 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Mesh.hpp"
+#include "src/voxels/Block.hpp"
 #include "src/voxels/Chunk.hpp"
 
 #define ATLAS_SIZE 8
@@ -23,6 +24,8 @@ public:
         indices.clear();
         vertices.reserve(1000);
         indices.reserve(500);
+
+        this->chunk = &chunk;
 
         indexOffset = 0;
 
@@ -51,7 +54,8 @@ public:
 private: 
 
     void CubeModel(int x, int y, int z){
-        bool openedFaces[6] = {true, true, true, true, true, true}; // OpenedAround(x, y, z);
+        if (x == 0 || y == 0 || z == 0 || x == 16 || z == 16 || y == 256) return;
+        std::array<bool, 6> openedFaces = opened_around(x, y, z);
         // Block block = Block.GetBlockByVoxelId(VoxelStorage.GetVoxel(x, y, z).Id);
 
         for (int face = 0; face < 6; face++)
@@ -121,6 +125,38 @@ private:
         }
     }
 
+    // std::array<bool, 6> opened_around(int x, int y, int z)
+    // {
+    //     std::array<bool, 6> opened;// = new bool[6];
+    //     opened[0] = Block::getBlockByVoxelId(chunk->get_voxel(x + 1, y, z).id).opened_faces[adjacent(0)];
+    //     opened[1] = Block::getBlockByVoxelId(chunk->get_voxel(x - 1, y, z).id).opened_faces[adjacent(1)];
+    //     opened[2] = Block::getBlockByVoxelId(chunk->get_voxel(x, y + 1, z).id).opened_faces[adjacent(2)];
+    //     opened[3] = Block::getBlockByVoxelId(chunk->get_voxel(x, y - 1, z).id).opened_faces[adjacent(3)];
+    //     opened[4] = Block::getBlockByVoxelId(chunk->get_voxel(x, y, z + 1).id).opened_faces[adjacent(4)];
+    //     opened[5] = Block::getBlockByVoxelId(chunk->get_voxel(x, y, z - 1).id).opened_faces[adjacent(5)];
+
+    //     return opened;
+    // }
+
+    std::array<bool, 6> opened_around(int x, int y, int z)
+    {
+        std::array<bool, 6> opened;
+        opened[0] = chunk->get_voxel(x + 1, y, z).id == 0;
+        opened[1] = chunk->get_voxel(x - 1, y, z).id == 0;
+        opened[2] = chunk->get_voxel(x, y + 1, z).id == 0;
+        opened[3] = chunk->get_voxel(x, y - 1, z).id == 0;
+        opened[4] = chunk->get_voxel(x, y, z + 1).id == 0;
+        opened[5] = chunk->get_voxel(x, y, z - 1).id == 0;
+
+        return opened;
+    }
+
+    int adjacent(int face) 
+    {
+        if (face % 2 == 0) return face + 1;
+        return face - 1;
+    }
+
     void vertex(float x, float y, float z, float u, float v)
     {
         const float newVertex[] = {_x + x, _y + y, _z + z, u, v};
@@ -143,4 +179,5 @@ private:
     unsigned int indexOffset = 0;
     unsigned int _x, _y, _z;
     unsigned int _face;
+    Chunk* chunk;
 };

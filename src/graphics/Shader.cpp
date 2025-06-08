@@ -44,7 +44,7 @@ Shader::~Shader()
     glDeleteProgram(ID);
 }
 
-bool Shader::use()
+void Shader::use()
 {
     glUseProgram(ID);
 }

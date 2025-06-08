@@ -21,7 +21,7 @@ public:
 
     GLuint getID();
 
-    bool use();
+    void use();
 
     bool is_compiled();
 

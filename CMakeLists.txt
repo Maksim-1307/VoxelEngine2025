@@ -7,7 +7,7 @@ file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
 add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES})
 
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)

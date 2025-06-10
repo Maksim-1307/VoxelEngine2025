@@ -7,26 +7,31 @@
 
 class Block{
 public:
-    Block(std::string name, BlockModel model); //: name(name), model(model);
+    Block(std::string name, BlockModel model, std::vector<std::tuple<size_t, size_t>> UVs); //: name(name), model(model);
     const std::string name;
 
     BlockModel getBlockModel() const {
         return model;
     }
 
-    static Block getBlockByVoxelId(size_t id)
+    static const Block& getBlockByVoxelId(size_t id) 
     {
-        return blocks[id];
+        return *blocks[id];
     }
-    std::array<bool, 6> opened_faces(int x, int y, int z){
-        return {0, 0, 0, 0, 0, 0};
-    }
+    std::array<bool, 6> opened_faces;
 
-    private : 
+    std::tuple<size_t, size_t> getUV(int face);
+
+    private : static void add_block(Block *block)
+    {
+        Block::blocks.push_back(block);
+        block->voxelId = Block::blocks.size() - 1;
+    }
+    const std::vector<std::tuple<size_t, size_t>> UVs;
     const BlockModel model;
-    uint8_t VoxelId : ID_SIZE;
+    uint8_t voxelId : ID_SIZE;
     // stores blocks data in format blocks[voxelId] -> Block
-    static std::vector<Block> blocks;
+    static std::vector<Block*> blocks;
 };
 
 

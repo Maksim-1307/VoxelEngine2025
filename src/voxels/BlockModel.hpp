@@ -1,5 +1,5 @@
 #pragma once
 
-class BlockModel{
-    
+enum class BlockModel{
+    AIR, SOLID
 };

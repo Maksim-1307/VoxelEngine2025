@@ -11,7 +11,7 @@
 #include "src/voxels/Block.hpp"
 #include "src/voxels/Chunk.hpp"
 
-#define ATLAS_SIZE 8
+#define ATLAS_SIZE 6
 
 
 class ChunkMeshBuilder {
@@ -56,7 +56,7 @@ private:
     void CubeModel(int x, int y, int z){
         if (x == 0 || y == 0 || z == 0 || x == 16 || z == 16 || y == 256) return;
         std::array<bool, 6> openedFaces = opened_around(x, y, z);
-        // Block block = Block.GetBlockByVoxelId(VoxelStorage.GetVoxel(x, y, z).Id);
+        Block block = Block::getBlockByVoxelId(chunk->get_voxel(x, y, z).id);
 
         for (int face = 0; face < 6; face++)
         {
@@ -64,7 +64,9 @@ private:
             {
                 // (uint x, uint y) blockFaceUV = block.GetUV((byte)face); // standart
                 // (float x, float y) uv = ((float)blockFaceUV.x / ATLAS_SIZE, (float)blockFaceUV.y / ATLAS_SIZE); // normalized
-                glm::vec2 uv = glm::vec2(0.0f, 0.0f);
+                size_t UVx = std::get<0>(block.getUV(face));
+                size_t UVy = std::get<1>(block.getUV(face));
+                glm::vec2 uv = glm::vec2((float)UVx / ATLAS_SIZE, (float)UVy / ATLAS_SIZE);
                 _face = face;
                 switch (face)
                 {
@@ -125,28 +127,15 @@ private:
         }
     }
 
-    // std::array<bool, 6> opened_around(int x, int y, int z)
-    // {
-    //     std::array<bool, 6> opened;// = new bool[6];
-    //     opened[0] = Block::getBlockByVoxelId(chunk->get_voxel(x + 1, y, z).id).opened_faces[adjacent(0)];
-    //     opened[1] = Block::getBlockByVoxelId(chunk->get_voxel(x - 1, y, z).id).opened_faces[adjacent(1)];
-    //     opened[2] = Block::getBlockByVoxelId(chunk->get_voxel(x, y + 1, z).id).opened_faces[adjacent(2)];
-    //     opened[3] = Block::getBlockByVoxelId(chunk->get_voxel(x, y - 1, z).id).opened_faces[adjacent(3)];
-    //     opened[4] = Block::getBlockByVoxelId(chunk->get_voxel(x, y, z + 1).id).opened_faces[adjacent(4)];
-    //     opened[5] = Block::getBlockByVoxelId(chunk->get_voxel(x, y, z - 1).id).opened_faces[adjacent(5)];
-
-    //     return opened;
-    // }
-
     std::array<bool, 6> opened_around(int x, int y, int z)
     {
-        std::array<bool, 6> opened;
-        opened[0] = chunk->get_voxel(x + 1, y, z).id == 0;
-        opened[1] = chunk->get_voxel(x - 1, y, z).id == 0;
-        opened[2] = chunk->get_voxel(x, y + 1, z).id == 0;
-        opened[3] = chunk->get_voxel(x, y - 1, z).id == 0;
-        opened[4] = chunk->get_voxel(x, y, z + 1).id == 0;
-        opened[5] = chunk->get_voxel(x, y, z - 1).id == 0;
+        std::array<bool, 6> opened;// = new bool[6];
+        opened[0] = Block::getBlockByVoxelId(chunk->get_voxel(x + 1, y, z).id).opened_faces[adjacent(0)];
+        opened[1] = Block::getBlockByVoxelId(chunk->get_voxel(x - 1, y, z).id).opened_faces[adjacent(1)];
+        opened[2] = Block::getBlockByVoxelId(chunk->get_voxel(x, y + 1, z).id).opened_faces[adjacent(2)];
+        opened[3] = Block::getBlockByVoxelId(chunk->get_voxel(x, y - 1, z).id).opened_faces[adjacent(3)];
+        opened[4] = Block::getBlockByVoxelId(chunk->get_voxel(x, y, z + 1).id).opened_faces[adjacent(4)];
+        opened[5] = Block::getBlockByVoxelId(chunk->get_voxel(x, y, z - 1).id).opened_faces[adjacent(5)];
 
         return opened;
     }

@@ -25,6 +25,11 @@ ChunkMeshBuilder *Engine::pChunkMeshBuilder = nullptr;
 
 void Engine::init()
 {
+
+    new Block("air", BlockModel::AIR,     {});
+    new Block("dirt", BlockModel::SOLID,  {{1, 1}});
+    new Block("stone", BlockModel::SOLID, {{1, 0}});
+
     WindowArgs wargs;
     wargs.name = "VoxelEngine";
     Engine::pWindow = new Window(wargs);
@@ -57,18 +62,18 @@ void Engine::init()
     Engine::pChunk = new Chunk();
     Engine::pChunk->set_voxel(2, 2, 2, {1, 0});
     Engine::pChunk->set_voxel(2, 3, 3, {1, 0});
-    Engine::pChunk->set_voxel(3, 2, 3, {1, 0});
-    Engine::pChunk->set_voxel(2, 2, 3, {1, 0});
+    Engine::pChunk->set_voxel(3, 2, 3, {2, 0});
+    Engine::pChunk->set_voxel(2, 2, 3, {2, 0});
     Engine::pChunkMeshBuilder = new ChunkMeshBuilder();
 
     Engine::pMesh = Engine::pChunkMeshBuilder->buildMesh(*Engine::pChunk);
-    Engine::pTexture = new Texture("res/textures/test.jpg");
+    Engine::pTexture = new Texture("res/textures/atlas.png", true);
     Engine::pRenderer = new MeshRenderer(Engine::pMesh, MeshType::MESH3D);
     Engine::pSpriteRenderer = new MeshRenderer(Engine::pSprite, MeshType::SPRITE2D);
     Engine::pCamera = new Camera(*Engine::pWindow);
     Engine::pInputController = new InputController(*Engine::pCamera, *Engine::pWindow);
     Engine::pCanvas = new Canvas(*Engine::pWindow);
-    std::string ss = "Day 3\nMaking a Minecraft clone on OpenGL";
+    std::string ss = "Day 5\nMaking a Minecraft clone on OpenGL";
     Engine::pText = new Text(ss);
 }
 
@@ -95,7 +100,7 @@ void Engine::game_loop()
 
         fpsCounter->update(deltaTime);
         Engine::pInputController->update(deltaTime);
-        Engine::pText->update("Day 3\nMaking a Minecraft clone on OpenGL");
+        //Engine::pText->update("Day 3\nMaking a Minecraft clone on OpenGL");
 
         // rendering a mesh
         Engine::pMeshShader->use();

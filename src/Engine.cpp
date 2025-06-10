@@ -27,8 +27,11 @@ void Engine::init()
 {
 
     new Block("air", BlockModel::AIR,     {});
-    new Block("dirt", BlockModel::SOLID,  {{1, 1}});
+    new Block("dirt", BlockModel::SOLID,  {{0, 1}});
     new Block("stone", BlockModel::SOLID, {{1, 0}});
+    new Block("grass", BlockModel::SOLID, {{1, 1}, {0, 0}, {0, 1}});
+    new Block("oak_log", BlockModel::SOLID, {{2, 1}, {0, 2}, {2, 1}});
+    new Block("leaves", BlockModel::SOLID, {{1, 2}});
 
     WindowArgs wargs;
     wargs.name = "VoxelEngine";
@@ -62,8 +65,10 @@ void Engine::init()
     Engine::pChunk = new Chunk();
     Engine::pChunk->set_voxel(2, 2, 2, {1, 0});
     Engine::pChunk->set_voxel(2, 3, 3, {1, 0});
-    Engine::pChunk->set_voxel(3, 2, 3, {2, 0});
-    Engine::pChunk->set_voxel(2, 2, 3, {2, 0});
+    Engine::pChunk->set_voxel(3, 3, 3, {2, 0});
+    Engine::pChunk->set_voxel(5, 3, 3, {3, 0});
+    Engine::pChunk->set_voxel(7, 3, 3, {4, 0});
+    Engine::pChunk->set_voxel(9, 3, 3, {5, 0});
     Engine::pChunkMeshBuilder = new ChunkMeshBuilder();
 
     Engine::pMesh = Engine::pChunkMeshBuilder->buildMesh(*Engine::pChunk);

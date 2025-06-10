@@ -41,7 +41,6 @@ public:
                 for (_y = 0; _y < CHUNK_H; _y++)
                 {
                     if (chunk.get_voxel(_x, _y, _z).id != 0){
-                        std::cout << "solid vox\n";
                         CubeModel(_x, _y, _z);
                     }
                 }

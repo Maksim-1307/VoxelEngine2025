@@ -22,12 +22,14 @@ public:
 
     std::tuple<size_t, size_t> getUV(int face);
 
-    private : static void add_block(Block *block)
+    private : 
+    static void add_block(Block *block)
     {
         Block::blocks.push_back(block);
         block->voxelId = Block::blocks.size() - 1;
     }
-    const std::vector<std::tuple<size_t, size_t>> UVs;
+    void set_UVs(std::vector<std::tuple<size_t, size_t>>& UV);
+    std::array<std::tuple<size_t, size_t>, 6> UVs;
     const BlockModel model;
     uint8_t voxelId : ID_SIZE;
     // stores blocks data in format blocks[voxelId] -> Block

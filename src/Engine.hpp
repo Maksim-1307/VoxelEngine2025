@@ -12,6 +12,8 @@
 #include "logic/FPSCounter.hpp"
 #include "logic/InputController.hpp"
 #include "voxels/Chunk.hpp"
+#include "logic/AreaMap3D.hpp"
+#include "voxels/Generator.hpp"
 
 
 class Engine {
@@ -35,4 +37,6 @@ class Engine {
         static Text* pText;
         static Chunk* pChunk;
         static ChunkMeshBuilder *pChunkMeshBuilder;
+        static AreaMap3D<Chunk>* pChunkMap;
+        static Generator* pGenerator;
 };

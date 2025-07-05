@@ -4,9 +4,10 @@
 
 #include "src/logic/Array3D.hpp"
 #include "voxel.hpp"
+#include "src/graphics/MeshRenderer.hpp"
 
 #define CHUNK_W 16
-#define CHUNK_H 256
+#define CHUNK_H 16
 
 
 class Chunk{
@@ -14,6 +15,7 @@ public:
     Chunk(){};
     Chunk(const Chunk &) = delete;
     Chunk &operator=(const Chunk &) = delete;
+    MeshRenderer* renderer;
     void set_voxel(size_t x, size_t y, size_t z, const voxel voxel)
     {
         voxels.set(x, y, z, voxel);

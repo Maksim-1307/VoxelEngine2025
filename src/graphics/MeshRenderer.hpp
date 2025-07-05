@@ -27,6 +27,7 @@ class MeshRenderer {
             clear_data();
         }
         void draw();
+        glm::mat4 transform = glm::mat4(1.0f);
 
     private:
         void gen_buffers(MeshType type);

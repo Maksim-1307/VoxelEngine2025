@@ -14,27 +14,14 @@ Mesh* ChunkMeshBuilder::buildMesh(Chunk &chunk)
 
     this->chunkX = this->chunk->X * CHUNK_W;
     this->chunkY = this->chunk->Y * CHUNK_H;
-    this->chunkZ = this->chunk->X * CHUNK_W;
-    // std::cout << this->chunkX << "chunkXX\n\n";
-    int blockX = chunkX * CHUNK_W;
-    int blockZ = chunkZ * CHUNK_W;
-
-    Chunk *ccc = Engine::pChunkMap->get(this->chunk->X, this->chunk->Y, this->chunk->Z);
-    // std::cout << this->chunk->X << " " << this->chunk->Y << " " << this->chunk->Z << "\n";
-    
+    this->chunkZ = this->chunk->Z * CHUNK_W;
 
     for (_x = 0; _x < CHUNK_W; _x++)
     {
-        for (_z = 0; _z < CHUNK_W; _z++)
+        for (_y = 0; _y < CHUNK_H; _y++)
         {
-            for (_y = 0; _y < CHUNK_H; _y++)
+            for (_z = 0; _z < CHUNK_W; _z++)
             {
-                // std::cout << "chunkX " << this->chunkX + _x << " = " << this->chunkX << " + " << _x << "\n";
-                // std::cout << "chunkX " << std::floor((this->chunkX + _x) / 16) << "\n";
-                // std::cout << _x << "_x\n";
-                // std::cout << std::floor((this->chunkX + _x) / 16) << " = " << this->chunkX + _x << " / 16 <- \n\n\n\n\n";
-                // std::cout << std::floor((this->chunkX + _x) / 16) << " " << std::floor((this->chunkY + _y) / 16) << " " << std::floor((this->chunkZ + _z) / 16) << " <-\n";
-                // std::cout << ccc->X << " " << ccc->Y << " " << ccc->Z << " <- \n\n";
                 if (Engine::pVoxelStorage->get_voxel(_x + chunkX, _y + chunkY, _z + chunkZ).id != 0)
                 {
                     CubeModel(_x, _y, _z);
@@ -47,8 +34,7 @@ Mesh* ChunkMeshBuilder::buildMesh(Chunk &chunk)
 
 void ChunkMeshBuilder::CubeModel(int x, int y, int z)
 {
-    // if (x == 0 || y == 0 || z == 0 || x == 16 || z == 16 || y == 16)
-    //     return;
+
     std::array<bool, 6> openedFaces = opened_around(x, y, z);
     Block block = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX, y + chunkY, z + chunkZ).id);
 
@@ -141,13 +127,11 @@ int ChunkMeshBuilder::adjacent(int face)
 
 void ChunkMeshBuilder::vertex(float x, float y, float z, float u, float v)
 {
-    // const float newVertex[] = {_x + x, _y + y, _z + z, u, v};
     vertices.push_back(_x + x);
     vertices.push_back(_y + y);
     vertices.push_back(_z + z);
     vertices.push_back(u);
     vertices.push_back(v);
-    // vertices.insert(vertices.end(), std::begin(newVertex), std::end(newVertex));
 }
 
 void ChunkMeshBuilder::index(uint a, uint b, uint c, uint d, uint e, uint f)

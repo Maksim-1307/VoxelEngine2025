@@ -75,10 +75,7 @@ void Engine::init()
     Engine::pChunk->set_voxel(9, 3, 3, {5, 0});
     Engine::pChunkMeshBuilder = new ChunkMeshBuilder();
 
-    // Engine::pMesh = Engine::pChunkMeshBuilder->buildMesh(*Engine::pChunk);
     Engine::pTexture = new Texture("res/textures/atlas.png", true);
-    // Engine::pRenderer = new MeshRenderer(Engine::pMesh, MeshType::MESH3D);
-    // Engine::pSpriteRenderer = new MeshRenderer(Engine::pSprite, MeshType::SPRITE2D);
     Engine::pCamera = new Camera(*Engine::pWindow);
     Engine::pInputController = new InputController(*Engine::pCamera, *Engine::pWindow);
     Engine::pCanvas = new Canvas(*Engine::pWindow);

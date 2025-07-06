@@ -30,7 +30,6 @@ private:
     
     void vertex(float x, float y, float z, float u, float v);
     void index(uint a, uint b, uint c, uint d, uint e, uint f);
-    
 
     std::vector<float> vertices = {};
     std::vector<uint> indices = {};

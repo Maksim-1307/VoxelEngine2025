@@ -81,7 +81,7 @@ void Engine::init()
     Engine::pCanvas = new Canvas(*Engine::pWindow);
     std::string ss = "Making a Minecraft clone on OpenGL";
     Engine::pText = new Text(ss);
-    Engine::pGenerator = new Generator("seed");
+    Engine::pGenerator = new Generator();
     Engine::pChunkMap = new AreaMap3D<Chunk>(6);
     std::function<Chunk *(int, int, int)> gen_func = [](int x, int y, int z) -> Chunk* 
     { 
@@ -126,7 +126,6 @@ void Engine::game_loop()
 
         fpsCounter->update(deltaTime);
         Engine::pInputController->update(deltaTime);
-        //Engine::pText->update("Day 3\nMaking a Minecraft clone on OpenGL");
 
         // rendering a mesh
         Engine::pMeshShader->use();

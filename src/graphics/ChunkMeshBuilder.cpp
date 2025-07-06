@@ -1,5 +1,5 @@
 #include "ChunkMeshBuilder.hpp"
-
+#include "src/Engine.hpp"
 
 Mesh* ChunkMeshBuilder::buildMesh(Chunk &chunk)
 {
@@ -12,10 +12,16 @@ Mesh* ChunkMeshBuilder::buildMesh(Chunk &chunk)
 
     indexOffset = 0;
 
-    int chunkX = 0;
-    int chunkZ = 0;
+    this->chunkX = this->chunk->X * CHUNK_W;
+    this->chunkY = this->chunk->Y * CHUNK_H;
+    this->chunkZ = this->chunk->X * CHUNK_W;
+    // std::cout << this->chunkX << "chunkXX\n\n";
     int blockX = chunkX * CHUNK_W;
     int blockZ = chunkZ * CHUNK_W;
+
+    Chunk *ccc = Engine::pChunkMap->get(this->chunk->X, this->chunk->Y, this->chunk->Z);
+    // std::cout << this->chunk->X << " " << this->chunk->Y << " " << this->chunk->Z << "\n";
+    
 
     for (_x = 0; _x < CHUNK_W; _x++)
     {
@@ -23,7 +29,13 @@ Mesh* ChunkMeshBuilder::buildMesh(Chunk &chunk)
         {
             for (_y = 0; _y < CHUNK_H; _y++)
             {
-                if (chunk.get_voxel(_x, _y, _z).id != 0)
+                // std::cout << "chunkX " << this->chunkX + _x << " = " << this->chunkX << " + " << _x << "\n";
+                // std::cout << "chunkX " << std::floor((this->chunkX + _x) / 16) << "\n";
+                // std::cout << _x << "_x\n";
+                // std::cout << std::floor((this->chunkX + _x) / 16) << " = " << this->chunkX + _x << " / 16 <- \n\n\n\n\n";
+                // std::cout << std::floor((this->chunkX + _x) / 16) << " " << std::floor((this->chunkY + _y) / 16) << " " << std::floor((this->chunkZ + _z) / 16) << " <-\n";
+                // std::cout << ccc->X << " " << ccc->Y << " " << ccc->Z << " <- \n\n";
+                if (Engine::pVoxelStorage->get_voxel(_x + chunkX, _y + chunkY, _z + chunkZ).id != 0)
                 {
                     CubeModel(_x, _y, _z);
                 }
@@ -35,10 +47,10 @@ Mesh* ChunkMeshBuilder::buildMesh(Chunk &chunk)
 
 void ChunkMeshBuilder::CubeModel(int x, int y, int z)
 {
-    if (x == 0 || y == 0 || z == 0 || x == 16 || z == 16 || y == 16)
-        return;
+    // if (x == 0 || y == 0 || z == 0 || x == 16 || z == 16 || y == 16)
+    //     return;
     std::array<bool, 6> openedFaces = opened_around(x, y, z);
-    Block block = Block::getBlockByVoxelId(chunk->get_voxel(x, y, z).id);
+    Block block = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX, y + chunkY, z + chunkZ).id);
 
     for (int face = 0; face < 6; face++)
     {
@@ -110,12 +122,12 @@ void ChunkMeshBuilder::CubeModel(int x, int y, int z)
 std::array<bool, 6> ChunkMeshBuilder::opened_around(int x, int y, int z)
 {
     std::array<bool, 6> opened;
-    opened[0] = Block::getBlockByVoxelId(chunk->get_voxel(x + 1, y, z).id).opened_faces[adjacent(0)];
-    opened[1] = Block::getBlockByVoxelId(chunk->get_voxel(x - 1, y, z).id).opened_faces[adjacent(1)];
-    opened[2] = Block::getBlockByVoxelId(chunk->get_voxel(x, y + 1, z).id).opened_faces[adjacent(2)];
-    opened[3] = Block::getBlockByVoxelId(chunk->get_voxel(x, y - 1, z).id).opened_faces[adjacent(3)];
-    opened[4] = Block::getBlockByVoxelId(chunk->get_voxel(x, y, z + 1).id).opened_faces[adjacent(4)];
-    opened[5] = Block::getBlockByVoxelId(chunk->get_voxel(x, y, z - 1).id).opened_faces[adjacent(5)];
+    opened[0] = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX + 1, y + chunkY, z + chunkZ).id).opened_faces[adjacent(0)];
+    opened[1] = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX - 1, y + chunkY, z + chunkZ).id).opened_faces[adjacent(1)];
+    opened[2] = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX, y + chunkY + 1, z + chunkZ).id).opened_faces[adjacent(2)];
+    opened[3] = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX, y + chunkY - 1, z + chunkZ).id).opened_faces[adjacent(3)];
+    opened[4] = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX, y + chunkY, z + chunkZ + 1).id).opened_faces[adjacent(4)];
+    opened[5] = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX, y + chunkY, z + chunkZ - 1).id).opened_faces[adjacent(5)];
 
     return opened;
 }

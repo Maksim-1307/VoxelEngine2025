@@ -14,6 +14,7 @@
 #include "voxels/Chunk.hpp"
 #include "logic/AreaMap3D.hpp"
 #include "voxels/Generator.hpp"
+#include "voxels/VoxelStorage.hpp"
 
 
 class Engine {
@@ -39,4 +40,5 @@ class Engine {
         static ChunkMeshBuilder *pChunkMeshBuilder;
         static AreaMap3D<Chunk>* pChunkMap;
         static Generator* pGenerator;
+        static VoxelStorage* pVoxelStorage;
 };

@@ -26,7 +26,7 @@ public:
             {
                 for (int z = 0; z < size; z++)
                 {
-                    secondBuffer->set(x, y, z, outCallback(x, y, z));
+                    secondBuffer->set(x, y, z, outCallback(x - size / 2, y - size / 2, z - size / 2));
                 }
             }
         }

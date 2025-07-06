@@ -16,6 +16,7 @@ public:
     Chunk(const Chunk &) = delete;
     Chunk &operator=(const Chunk &) = delete;
     MeshRenderer* renderer;
+    int X, Y, Z;
     void set_voxel(size_t x, size_t y, size_t z, const voxel voxel)
     {
         voxels.set(x, y, z, voxel);

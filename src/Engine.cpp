@@ -24,6 +24,7 @@ Chunk *Engine::pChunk = nullptr;
 ChunkMeshBuilder *Engine::pChunkMeshBuilder = nullptr;
 AreaMap3D<Chunk>* Engine::pChunkMap = nullptr;
 Generator *Engine::pGenerator = nullptr;
+VoxelStorage* Engine::pVoxelStorage = nullptr;
 
 void Engine::init()
 {
@@ -74,23 +75,24 @@ void Engine::init()
     Engine::pChunk->set_voxel(9, 3, 3, {5, 0});
     Engine::pChunkMeshBuilder = new ChunkMeshBuilder();
 
-    Engine::pMesh = Engine::pChunkMeshBuilder->buildMesh(*Engine::pChunk);
+    // Engine::pMesh = Engine::pChunkMeshBuilder->buildMesh(*Engine::pChunk);
     Engine::pTexture = new Texture("res/textures/atlas.png", true);
-    Engine::pRenderer = new MeshRenderer(Engine::pMesh, MeshType::MESH3D);
-    Engine::pSpriteRenderer = new MeshRenderer(Engine::pSprite, MeshType::SPRITE2D);
+    // Engine::pRenderer = new MeshRenderer(Engine::pMesh, MeshType::MESH3D);
+    // Engine::pSpriteRenderer = new MeshRenderer(Engine::pSprite, MeshType::SPRITE2D);
     Engine::pCamera = new Camera(*Engine::pWindow);
     Engine::pInputController = new InputController(*Engine::pCamera, *Engine::pWindow);
     Engine::pCanvas = new Canvas(*Engine::pWindow);
     std::string ss = "Making a Minecraft clone on OpenGL";
     Engine::pText = new Text(ss);
     Engine::pGenerator = new Generator("seed");
-    Engine::pChunkMap = new AreaMap3D<Chunk>(5);
+    Engine::pChunkMap = new AreaMap3D<Chunk>(6);
     std::function<Chunk *(int, int, int)> gen_func = [](int x, int y, int z) -> Chunk* 
     { 
         return Engine::pGenerator->generate_at(x, y, z);
     };
     Engine::pChunkMap->set_out_callback(gen_func);
     Engine::pChunkMap->fill();
+    Engine::pVoxelStorage = new VoxelStorage(Engine::pChunkMap);
 
     for (int x = -5; x < 5; x++) {
         for (int y = -5; y < 5; y++) {
@@ -98,7 +100,7 @@ void Engine::init()
                 Chunk* chunk = Engine::pChunkMap->get(x, y, z);
                 Mesh *mesh = Engine::pChunkMeshBuilder->buildMesh(*chunk);
                 chunk->renderer = new MeshRenderer(mesh, MeshType::MESH3D);
-                chunk->renderer->transform = glm::translate(glm::mat4(1.0f), glm::vec3(x*16,y*16,z*16));
+                chunk->renderer->transform = glm::translate(glm::mat4(1.0f), glm::vec3(chunk->X*16,chunk->Y*16,chunk->Z*16));
             }
         }
     }
@@ -139,7 +141,7 @@ void Engine::game_loop()
         Engine::pMeshShader->set_matrix4("view", view);
         Engine::pMeshShader->set_matrix4("projection", projection);
         Engine::pMeshShader->set_texture("theTexture", Engine::pTexture->getID());
-        Engine::pRenderer->draw();
+        // Engine::pRenderer->draw();
 
         for (int x = -5; x < 5; x++)
         {

@@ -11,9 +11,12 @@ Chunk *Generator::generate_at(int x, int y, int z)
     int Z = z * CHUNK_W;
 
     Chunk *chunk = new Chunk();
-    for (int x = 1; x < CHUNK_W-1; x++){
-        for (int y = 1; y < CHUNK_H-1; y++){
-            for (int z = 1; z < CHUNK_W-1; z++){
+    chunk->X = x;
+    chunk->Y = y;
+    chunk->Z = z;
+    for (int x = 0; x < CHUNK_W; x++){
+        for (int y = 0; y < CHUNK_H; y++){
+            for (int z = 0; z < CHUNK_W; z++){
                 float perlin = stb_perlin_noise3((x + X) / 10.038f, (y + Y) / 10.038f, (z + Z) / 10.038f, 0, 0, 0);
                 if (perlin > 0.5f){
                     chunk->set_voxel(x, y, z, {1, 0});

@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <cmath>
 #include "Mesh.hpp"
 #include "src/voxels/Block.hpp"
 #include "src/voxels/Chunk.hpp"
@@ -33,8 +34,9 @@ private:
 
     std::vector<float> vertices = {};
     std::vector<uint> indices = {};
-    unsigned int indexOffset = 0;
-    unsigned int _x, _y, _z;
-    unsigned int _face;
+    int indexOffset = 0;
+    int _x, _y, _z;
+    int _face;
+    int chunkX, chunkY, chunkZ;
     Chunk* chunk;
 };

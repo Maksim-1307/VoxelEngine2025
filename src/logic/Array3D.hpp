@@ -24,6 +24,9 @@ public:
         check_bounds(x, y, z);
         return data[x * (Y * Z) + y * Z + z];
     }
+    T* get_data() const {
+        return data;
+    }
     void set(size_t x, size_t y, size_t z, T val){
         check_bounds(x, y, z);
         data[x * (Y * Z) + y * Z + z] = val;

@@ -19,6 +19,9 @@ public:
     void set_out_callback(std::function<T*(int, int, int)> callback){
         this->outCallback = callback;
     }
+    T** get_data() const {
+        return this->firstBuffer->get_data();
+    }
     void fill(){
         for (int x = 0; x < size; x++)
         {
@@ -31,6 +34,9 @@ public:
             }
         }
         std::swap(firstBuffer, secondBuffer);
+    }
+    int get_size(){
+        return this->size;
     }
 
 private:

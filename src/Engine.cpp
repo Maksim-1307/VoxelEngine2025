@@ -25,6 +25,7 @@ ChunkMeshBuilder *Engine::pChunkMeshBuilder = nullptr;
 AreaMap3D<Chunk>* Engine::pChunkMap = nullptr;
 Generator *Engine::pGenerator = nullptr;
 VoxelStorage* Engine::pVoxelStorage = nullptr;
+ChunksController* Engine::pChunksController = nullptr;
 
 void Engine::init()
 {
@@ -88,19 +89,21 @@ void Engine::init()
         return Engine::pGenerator->generate_at(x, y, z);
     };
     Engine::pChunkMap->set_out_callback(gen_func);
-    Engine::pChunkMap->fill();
+    // Engine::pChunkMap->fill();
     Engine::pVoxelStorage = new VoxelStorage(Engine::pChunkMap);
+    Engine::pChunksController = new ChunksController(Engine::pChunkMap, Engine::pCamera);
 
-    for (int x = -5; x < 5; x++) {
-        for (int y = -5; y < 5; y++) {
-            for (int z = -5; z < 5; z++) {
-                Chunk* chunk = Engine::pChunkMap->get(x, y, z);
-                Mesh *mesh = Engine::pChunkMeshBuilder->buildMesh(*chunk);
-                chunk->renderer = new MeshRenderer(mesh, MeshType::MESH3D);
-                chunk->renderer->transform = glm::translate(glm::mat4(1.0f), glm::vec3(chunk->X*16,chunk->Y*16,chunk->Z*16));
-            }
-        }
-    }
+    // for (int x = -5; x < 5; x++) {
+    //     for (int y = -5; y < 5; y++) {
+    //         for (int z = -5; z < 5; z++) {
+    //             Chunk* chunk = Engine::pChunkMap->get(x, y, z);
+    //             Mesh *mesh = Engine::pChunkMeshBuilder->buildMesh(*chunk);
+    //             chunk->renderer = new MeshRenderer(mesh, MeshType::MESH3D);
+    //             chunk->renderer->transform = glm::translate(glm::mat4(1.0f), glm::vec3(chunk->X*16,chunk->Y*16,chunk->Z*16));
+    //         }
+    //     }
+    // }
+
 }
 
 void Engine::game_loop()
@@ -126,6 +129,7 @@ void Engine::game_loop()
 
         fpsCounter->update(deltaTime);
         Engine::pInputController->update(deltaTime);
+        Engine::pChunksController->update();
 
         // rendering a mesh
         Engine::pMeshShader->use();
@@ -139,21 +143,7 @@ void Engine::game_loop()
         Engine::pMeshShader->set_texture("theTexture", Engine::pTexture->getID());
         // Engine::pRenderer->draw();
 
-        for (int x = -5; x < 5; x++)
-        {
-            for (int y = -5; y < 5; y++)
-            {
-                for (int z = -5; z < 5; z++)
-                {
-                    Chunk *chunk = Engine::pChunkMap->get(x, y, z);
-                    // Mesh *mesh = Engine::pChunkMeshBuilder->buildMesh(*chunk);
-                    // new MeshRenderer(mesh, MeshType::MESH3D);
-                    // glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(x * 16, y * 16, z * 16));
-                    Engine::pMeshShader->set_matrix4("model", chunk->renderer->transform);
-                    chunk->renderer->draw();
-                }
-            }
-        }
+        Engine::pChunksController->draw_chunks();
 
         // rendering a sprite
         Engine::pTextShader->use();

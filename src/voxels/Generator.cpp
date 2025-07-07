@@ -17,7 +17,7 @@ Chunk *Generator::generate_at(int x, int y, int z)
     for (int x = 0; x < CHUNK_W; x++){
         for (int y = 0; y < CHUNK_H; y++){
             for (int z = 0; z < CHUNK_W; z++){
-                float perlin = stb_perlin_noise3_seed((x + X) / 10.038f, (y + Y) / 10.038f, (z + Z) / 10.038f, 0, 0, 0, this->seed);
+                float perlin = stb_perlin_noise3_seed((x + X) / 15.038f, (y + Y) / 15.038f, (z + Z) / 15.038f, 0, 0, 0, this->seed);
                 if (perlin > 0.5f){
                     chunk->set_voxel(x, y, z, {1, 0});
                 } else {

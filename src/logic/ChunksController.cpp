@@ -13,7 +13,7 @@ void ChunksController::update(){
         glm::ivec3 delta = currentPos - this->camPos;
         this->camPos = currentPos;
         std::cout << "movement\n";
-        // load_around
+        Engine::pChunkMap->translate(delta.x, delta.y, delta.z);
     }
 }
 
@@ -38,13 +38,53 @@ void ChunksController::load_around(glm::ivec3 center){
     }
 }
 
-void ChunksController::draw_chunks(){
-    Chunk** chunks = Engine::pChunkMap->get_data();
+// void ChunksController::draw_chunks(){
+//     Chunk** chunks = Engine::pChunkMap->get_data();
+//     int size = Engine::pChunkMap->get_size();
+//     for (int i = 0; i < size*size*size; i++){
+//         Chunk* chunk = chunks[i];
+//         if (chunk->renderer == nullptr) {
+//             // continue;
+//             int x = chunk->X; 
+//             int y = chunk->Y;
+//             int z = chunk->Z;
+
+//             if (Engine::pChunkMap->is_inside(x, y, z))
+//             {
+//                 handle_at(chunk->X, chunk->Y, chunk->Z);
+//             } else {
+//                 continue;
+//             }
+//         }
+//         Engine::pMeshShader->set_matrix4("model", chunk->renderer->transform);
+//         chunk->renderer->draw();
+//     }
+// }
+
+void ChunksController::draw_chunks()
+{
+    glm::ivec3 center = this->camPos;
+    for (int x = center.x - distance; x < center.x + distance; x++)
+    {
+        for (int y = center.y - distance; y < center.y + distance; y++)
+        {
+            for (int z = center.z - distance; z < center.z + distance; z++)
+            {
+                Chunk *chunk = Engine::pChunkMap->get(x, y, z);
+                if (chunk->renderer == nullptr)
+                {
+                    // continue;
+                    handle_at(chunk->X, chunk->Y, chunk->Z);
+                }
+                Engine::pMeshShader->set_matrix4("model", chunk->renderer->transform);
+                chunk->renderer->draw();
+            }
+        }
+    }
+    Chunk **chunks = Engine::pChunkMap->get_data();
     int size = Engine::pChunkMap->get_size();
-    for (int i = 0; i < size*size*size; i++){
-        Chunk* chunk = chunks[i];
-        if (chunk->renderer == nullptr) continue;
-        Engine::pMeshShader->set_matrix4("model", chunk->renderer->transform);
-        chunk->renderer->draw();
+    for (int i = 0; i < size * size * size; i++)
+    {
+        
     }
 }

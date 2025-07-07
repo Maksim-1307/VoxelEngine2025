@@ -35,8 +35,36 @@ public:
         }
         std::swap(firstBuffer, secondBuffer);
     }
+    void translate(int dX, int dY, int dZ){
+        if (dX == 0 && dY == 0 && dZ == 0) return;
+        for (int x = 0; x < size; x++)
+        {
+            for (int y = 0; y < size; y++)
+            {
+                for (int z = 0; z < size; z++)
+                {
+                    if (in_bounds(x + dX, y + dY, z + dZ)){
+                        secondBuffer->set(x, y, z, firstBuffer->get(x + dX, y + dY, z + dZ));
+                    } else {
+                        // secondBuffer->set(x, y, z, firstBuffer->get(x, y, z));
+                        secondBuffer->set(x, y, z, outCallback(x + dX - size / 2, y + dY - size / 2, z + dZ - size / 2));
+                    }
+                }
+            }
+        }
+        offsetX += dX;
+        offsetY += dY;
+        offsetZ += dZ;
+        std::swap(firstBuffer, secondBuffer);
+    }
     int get_size(){
         return this->size;
+    }
+    bool is_inside(int x, int y, int z){
+        x = x - offsetX + size / 2;
+        y = y - offsetY + size / 2;
+        z = z - offsetZ + size / 2;
+        return x > 0 && y > 0 && z > 0 && x < size-1 && y < size-1 && z < size-1;
     }
 
 private:
@@ -47,6 +75,9 @@ private:
     bool set(int x, int y, int z, T val);
     bool resize(int newSize);
     std::function<T*(int, int, int)> outCallback;
+    bool in_bounds(int x, int y, int z){
+        return x >= 0 && y >= 0 && z >= 0 && x < size && y < size && z < size;
+    }
 };
 
 /*

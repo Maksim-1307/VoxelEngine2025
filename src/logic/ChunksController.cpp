@@ -74,7 +74,7 @@ void ChunksController::draw_chunks()
                 if (chunk->renderer == nullptr)
                 {
                     // continue;
-                    handle_at(chunk->X, chunk->Y, chunk->Z);
+                    handle_at(x, y, z);
                 }
                 Engine::pMeshShader->set_matrix4("model", chunk->renderer->transform);
                 chunk->renderer->draw();

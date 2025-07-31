@@ -37,6 +37,7 @@ class Engine {
         static Canvas* pCanvas;
         static Texture* pTexture;
         static Text* pText;
+        static Text* pFpsText;
         static Chunk* pChunk;
         static ChunkMeshBuilder *pChunkMeshBuilder;
         static AreaMap3D<Chunk>* pChunkMap;

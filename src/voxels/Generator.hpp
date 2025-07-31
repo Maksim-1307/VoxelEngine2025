@@ -6,6 +6,11 @@
 #include <random>
 #include "src/voxels/Chunk.hpp"
 
+enum class GENERATION_TYPE {
+    PERLIN_NOISE_3D,
+    DEFAULT
+};
+
 class Generator {
     public:
     Generator(std::string seed="")

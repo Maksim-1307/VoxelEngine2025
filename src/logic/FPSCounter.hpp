@@ -12,6 +12,8 @@ public:
         return fps;
     }
 
+    void display(uint fps, uint minFps);
+
 private:
     uint fps = 0;
     uint minFps = 0;

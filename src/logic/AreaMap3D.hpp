@@ -113,10 +113,6 @@ public:
                mx < size && my < size && mz < size;
     }
 
-    void print_center(){
-        std::cout << "AreaMap3D center in " << offsetX << " " << offsetY << " " << offsetZ << "\n";
-    }
-
 private:
     Array3D<T*>* firstBuffer;
     Array3D<T*>* secondBuffer;

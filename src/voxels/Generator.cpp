@@ -1,7 +1,7 @@
 #include "Generator.hpp"
 
 #define STB_PERLIN_IMPLEMENTATION
-#include "include/stb_perlin.h"
+#include "include/stb_perlin.h" 
 
 Chunk *Generator::generate_at(int x, int y, int z)
 {

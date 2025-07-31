@@ -40,9 +40,6 @@ void ChunksController::handle_at(int x, int y, int z) {
 
 void ChunksController::load_around(glm::ivec3 center) {
 
-    std::cout << center.x << " " << center.y << " " << center.z << "\n";
-    Engine::pChunkMap->print_center();
-
     for (int x = center.x - distance; x <= center.x + distance; x++) {
         for (int y = center.y - distance; y <= center.y + distance; y++) {
             for (int z = center.z - distance; z <= center.z + distance; z++) {

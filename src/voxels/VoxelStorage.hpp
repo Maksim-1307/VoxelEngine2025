@@ -25,7 +25,13 @@ class VoxelStorage{
             int blockY = MOD(y, 16);
             int blockZ = MOD(z, 16);
 
-            return chunksMap->get(chunkX, chunkY, chunkZ)->get_voxel(blockX, blockY, blockZ);
+            Chunk* ch = chunksMap->get(chunkX, chunkY, chunkZ);
+            if (ch == nullptr) {
+                // std::cout << "ERROR: Chunk out of bounds at " << chunkX << " " << chunkY << " " << chunkZ << "\n";
+                return {2, 0};
+            }
+
+            return ch->get_voxel(blockX, blockY, blockZ);
         };
 
         void set_voxel(int x, int y, int z, voxel vox){

@@ -83,7 +83,7 @@ void Engine::init()
     std::string ss = "Making a Minecraft clone on OpenGL";
     Engine::pText = new Text(ss);
     Engine::pGenerator = new Generator();
-    Engine::pChunkMap = new AreaMap3D<Chunk>(6);
+    Engine::pChunkMap = new AreaMap3D<Chunk>(7);
     std::function<Chunk *(int, int, int)> gen_func = [](int x, int y, int z) -> Chunk* 
     { 
         return Engine::pGenerator->generate_at(x, y, z);

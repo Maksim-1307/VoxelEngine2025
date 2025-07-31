@@ -38,7 +38,7 @@ public:
 private:
 
     void check_bounds(size_t x, size_t y, size_t z) const {
-        if (x >= X || y >= Y || z >= Z)
+        if (x >= X || y >= Y || z >= Z || x < 0 || y < 0 || z < 0)
         {
             throw std::out_of_range("ERROR: Array3D index out of bounds");
         }

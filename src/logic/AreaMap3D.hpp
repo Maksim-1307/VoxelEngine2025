@@ -58,6 +58,8 @@ public:
     void translate(int dX, int dY, int dZ) {
         if (dX == 0 && dY == 0 && dZ == 0) return;
 
+        std::vector<T*> delete_buffer = {};
+
         // no idea why, but when you multiply by -1 it works great
         dX *= -1;
         dY *= -1;
@@ -76,6 +78,12 @@ public:
                     
                     if (in_bounds(oldX, oldY, oldZ)) {
                         secondBuffer->set(x, y, z, firstBuffer->get(oldX, oldY, oldZ));
+                    }
+                    int newX = x + dX;
+                    int newY = y + dY;
+                    int newZ = z + dZ;
+                    if (!in_bounds(newX, newY, newZ)) {
+                        delete_buffer.push_back(firstBuffer->get(x, y, z));
                     }
                 }
             }
@@ -99,6 +107,9 @@ public:
         offsetZ -= dZ;
 
         std::swap(firstBuffer, secondBuffer);
+        for (auto ch : delete_buffer) {
+            delete ch;
+        }
     }
 
     int get_size() const {

@@ -12,9 +12,14 @@
 
 class Chunk{
 public:
-    Chunk(){};
+    Chunk(){
+        Chunk::chunks += 1;
+    };
     Chunk(const Chunk &) = delete;
     Chunk &operator=(const Chunk &) = delete;
+    ~Chunk(){
+        Chunk::chunks -= 1;
+    };
     MeshRenderer* renderer;
     int X, Y, Z;
     void set_voxel(size_t x, size_t y, size_t z, const voxel voxel)
@@ -25,6 +30,7 @@ public:
     {
         return voxels.get(x, y, z);
     }
+    static int chunks;
 
 private:
     Array3D<voxel> voxels = Array3D<voxel>(CHUNK_W, CHUNK_H, CHUNK_W);

@@ -132,6 +132,7 @@ void ChunkMeshBuilder::vertex(float x, float y, float z, float u, float v)
     vertices.push_back(_z + z);
     vertices.push_back(u);
     vertices.push_back(v);
+    vertices.push_back(pack_to_float(packRGBS(15, 15, 0, 15)));
 }
 
 void ChunkMeshBuilder::index(uint a, uint b, uint c, uint d, uint e, uint f)

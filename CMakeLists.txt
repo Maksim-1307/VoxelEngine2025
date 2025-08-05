@@ -9,6 +9,11 @@ add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES})
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 
+if (APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
+    link_directories(/opt/homebrew/lib)
+    include_directories(/opt/homebrew/include)
+endif()
+
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(GLM REQUIRED)

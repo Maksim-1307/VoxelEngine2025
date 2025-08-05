@@ -86,9 +86,9 @@ GLuint Shader::createShader(const std::string &source, const GLenum shaderType)
     if (!success)
     {
         glGetShaderInfoLog(pShader, 512, NULL, infoLog);
-        std::cerr << "ERROR! Vertex shader compilation failed\n"
+        std::cerr << "ERROR! Shader compilation failed\n"
                     << infoLog << std::endl;
-        std::cerr << "Vertex shader source: \n"
+        std::cerr << "Shader source: \n"
                     << source << std::endl;
         exit(-1);
     }

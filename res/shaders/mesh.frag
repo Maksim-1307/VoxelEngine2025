@@ -3,11 +3,12 @@
 out vec4 outputColor;
 
 in vec2 texCoord;
+in vec4 lightColor;
 
 uniform sampler2D theTexture;
 
 void main()
 {
-    vec4 color = texture(theTexture, texCoord);
-    outputColor = color;
+    vec4 texColor = texture(theTexture, texCoord);
+    outputColor = mix(texColor, lightColor, 0.5);
 }

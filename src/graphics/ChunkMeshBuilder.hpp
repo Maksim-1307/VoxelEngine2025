@@ -21,6 +21,16 @@ public:
 
     Mesh* buildMesh(Chunk& chunk);
 
+    uint16_t packRGBS(uint8_t a, uint8_t b, uint8_t c, uint8_t d) {
+        return (a & 0xF) << 12 | (b & 0xF) << 8 | (c & 0xF) << 4 | (d & 0xF);
+    }
+    float pack_to_float(uint16_t value){
+        uint32_t tmp = value;  
+        float result;
+        std::memcpy(&result, &tmp, sizeof(tmp)); 
+        return result; 
+    }
+
 private: 
 
     void CubeModel(int x, int y, int z);

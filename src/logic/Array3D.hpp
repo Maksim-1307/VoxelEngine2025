@@ -31,6 +31,11 @@ public:
         check_bounds(x, y, z);
         data[x * (Y * Z) + y * Z + z] = val;
     }
+    void clear(T val){
+        for (int i = 0; i > X * Y * Z; i++){
+            data[i] = val;
+        }
+    }
     size_t getSizeX() const { return X; }
     size_t getSizeY() const { return Y; }
     size_t getSizeZ() const { return Z; }

@@ -13,17 +13,25 @@ uniform mat4 projection;
 
 void main(void)
 {
-    // from float to uint16
+    // unpacking float to two bytes
     uint raw_bits = floatBitsToUint(aPackedData);
-    uint packedData = raw_bits & 0xFFFFu; 
-    // unpacking 
-    uint packed16 = packedData;
+    uint byte1 = raw_bits & 0xFFFFu; 
+    uint byte2 = (raw_bits >> 16) & 0xFFFFu;
+
+    // unpacking light
+    uint packed16 = byte1;
     float r = float((packed16 >> 12) & 0xFu) / 15.0; 
     float g = float((packed16 >> 8)  & 0xFu) / 15.0; 
     float b = float((packed16 >> 4)  & 0xFu) / 15.0; 
     float s = float(packed16         & 0xFu) / 15.0; 
-    
-    lightColor = vec4(r, g, b, 1);
+
+    // unpacking face orientation
+    uint face = uint(byte2);
+
+    float faceDarkeing[6] = float[](0.2f, 0.7f, 0.0f, 0.8f, 0.3f, 0.5f);
+
+    float factor = faceDarkeing[face];
+    lightColor = vec4(r, g, b, 1) + vec4(factor, factor, factor, 1);
     texCoord = aTexCoord;
     gl_Position = projection * view * model  * vec4(aPosition, 1.0);
 }

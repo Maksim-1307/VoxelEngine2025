@@ -24,11 +24,19 @@ public:
     uint16_t packRGBS(uint8_t a, uint8_t b, uint8_t c, uint8_t d) {
         return (a & 0xF) << 12 | (b & 0xF) << 8 | (c & 0xF) << 4 | (d & 0xF);
     }
+
     float pack_to_float(uint16_t value){
         uint32_t tmp = value;  
         float result;
         std::memcpy(&result, &tmp, sizeof(tmp)); 
         return result; 
+    }
+    
+    float pack_to_float(uint16_t a, uint16_t b){
+        uint32_t combined = (static_cast<uint32_t>(b) << 16) | a;
+        float result;
+        memcpy(&result, &combined, sizeof(float));
+        return result;
     }
 
 private: 
@@ -40,6 +48,7 @@ private:
     
     void vertex(float x, float y, float z, float u, float v);
     void index(uint a, uint b, uint c, uint d, uint e, uint f);
+    float calculate_light();
 
     std::vector<float> vertices = {};
     std::vector<uint> indices = {};

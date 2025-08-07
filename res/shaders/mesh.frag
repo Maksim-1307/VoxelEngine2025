@@ -11,4 +11,5 @@ void main()
 {
     vec4 texColor = texture(theTexture, texCoord);
     outputColor = mix(texColor, lightColor, 0.5);
+    outputColor = lightColor;
 }

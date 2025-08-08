@@ -23,6 +23,7 @@ AreaMap3D<Chunk>* Engine::pChunkMap = nullptr;
 Generator *Engine::pGenerator = nullptr;
 VoxelStorage* Engine::pVoxelStorage = nullptr;
 ChunksController* Engine::pChunksController = nullptr;
+Terrain* Engine::pTerrain = nullptr;
 
 void Engine::init()
 {
@@ -61,6 +62,7 @@ void Engine::init()
     Engine::pChunkMap->set_out_callback(gen_func);
     Engine::pVoxelStorage = new VoxelStorage(Engine::pChunkMap);
     Engine::pChunksController = new ChunksController(Engine::pChunkMap, Engine::pCamera);
+    Engine::pTerrain = new Terrain(*Engine::pVoxelStorage);
 }
 
 void Engine::game_loop()
@@ -74,6 +76,7 @@ void Engine::game_loop()
 
     std::cout << "game loop started\n";
     auto lastTime = high_resolution_clock::now();
+    bool prevObstacle = true;
 
     while (!Engine::pWindow->should_close())
     {
@@ -115,6 +118,13 @@ void Engine::game_loop()
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 120.0f, 0.0f));
         Engine::pTextShader->set_matrix4("projection", projection * glm::scale(transform, glm::vec3(1.0f, -1.0f, 1.0f)));
         Engine::pFpsText->draw();
+
+        glm::vec3 camPos = Engine::pCamera->position;
+        bool obstacle = Engine::pTerrain->is_obstacle_at(camPos.x, camPos.y, camPos.z);
+        if (prevObstacle != obstacle) {
+            std::cout << "obstacle " << obstacle << "\n";
+        }
+        prevObstacle = obstacle;
 
         glfwSwapBuffers(Engine::pWindow->get_glfw_window());
         glfwPollEvents();

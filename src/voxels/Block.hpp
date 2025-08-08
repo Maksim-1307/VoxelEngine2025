@@ -3,26 +3,36 @@
 #include <iostream>
 #include "BlockModel.hpp"
 #include "voxel.hpp"
+#include "src/physics/AABB.hpp"
 
 
 class Block{
-public:
+public :
     Block(std::string name, BlockModel model, std::vector<std::tuple<size_t, size_t>> UVs); //: name(name), model(model);
+    
     const std::string name;
+    std::array<bool, 6> opened_faces;
 
-    BlockModel getBlockModel() const {
-        return model;
-    }
+    BlockModel getBlockModel() const { return model; }
+    std::tuple<size_t, size_t> getUV(int face);
 
     static const Block& getBlockByVoxelId(size_t id) 
     {
         return *blocks[id];
     }
-    std::array<bool, 6> opened_faces;
+    static const std::vector<AABB> getAABBs(voxel vox){
+        BlockModel model = Block::getBlockByVoxelId(vox.id).getBlockModel();
+        switch (model) {
+            case BlockModel::AIR:
+                return {};
+            case BlockModel::SOLID:
+                return {AABB(glm::vec3(1.0f))};
+            default:
+                return {};
+        }
+    }
 
-    std::tuple<size_t, size_t> getUV(int face);
-
-    private : 
+private : 
     static void add_block(Block *block)
     {
         Block::blocks.push_back(block);

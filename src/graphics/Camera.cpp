@@ -10,7 +10,6 @@ Camera::Camera(Window &window) : window(window)
 
 void Camera::updateVectors()
 {
-
     front.x = cos(glm::radians(horizontalRot)) * cos(glm::radians(verticalRot));
     front.y = sin(glm::radians(verticalRot));
     front.z = sin(glm::radians(horizontalRot)) * cos(glm::radians(verticalRot));

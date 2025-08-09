@@ -18,6 +18,6 @@ void FPSCounter::update(float deltaTime){
 }
 
 void FPSCounter::display(uint fps, uint minFps) {
-    std::string s = "fps: " + std::to_string(fps) + "\nmin: " + std::to_string(minFps);
-    Engine::pFpsText->update(s);
+    Engine::pStats->set("min fps", std::to_string(minFps));
+    Engine::pStats->set("fps", std::to_string(fps));    
 }

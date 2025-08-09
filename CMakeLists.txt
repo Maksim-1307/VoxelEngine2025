@@ -17,8 +17,9 @@ endif()
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(GLM REQUIRED)
+find_package(RmlUi REQUIRED)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} ${LIBS} glfw OpenGL::GL GLEW::GLEW glm::glm)
+target_link_libraries(${PROJECT_NAME} ${LIBS} glfw OpenGL::GL GLEW::GLEW glm::glm RmlUi::RmlUi)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 

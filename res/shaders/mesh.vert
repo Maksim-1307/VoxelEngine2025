@@ -28,10 +28,11 @@ void main(void)
     // unpacking face orientation
     uint face = uint(byte2);
 
-    float faceDarkeing[6] = float[](0.2f, 0.7f, 0.0f, 0.8f, 0.3f, 0.5f);
+    float faceDarkeing[6] = float[](0.7f, 0.2f, 0.8f, 0.0f, 0.5f, 0.3f);
 
-    float factor = faceDarkeing[face];
-    lightColor = vec4(r, g, b, 1) + vec4(factor, factor, factor, 1);
+    float darkeing = faceDarkeing[face];
+    float factor = 0.05;
+    lightColor = mix(vec4(r, g, b, 1), vec4(darkeing, darkeing, darkeing, 1), factor);
     texCoord = aTexCoord;
     gl_Position = projection * view * model  * vec4(aPosition, 1.0);
 }

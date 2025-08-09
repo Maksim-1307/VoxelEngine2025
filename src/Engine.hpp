@@ -17,6 +17,7 @@
 #include "voxels/VoxelStorage.hpp"
 #include "logic/ChunksController.hpp"
 #include "physics/Terrain.hpp"
+#include "graphics/Stats.hpp"
 
 
 class Engine {
@@ -46,4 +47,5 @@ class Engine {
         static VoxelStorage* pVoxelStorage;
         static ChunksController* pChunksController;
         static Terrain* pTerrain;
+        static Stats* pStats;
 };

@@ -14,6 +14,7 @@ if (APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
     include_directories(/opt/homebrew/include)
 endif()
 
+find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(GLM REQUIRED)

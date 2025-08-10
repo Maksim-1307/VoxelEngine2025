@@ -16,6 +16,22 @@ public:
     void set(int x, int y, int z, light val){
         map.set(x, y, z, val);
     }
+    void set(int x, int y, int z, int channel, uint8_t val) {
+        switch (channel) {
+            case 0:
+                setR(x, y, z, val);
+                break;
+            case 1:
+                setG(x, y, z, val);
+                break;
+            case 2:
+                setB(x, y, z, val);
+                break;
+            case 3:
+                setS(x, y, z, val);
+                break;
+        }
+    }
     void setR(int x, int y, int z, int val){
         light l = map.get(x, y, z);
         l.setR(val);
@@ -39,6 +55,9 @@ public:
 
     light get(int x, int y, int z) const {
         return map.get(x, y, z);
+    }
+    uint8_t get(int x, int y, int z, int channel) {
+        return map.get(x, y, z).get(channel);
     }
     uint8_t getR(int x, int y, int z) const {
         return map.get(x, y, z).getR();

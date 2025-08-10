@@ -22,6 +22,13 @@ void ChunksController::update() {
 void ChunksController::handle_at(int x, int y, int z) {
     Chunk* chunk = Engine::pChunkMap->get(x, y, z);
     if (!chunk || chunk->renderer != nullptr) return;
+
+    try {
+        Engine::pLighting->prebuildSkyLight(chunk);
+    } catch (...) {
+        std::cerr << "Failed to pre build light of chunk at "
+                << x << ", " << y << ", " << z << "\n";
+    }
     
     try {
         Mesh* mesh = Engine::pChunkMeshBuilder->buildMesh(*chunk);

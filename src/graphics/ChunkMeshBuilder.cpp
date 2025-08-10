@@ -146,41 +146,20 @@ void ChunkMeshBuilder::index(uint a, uint b, uint c, uint d, uint e, uint f)
     indexOffset += 4;
 }
 
-float ChunkMeshBuilder::calculate_light(){
-    light l = chunk->lightmap.get(_x, _y, _z);
-    // int wx = chunkX + _x;
-    // int wy = chunkY + _y;
-    // int wz = chunkZ + _z;
+uint16_t ChunkMeshBuilder::calculate_light(){
+    const int coords[] = {
+        1, 0, 0, // x+
+       -1, 0, 0, // x-
+        0, 1, 0, // y+
+        0,-1, 0, // ...
+        0, 0, 1,
+        0, 0,-1
+    };
+    int face = _face;
+    int x = _x + coords[face * 3 + 0];
+    int y = _y + coords[face * 3 + 1];
+    int z = _z + coords[face * 3 + 2];
 
-    // float faceFactor = 0.2f;
-    // float [] faceDarkening = [0.2f, 0.7f, 0.0f, 0.8f, 0.3f, 0.5f];
+    return Engine::pVoxelStorage->get_light(x + chunkX, y + chunkY, z + chunkZ).value;
 
-    // switch(_face){
-    //     case 0:
-    //         l = Engine::VoxelStorage->get_light(wx + 1, wy, wz);
-    //         break;
-    //     case 1:
-    //         l = Engine::VoxelStorage->get_light(wx - 1, wy, wz);
-    //         break;
-    //     case 2:
-    //         l = Engine::VoxelStorage->get_light(wx, wy + 1, wz);
-    //         break;
-    //     case 3:
-    //         l = Engine::VoxelStorage->get_light(wx, wy - 1, wz);
-    //         break;
-    //     case 4:
-    //         l = Engine::VoxelStorage->get_light(wx, wy, wz + 1);
-    //         break;
-    //     case 5:
-    //         l = Engine::VoxelStorage->get_light(wx, wy, wz - 1);
-    //         break;
-    // }
-    // light = light + faceDarkening[_face] * faceFactor;
-    // if (light < 0.0f) light = 0.0f;
-    // if (light > 1.0f) light = 1.0f;
-
-    // switch(_face) {
-    //     case 0:
-    // }
-    return pack_to_float(l.value, 0);
 }

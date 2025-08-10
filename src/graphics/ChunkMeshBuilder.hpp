@@ -48,7 +48,7 @@ private:
     
     void vertex(float x, float y, float z, float u, float v);
     void index(uint a, uint b, uint c, uint d, uint e, uint f);
-    float calculate_light();
+    uint16_t calculate_light();
 
     std::vector<float> vertices = {};
     std::vector<uint> indices = {};

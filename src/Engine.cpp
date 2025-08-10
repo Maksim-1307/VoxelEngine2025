@@ -28,6 +28,7 @@ VoxelStorage* Engine::pVoxelStorage = nullptr;
 ChunksController* Engine::pChunksController = nullptr;
 Terrain* Engine::pTerrain = nullptr;
 Stats* Engine::pStats = nullptr;
+Lighting* Engine::pLighting = nullptr;
 
 void Engine::init()
 {
@@ -68,6 +69,7 @@ void Engine::init()
     Engine::pChunksController = new ChunksController(Engine::pChunkMap, Engine::pCamera);
     Engine::pTerrain = new Terrain(*Engine::pVoxelStorage);
     Engine::pStats = new Stats();
+    Engine::pLighting = new Lighting(*Engine::pChunkMap);
 }
 
 void Engine::game_loop()
@@ -83,7 +85,6 @@ void Engine::game_loop()
     auto lastTime = high_resolution_clock::now();
     bool prevObstacle = true;
     std::string s = "";
-    Text* obstacleText = new Text(s);
 
     while (!Engine::pWindow->should_close())
     {
@@ -128,17 +129,10 @@ void Engine::game_loop()
         glm::vec3 camPos = Engine::pCamera->position;
         bool obstacle = Engine::pTerrain->is_obstacle_at(camPos.x, camPos.y, camPos.z);
         Engine::pStats->set("Obstacle", obstacle ? "true" : "false");
-        if (prevObstacle != obstacle) {
-            if (obstacle) {
-                obstacleText->update("Obstacle");
-            } else {
-                obstacleText->update("Free");
-            }
-        }
         prevObstacle = obstacle;
+
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 250.0f, 0.0f));
         Engine::pTextShader->set_matrix4("projection", projection * glm::scale(transform, glm::vec3(1.0f, -1.0f, 1.0f)));
-        // obstacleText->draw();
         Engine::pStats->draw();
 
         glfwSwapBuffers(Engine::pWindow->get_glfw_window());

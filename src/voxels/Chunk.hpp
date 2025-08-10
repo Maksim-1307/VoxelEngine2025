@@ -36,6 +36,7 @@ public:
         return voxels.get(x, y, z);
     }
     static int chunks;
+    bool modified = false;
 
 private:
     Array3D<voxel> voxels = Array3D<voxel>(CHUNK_W, CHUNK_H, CHUNK_W);

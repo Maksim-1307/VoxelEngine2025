@@ -10,6 +10,6 @@ uniform sampler2D theTexture;
 void main()
 {
     vec4 texColor = texture(theTexture, texCoord);
-    outputColor = mix(texColor, lightColor, 0.8);
-    // outputColor = lightColor;
+    outputColor = vec4(texColor.rgb *= min(vec3(1.0), lightColor.rgb), 1);
+    //outputColor = lightColor;
 }

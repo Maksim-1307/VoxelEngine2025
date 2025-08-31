@@ -13,6 +13,10 @@ uniform mat4 projection;
 
 void main(void)
 {
+    // make uniform
+    float skyBrightness = 1.0;
+    vec3 skyColor = vec3(1, 1, 1);
+
     // unpacking float to two bytes
     uint raw_bits = floatBitsToUint(aPackedData);
     uint byte1 = raw_bits & 0xFFFFu; 
@@ -20,19 +24,21 @@ void main(void)
 
     // unpacking light
     uint packed16 = byte1;
-    float r = float((packed16 >> 12) & 0xFu) / 15.0; 
-    float g = float((packed16 >> 8)  & 0xFu) / 15.0; 
-    float b = float((packed16 >> 4)  & 0xFu) / 15.0; 
-    float s = float(packed16         & 0xFu) / 15.0; 
+    float r = float(uint((packed16 >> 12) & 0xFu) + uint(2)) / 17.0; 
+    float g = float(uint((packed16 >> 8)  & 0xFu) + uint(2)) / 17.0; 
+    float b = float(uint((packed16 >> 4)  & 0xFu) + uint(2)) / 17.0; 
+    float s = float(uint(packed16         & 0xFu) + uint(2)) / 17.0; 
 
     // unpacking face orientation
     uint face = uint(byte2);
 
-    float faceDarkeing[6] = float[](0.7f, 0.2f, 0.8f, 0.0f, 0.5f, 0.3f);
+    vec3 totalLight = vec3(r, g, b) + skyColor * skyBrightness * s;
 
-    float darkeing = faceDarkeing[face];
-    float factor = 0.05;
-    lightColor = mix(vec4(r, g, b, 1), vec4(darkeing, darkeing, darkeing, 1), factor);
+    float faceDarkeing[6] = float[](0.2f, 0.7f, 0.0f, 0.8f, 0.3f, 0.5f);
+    float faceFactor = 0.5;
+    float darkeing = faceDarkeing[face] * faceFactor;
+
+    lightColor = vec4(mix(totalLight, vec3(0), darkeing), 1);
     texCoord = aTexCoord;
     gl_Position = projection * view * model  * vec4(aPosition, 1.0);
 }

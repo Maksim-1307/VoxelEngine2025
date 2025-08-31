@@ -21,13 +21,11 @@ void ChunksController::update() {
 
 void ChunksController::handle_at(int x, int y, int z) {
     Chunk* chunk = Engine::pChunkMap->get(x, y, z);
-    if (!chunk || chunk->renderer != nullptr) return;
-
+    if (!chunk || !chunk->modified) return;
     try {
         Engine::pLighting->prebuildSkyLight(chunk);
     } catch (...) {
-        std::cerr << "Failed to pre build light of chunk at "
-                << x << ", " << y << ", " << z << "\n";
+        std::cerr << "Failed to pre build light of chunk " << "\n";
     }
     
     try {
@@ -39,6 +37,7 @@ void ChunksController::handle_at(int x, int y, int z) {
             glm::mat4(1.0f),
             glm::vec3(chunk->X * CHUNK_W, chunk->Y * CHUNK_H, chunk->Z * CHUNK_W)
         );
+        chunk->modified = false;
     } catch (...) {
         std::cerr << "Failed to build mesh for chunk at " 
                   << x << ", " << y << ", " << z << "\n";
@@ -47,9 +46,9 @@ void ChunksController::handle_at(int x, int y, int z) {
 
 void ChunksController::load_around(glm::ivec3 center) {
 
-    for (int x = center.x - distance; x <= center.x + distance; x++) {
-        for (int y = center.y - distance; y <= center.y + distance; y++) {
-            for (int z = center.z - distance; z <= center.z + distance; z++) {
+    for (int x = center.x - distance; x <= center.x + distance; x++) {    
+        for (int z = center.z - distance; z <= center.z + distance; z++) {
+            for (int y = center.y + distance; y >= center.y - distance; y--) {
                 handle_at(x, y, z);
             }
         }

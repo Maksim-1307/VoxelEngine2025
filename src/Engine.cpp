@@ -59,7 +59,7 @@ void Engine::init()
     std::string sss = "fps: ";
     Engine::pFpsText = new Text(sss);
     Engine::pGenerator = new Generator();
-    Engine::pChunkMap = new AreaMap3D<Chunk>(7);
+    Engine::pChunkMap = new AreaMap3D<Chunk>(6);
     std::function<Chunk *(int, int, int)> gen_func = [](int x, int y, int z) -> Chunk* 
     { 
         return Engine::pGenerator->generate_at(x, y, z);
@@ -130,6 +130,8 @@ void Engine::game_loop()
         bool obstacle = Engine::pTerrain->is_obstacle_at(camPos.x, camPos.y, camPos.z);
         Engine::pStats->set("Obstacle", obstacle ? "true" : "false");
         prevObstacle = obstacle;
+        int light = Engine::pVoxelStorage->get_light(floor(camPos.x), floor(camPos.y), floor(camPos.z)).getS();
+        Engine::pStats->set("Light", std::to_string(light));
 
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 250.0f, 0.0f));
         Engine::pTextShader->set_matrix4("projection", projection * glm::scale(transform, glm::vec3(1.0f, -1.0f, 1.0f)));

@@ -3,6 +3,8 @@
 #define STB_PERLIN_IMPLEMENTATION
 #include "include/stb_perlin.h" 
 
+#define FACTOR 25.0f
+
 Chunk *Generator::generate_at(int x, int y, int z)
 {
     // global coords
@@ -17,8 +19,8 @@ Chunk *Generator::generate_at(int x, int y, int z)
     for (int x = 0; x < CHUNK_W; x++){
         for (int y = 0; y < CHUNK_H; y++){
             for (int z = 0; z < CHUNK_W; z++){
-                float perlin = stb_perlin_noise3_seed((x + X) / 15.038f, (y + Y) / 15.038f, (z + Z) / 15.038f, 0, 0, 0, this->seed);
-                if (perlin > 0.5f){
+                float perlin = stb_perlin_noise3_seed((x + X) / FACTOR, (y + Y) / FACTOR * 2, (z + Z) / FACTOR, 0, 0, 0, this->seed);
+                if (perlin > 0.4f){
                     chunk->set_voxel(x, y, z, {1, 0});
                 } else {
                     chunk->set_voxel(x, y, z, {0, 0});
@@ -26,5 +28,7 @@ Chunk *Generator::generate_at(int x, int y, int z)
             }
         }
     }
+    chunk->modified = true;
+    chunk->lightmap.mask.clear(true);
     return chunk;
 }

@@ -2,12 +2,14 @@
 
 #include "light.hpp"
 #include "src/logic/Array3D.hpp"
+#include "src/logic/Array2D.hpp"
 
 class Lightmap {
 public:
-    Lightmap(int X, int Y, int Z) : map(X, Y, Z){};
+    Lightmap(int X, int Y, int Z) : map(X, Y, Z), mask(X, Z) {};
     ~Lightmap(){};
     Array3D<light> map;
+    Array2D<bool> mask;
 
     void clear(){
         map.clear({0});

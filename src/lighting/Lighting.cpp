@@ -1,5 +1,5 @@
 #include "Lighting.hpp"
-
+#include "src/Engine.hpp"
 #include <memory>
 
 Lighting::Lighting(AreaMap3D<Chunk>& chunks) 
@@ -26,22 +26,45 @@ void Lighting::clear(){
 }
 
 void Lighting::prebuildSkyLight(Chunk* chunk){
+    chunk->lightmap.clear();
+    chunk->lightmap.mask.clear(false);
+    int cx = chunk->X;
+    int cy = chunk->Y;
+    int cz = chunk->Z;
 
+    Chunk* topChunk = Engine::pChunkMap->get(cx, cy+1, cz);
+    
     for (int z = 0; z < CHUNK_W; z++){
         for (int x = 0; x < CHUNK_W; x++){
-            for (int y = CHUNK_H-1; y >= 0; y--){ // ! changed !
+            bool canLightPass = true;
+        
+            if (topChunk) {
+                canLightPass = topChunk->lightmap.mask.get(x, z);
+            } else {
+                canLightPass = true;
+                std::cout << "YES\n";
+            }
+            
+            if (!canLightPass) {
+                chunk->lightmap.mask.set(x, z, false);
+                continue;
+            }
+            
+            bool columnIsTransparent = true;
+            for (int y = CHUNK_H-1; y >= 0; y--){ 
                 voxel vox = chunk->get_voxel(x, y, z);
-                //const Block* block = blockDefs[vox.id];
-                if (vox.id != 0) {
-                    std::cout << y << "\n";
-                    // if (highestPoint < y)
-                    //     highestPoint = y;
+                
+                if (vox.id != 0) { 
+                    columnIsTransparent = false;
                     break;
                 }
-                chunk->lightmap.setS(x,y,z, 15); // ! changed !
+                
+                chunk->lightmap.setS(x, y, z, 15);
             }
+            chunk->lightmap.mask.set(x, z, columnIsTransparent);
         }
     }
+    chunk->modified = true;
 }
 
 // void Lighting::buildSkyLight(int cx, int cy, int cz){

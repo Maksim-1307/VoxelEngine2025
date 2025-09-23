@@ -23,7 +23,7 @@ class ChunksController {
     private:
         void handle_at(int x, int y, int z);
         void load_around(glm::ivec3 center);
-        int distance = 5;
+        int distance = 4;
         AreaMap3D<Chunk> *chunkMap;
         Camera* camera;
         glm::ivec3 camPos;

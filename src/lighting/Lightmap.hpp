@@ -13,6 +13,7 @@ public:
 
     void clear(){
         map.clear({0});
+        mask.clear(true);
     }
 
     void set(int x, int y, int z, light val){

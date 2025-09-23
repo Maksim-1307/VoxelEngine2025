@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Array3D.hpp"
+#include <functional>
+#include <vector>
 
 template <class T>
 class AreaMap3D
@@ -8,7 +10,7 @@ class AreaMap3D
 public:
     AreaMap3D(int radius)
     {
-        size = radius * 2 + 1; 
+        size = radius * 2 + 1; // Исправлено: +1 вместо +2
         firstBuffer = new Array3D<T*>(size, size, size);
         secondBuffer = new Array3D<T*>(size, size, size);
         for (int i = 0; i < size*size*size; i++) {
@@ -18,14 +20,19 @@ public:
     }
 
     ~AreaMap3D() {
+        // Сначала удаляем все объекты
+        for (int i = 0; i < size*size*size; i++) {
+            delete firstBuffer->get_data()[i];
+            delete secondBuffer->get_data()[i];
+        }
         delete firstBuffer;
         delete secondBuffer;
     }
 
     T* get(int x, int y, int z) {
-        int mx = x + size/2 - offsetX;
-        int my = y + size/2 - offsetY;
-        int mz = z + size/2 - offsetZ;
+        int mx = x - offsetX + size/2;  // Исправлено!
+        int my = y - offsetY + size/2;
+        int mz = z - offsetZ + size/2;
         
         if (!in_bounds(mx, my, mz)) {
             return nullptr;
@@ -37,10 +44,6 @@ public:
         this->outCallback = callback;
     }
 
-    T** get_data() const {
-        return this->firstBuffer->get_data();
-    }
-
     void fill() {
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
@@ -48,23 +51,21 @@ public:
                     int wx = x - size/2 + offsetX;
                     int wy = y - size/2 + offsetY;
                     int wz = z - size/2 + offsetZ;
-                    secondBuffer->set(x, y, z, outCallback(wx, wy, wz));
+                    T* newObj = outCallback(wx, wy, wz);
+                    secondBuffer->set(x, y, z, newObj);
                 }
             }
         }
         std::swap(firstBuffer, secondBuffer);
     }
 
-    void translate(int dX, int dY, int dZ) {
-        if (dX == 0 && dY == 0 && dZ == 0) return;
+    void translate(int dx, int dy, int dz) {
 
-        std::vector<T*> delete_buffer = {};
+        if (dx == 0 && dy == 0 && dz == 0) return;
 
-        // no idea why, but when you multiply by -1 it works great
-        dX *= -1;
-        dY *= -1;
-        dZ *= -1;
-        
+        std::vector<T*> to_delete;
+
+        // Clear second buffer
         for (int i = 0; i < size*size*size; i++) {
             secondBuffer->get_data()[i] = nullptr;
         }
@@ -72,56 +73,50 @@ public:
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
                 for (int z = 0; z < size; z++) {
-                    int oldX = x - dX;
-                    int oldY = y - dY;
-                    int oldZ = z - dZ;
-                    
-                    if (in_bounds(oldX, oldY, oldZ)) {
-                        secondBuffer->set(x, y, z, firstBuffer->get(oldX, oldY, oldZ));
-                    }
-                    int newX = x + dX;
-                    int newY = y + dY;
-                    int newZ = z + dZ;
-                    if (!in_bounds(newX, newY, newZ)) {
-                        delete_buffer.push_back(firstBuffer->get(x, y, z));
-                    }
-                }
-            }
-        }
+                    int sourceX = x + dx;
+                    int sourceY = y + dy;
+                    int sourceZ = z + dz;
 
-        for (int x = 0; x < size; x++) {
-            for (int y = 0; y < size; y++) {
-                for (int z = 0; z < size; z++) {
-                    if (secondBuffer->get(x, y, z) == nullptr) {
-                        int wx = x - size/2 + offsetX + dX;
-                        int wy = y - size/2 + offsetY + dY;
-                        int wz = z - size/2 + offsetZ + dZ;
+                    if (in_bounds(sourceX, sourceY, sourceZ)) {
+                        secondBuffer->set(x, y, z, firstBuffer->get(sourceX, sourceY, sourceZ));
+                        firstBuffer->set(sourceX, sourceY, sourceZ, nullptr);
+                    } else {
+                        int wx = x - size/2 + offsetX + dx;
+                        int wy = y - size/2 + offsetY + dy;
+                        int wz = z - size/2 + offsetZ + dz;
                         secondBuffer->set(x, y, z, outCallback(wx, wy, wz));
                     }
                 }
             }
         }
-        // and here too 
-        offsetX -= dX;
-        offsetY -= dY;
-        offsetZ -= dZ;
+
+        // Обновляем offset с учётом оригинального сдвига (без инверсии)
+        offsetX += dx;
+        offsetY += dy;
+        offsetZ += dz;
+
+        // // Заполняем пустые места с использованием нового offset
+        // for (int x = 0; x < size; x++) {
+        //     for (int y = 0; y < size; y++) {
+        //         for (int z = 0; z < size; z++) {
+        //             if (secondBuffer->get(x, y, z) == nullptr) {
+        //                 int wx = x - size/2 + offsetX;
+        //                 int wy = y - size/2 + offsetY;
+        //                 int wz = z - size/2 + offsetZ;
+        //                 secondBuffer->set(x, y, z, outCallback(wx, wy, wz));
+        //             }
+        //         }
+        //     }
+        // }
 
         std::swap(firstBuffer, secondBuffer);
-        for (auto ch : delete_buffer) {
-            delete ch;
-        }
-    }
-
-    int get_size() const {
-        return this->size;
-    }
+}
 
     bool is_inside(int x, int y, int z) {
         int mx = x - offsetX + size/2;
         int my = y - offsetY + size/2;
         int mz = z - offsetZ + size/2;
-        return mx >= 0 && my >= 0 && mz >= 0 && 
-               mx < size && my < size && mz < size;
+        return in_bounds(mx, my, mz);
     }
 
 private:

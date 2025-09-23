@@ -21,7 +21,8 @@ void ChunksController::update() {
 
 void ChunksController::handle_at(int x, int y, int z) {
     Chunk* chunk = Engine::pChunkMap->get(x, y, z);
-    if (!chunk || !chunk->modified) return;
+    // if (!chunk || !chunk->modified) return;
+    if (!chunk) return;
     try {
         Engine::pLighting->prebuildSkyLight(chunk);
     } catch (...) {
@@ -48,7 +49,7 @@ void ChunksController::load_around(glm::ivec3 center) {
 
     for (int x = center.x - distance; x <= center.x + distance; x++) {    
         for (int z = center.z - distance; z <= center.z + distance; z++) {
-            for (int y = center.y + distance; y >= center.y - distance; y--) {
+            for (int y = center.y + distance; y > center.y - distance; y--) {
                 handle_at(x, y, z);
             }
         }

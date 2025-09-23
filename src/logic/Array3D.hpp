@@ -54,3 +54,4 @@ private:
     const size_t Z;
     T* data;
 };
+

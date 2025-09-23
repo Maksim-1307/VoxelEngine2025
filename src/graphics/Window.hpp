@@ -11,8 +11,8 @@
 struct WindowArgs
 {
     std::string name = "OpenGL Window";
-    GLuint width = 800;
-    GLuint height = 600;
+    GLuint width = 649;
+    GLuint height = 480;
     bool isResizable = true;
     glm::vec3 clearColor = glm::vec3(0.0f, 0.0f, 0.0f);
 };

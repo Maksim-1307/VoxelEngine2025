@@ -40,9 +40,19 @@ void Lighting::prebuildSkyLight(Chunk* chunk){
         
             if (topChunk) {
                 canLightPass = topChunk->lightmap.mask.get(x, z);
+
+                     // test
+                    int X = topChunk->X;
+                    int Y = topChunk->Y;
+                    int Z = topChunk->Z;
+                    if (cx != X || cy + 1 != Y || cz != Z) {
+                        std::cout << "CHUNK BIAS " << cx - X << " " << cy + 1 - Y << " " << cz - Z << "\n";
+                    }
+                    //
+
             } else {
                 canLightPass = true;
-                std::cout << "YES\n";
+                std::cout << "\n";
             }
             
             if (!canLightPass) {
@@ -65,6 +75,7 @@ void Lighting::prebuildSkyLight(Chunk* chunk){
         }
     }
     chunk->modified = true;
+
 }
 
 // void Lighting::buildSkyLight(int cx, int cy, int cz){

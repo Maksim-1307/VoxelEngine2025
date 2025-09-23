@@ -17,13 +17,13 @@ class VoxelStorage{
 
         voxel get_voxel(int x, int y, int z){
 
-            int chunkX = std::floor((float)x / CHUNK_W);
-            int chunkY = std::floor((float)y / CHUNK_H);
-            int chunkZ = std::floor((float)z / CHUNK_W);
+            int chunkX = get_chunk_coord(x, CHUNK_W);
+            int chunkY = get_chunk_coord(y, CHUNK_H);
+            int chunkZ = get_chunk_coord(z, CHUNK_W);
 
-            int blockX = MOD(x, CHUNK_W);
-            int blockY = MOD(y, CHUNK_H);
-            int blockZ = MOD(z, CHUNK_W);
+            int blockX = get_block_coord(x, CHUNK_W);
+            int blockY = get_block_coord(y, CHUNK_H);
+            int blockZ = get_block_coord(z, CHUNK_W);
 
             Chunk* ch = chunksMap->get(chunkX, chunkY, chunkZ);
             if (ch == nullptr) {
@@ -36,26 +36,26 @@ class VoxelStorage{
 
         void set_voxel(int x, int y, int z, voxel vox){
 
-            int chunkX = std::floor((float)x / CHUNK_W);
-            int chunkY = std::floor((float)y / CHUNK_H);
-            int chunkZ = std::floor((float)z / CHUNK_W);
+            int chunkX = get_chunk_coord(x, CHUNK_W);
+            int chunkY = get_chunk_coord(y, CHUNK_H);
+            int chunkZ = get_chunk_coord(z, CHUNK_W);
 
-            int blockX = MOD(x, 16);
-            int blockY = MOD(y, 16);
-            int blockZ = MOD(z, 16);
+            int blockX = get_block_coord(x, CHUNK_W);
+            int blockY = get_block_coord(y, CHUNK_H);
+            int blockZ = get_block_coord(z, CHUNK_W);
 
             chunksMap->get(chunkX, chunkY, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
         };
 
         light get_light(int x, int y, int z) const {
 
-            int chunkX = std::floor((float)x / CHUNK_W);
-            int chunkY = std::floor((float)y / CHUNK_H);
-            int chunkZ = std::floor((float)z / CHUNK_W);
+            int chunkX = get_chunk_coord(x, CHUNK_W);
+            int chunkY = get_chunk_coord(y, CHUNK_H);
+            int chunkZ = get_chunk_coord(z, CHUNK_W);
 
-            int blockX = MOD(x, CHUNK_W);
-            int blockY = MOD(y, CHUNK_H);
-            int blockZ = MOD(z, CHUNK_W);
+            int blockX = get_block_coord(x, CHUNK_W);
+            int blockY = get_block_coord(y, CHUNK_H);
+            int blockZ = get_block_coord(z, CHUNK_W);
 
             return chunksMap->get(chunkX, chunkY, chunkZ)->lightmap.get(blockX, blockY, blockZ);
 
@@ -63,19 +63,30 @@ class VoxelStorage{
 
         uint8_t get_light(int x, int y, int z, int channel) const {
 
-            int chunkX = std::floor((float)x / CHUNK_W);
-            int chunkY = std::floor((float)y / CHUNK_H);
-            int chunkZ = std::floor((float)z / CHUNK_W);
+            int chunkX = get_chunk_coord(x, CHUNK_W);
+            int chunkY = get_chunk_coord(y, CHUNK_H);
+            int chunkZ = get_chunk_coord(z, CHUNK_W);
 
-            int blockX = MOD(x, CHUNK_W);
-            int blockY = MOD(y, CHUNK_H);
-            int blockZ = MOD(z, CHUNK_W);
+            int blockX = get_block_coord(x, CHUNK_W);
+            int blockY = get_block_coord(y, CHUNK_H);
+            int blockZ = get_block_coord(z, CHUNK_W);
 
             return chunksMap->get(chunkX, chunkY, chunkZ)->lightmap.get(blockX, blockY, blockZ, channel);
 
         };
 
     private:
+    int get_chunk_coord(int coord, int chunk_size) const {
+        return std::floor((float)coord / chunk_size);
+    }
+
+    int get_block_coord(int coord, int chunk_size) const {
+        int result = coord % chunk_size;
+        if (result < 0) {
+            result += chunk_size;
+        }
+        return result;
+    }
     AreaMap3D<Chunk>* chunksMap;
 
 };

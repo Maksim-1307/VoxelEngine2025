@@ -22,13 +22,13 @@ Texture *Engine::pTexture = nullptr;
 Text *Engine::pText = nullptr;
 Text *Engine::pFpsText = nullptr;
 ChunkMeshBuilder *Engine::pChunkMeshBuilder = nullptr;
-AreaMap3D<Chunk>* Engine::pChunkMap = nullptr;
+AreaMap2D<Chunk>* Engine::pChunkMap = nullptr;
 Generator *Engine::pGenerator = nullptr;
 VoxelStorage* Engine::pVoxelStorage = nullptr;
 ChunksController* Engine::pChunksController = nullptr;
 Terrain* Engine::pTerrain = nullptr;
 Stats* Engine::pStats = nullptr;
-Lighting* Engine::pLighting = nullptr;
+// Lighting* Engine::pLighting = nullptr;
 
 void Engine::init()
 {
@@ -40,6 +40,7 @@ void Engine::init()
     new Block("oak_log", BlockModel::SOLID, {{2, 1}, {0, 2}, {2, 1}});
     new Block("leaves", BlockModel::SOLID, {{1, 2}});
 
+    // Graphics
     WindowArgs wargs;
     wargs.name = "VoxelEngine";
     wargs.clearColor = {0.67f, 0.84f, 0.9f};
@@ -54,22 +55,32 @@ void Engine::init()
     Engine::pCamera = new Camera(*Engine::pWindow);
     Engine::pInputController = new InputController(*Engine::pCamera, *Engine::pWindow);
     Engine::pCanvas = new Canvas(*Engine::pWindow);
+    
+    // Texts 
     std::string ss = "Making a Minecraft clone on OpenGL";
     Engine::pText = new Text(ss);
     std::string sss = "fps: ";
     Engine::pFpsText = new Text(sss);
+    
+    // World
     Engine::pGenerator = new Generator();
-    Engine::pChunkMap = new AreaMap3D<Chunk>(6);
-    std::function<Chunk *(int, int, int)> gen_func = [](int x, int y, int z) -> Chunk* 
+    Engine::pChunkMap = new AreaMap2D<Chunk>(6);
+    
+
+    // Engine::pLighting = new Lighting(*Engine::pChunkMap);
+    
+
+    std::function<Chunk *(int, int)> gen_func = [](int x, int z) -> Chunk* 
     { 
-        return Engine::pGenerator->generate_at(x, y, z);
+        return Engine::pGenerator->generate_at(x, z);
     };
     Engine::pChunkMap->set_out_callback(gen_func);
+    
+    // Other
     Engine::pVoxelStorage = new VoxelStorage(Engine::pChunkMap);
     Engine::pChunksController = new ChunksController(Engine::pChunkMap, Engine::pCamera);
     Engine::pTerrain = new Terrain(*Engine::pVoxelStorage);
     Engine::pStats = new Stats();
-    Engine::pLighting = new Lighting(*Engine::pChunkMap);
 }
 
 void Engine::game_loop()
@@ -130,8 +141,11 @@ void Engine::game_loop()
         bool obstacle = Engine::pTerrain->is_obstacle_at(camPos.x, camPos.y, camPos.z);
         Engine::pStats->set("Obstacle", obstacle ? "true" : "false");
         prevObstacle = obstacle;
-        int light = Engine::pVoxelStorage->get_light(floor(camPos.x), floor(camPos.y), floor(camPos.z)).getS();
+        int light = -1;//Engine::pVoxelStorage->get_light(floor(camPos.x), floor(camPos.y), floor(camPos.z)).getS();
         Engine::pStats->set("Light", std::to_string(light));
+        Engine::pStats->set("X", std::to_string(camPos.x));
+        Engine::pStats->set("Y", std::to_string(camPos.y));
+        Engine::pStats->set("Z", std::to_string(camPos.z));
 
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 250.0f, 0.0f));
         Engine::pTextShader->set_matrix4("projection", projection * glm::scale(transform, glm::vec3(1.0f, -1.0f, 1.0f)));

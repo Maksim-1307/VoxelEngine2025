@@ -47,48 +47,48 @@ class VoxelStorage{
             chunksMap->get(chunkX, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
         };
 
-        // light get_light(int x, int y, int z) const {
+        light get_light(int x, int y, int z) const {
 
-        //     int chunkX = get_chunk_coord(x, CHUNK_W);
-        //     int chunkY = get_chunk_coord(y, CHUNK_H);
-        //     int chunkZ = get_chunk_coord(z, CHUNK_W);
+            int chunkX = get_chunk_coord(x, CHUNK_W);
+            int chunkY = get_chunk_coord(y, CHUNK_H);
+            int chunkZ = get_chunk_coord(z, CHUNK_W);
 
-        //     int blockX = get_block_coord(x, CHUNK_W);
-        //     int blockY = get_block_coord(y, CHUNK_H);
-        //     int blockZ = get_block_coord(z, CHUNK_W);
+            int blockX = get_block_coord(x, CHUNK_W);
+            int blockY = get_block_coord(y, CHUNK_H);
+            int blockZ = get_block_coord(z, CHUNK_W);
 
-        //     return chunksMap->get(chunkX, chunkZ)->lightmap.get(blockX, blockY, blockZ);
+            return chunksMap->get(chunkX, chunkZ)->lightmap.get(blockX, blockY, blockZ);
 
-        // };
+        };
 
-        // uint8_t get_light(int x, int y, int z, int channel) const {
+        uint8_t get_light(int x, int y, int z, int channel) const {
 
-        //     int chunkX = get_chunk_coord(x, CHUNK_W);
-        //     int chunkY = get_chunk_coord(y, CHUNK_H);
-        //     int chunkZ = get_chunk_coord(z, CHUNK_W);
+            int chunkX = get_chunk_coord(x, CHUNK_W);
+            int chunkY = get_chunk_coord(y, CHUNK_H);
+            int chunkZ = get_chunk_coord(z, CHUNK_W);
 
-        //     int blockX = get_block_coord(x, CHUNK_W);
-        //     int blockY = get_block_coord(y, CHUNK_H);
-        //     int blockZ = get_block_coord(z, CHUNK_W);
+            int blockX = get_block_coord(x, CHUNK_W);
+            int blockY = get_block_coord(y, CHUNK_H);
+            int blockZ = get_block_coord(z, CHUNK_W);
 
-        //     return chunksMap->get(chunkX, chunkZ)->lightmap.get(blockX, blockY, blockZ, channel);
+            return chunksMap->get(chunkX, chunkZ)->lightmap.get(blockX, blockY, blockZ, channel);
 
-        // };
+        };
 
-        // // Remake !!! Only for testing 
-        // void set_light(int x, int y, int z, uint8_t value) const {
+        // Remake !!! Only for testing 
+        void set_light(int x, int y, int z, uint8_t value) const {
 
-        //     int chunkX = get_chunk_coord(x, CHUNK_W);
-        //     int chunkY = get_chunk_coord(y, CHUNK_H);
-        //     int chunkZ = get_chunk_coord(z, CHUNK_W);
+            int chunkX = get_chunk_coord(x, CHUNK_W);
+            int chunkY = get_chunk_coord(y, CHUNK_H);
+            int chunkZ = get_chunk_coord(z, CHUNK_W);
 
-        //     int blockX = get_block_coord(x, CHUNK_W);
-        //     int blockY = get_block_coord(y, CHUNK_H);
-        //     int blockZ = get_block_coord(z, CHUNK_W);
+            int blockX = get_block_coord(x, CHUNK_W);
+            int blockY = get_block_coord(y, CHUNK_H);
+            int blockZ = get_block_coord(z, CHUNK_W);
 
-        //     chunksMap->get(chunkX, chunkZ)->lightmap.setS(blockX, blockY, blockZ, value);
+            chunksMap->get(chunkX, chunkZ)->lightmap.setS(blockX, blockY, blockZ, value);
 
-        // };
+        };
 
     private:
     int get_chunk_coord(int coord, int chunk_size) const {

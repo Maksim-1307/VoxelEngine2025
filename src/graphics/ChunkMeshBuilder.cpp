@@ -160,6 +160,6 @@ uint16_t ChunkMeshBuilder::calculate_light(){
     int y = _y + coords[face * 3 + 1];
     int z = _z + coords[face * 3 + 2];
 
-    return 15;//Engine::pVoxelStorage->get_light(x + chunkX, y + chunkY, z + chunkZ).value;
+    return Engine::pVoxelStorage->get_light(x + chunkX, y + chunkY, z + chunkZ).value;
 
 }

@@ -1,109 +1,72 @@
-// #include "Lighting.hpp"
-// #include "src/Engine.hpp"
-// #include <memory>
-// #include <queue>
+#include "Lighting.hpp"
+#include "src/Engine.hpp"
+#include <memory>
+#include <queue>
 
-// std::queue<Chunk*> Lighting::preBuildQueue;
+std::queue<Chunk*> Lighting::preBuildQueue;
 
-// Lighting::Lighting(AreaMap3D<Chunk>& chunks) 
-//   : chunks(chunks) {
-//     solverR = std::make_unique<LightSolver>(chunks, 0);
-//     solverG = std::make_unique<LightSolver>(chunks, 1);
-//     solverB = std::make_unique<LightSolver>(chunks, 2);
-//     solverS = std::make_unique<LightSolver>(chunks, 3);
-// }
+Lighting::Lighting(AreaMap2D<Chunk>& chunks) 
+  : chunks(chunks) {
+    // solverR = std::make_unique<LightSolver>(chunks, 0);
+    // solverG = std::make_unique<LightSolver>(chunks, 1);
+    // solverB = std::make_unique<LightSolver>(chunks, 2);
+    // solverS = std::make_unique<LightSolver>(chunks, 3);
+}
 
-// Lighting::~Lighting() = default;
+Lighting::~Lighting() = default;
 
-// void Lighting::clear(){
-//     Chunk** chunks = Engine::pChunkMap->get_volume();
-//     int size = Engine::pChunkMap->size;
+void Lighting::clear(){
+    Chunk** chunks = Engine::pChunkMap->get_volume();
+    int size = Engine::pChunkMap->size;
 
-//     for (int x = 0; x < size; x++) {
-//         for (int z = 0; z < size; z++) {
-//             // for (int y = size - 1; y >= 0; y--) {
-//             for (int y = 0; y < size; y++) {
-//                 Chunk* chunk = Engine::pChunkMap->firstBuffer->get(x, y, z);
-//                 if (!chunk) continue;
-//                 chunk->lightmap.clear();
-//                 chunk->lightmap.mask.clear(false);
-//             }
-//         }
-//     }
+    for (int x = 0; x < size; x++) {
+        for (int z = 0; z < size; z++) {
+            Chunk* chunk = Engine::pChunkMap->firstBuffer->get(x, z);
+            if (!chunk) continue;
+            chunk->lightmap.clear();
+        }
+    }
 
-//     for (int x = 0; x < size; x++) {
-//         for (int z = 0; z < size; z++) {
-//             // for (int y = size - 1; y >= 0; y--) {
-//             // for (int y = 0; y < size; y++) {
-//                 Chunk* chunk = Engine::pChunkMap->firstBuffer->get(x, size-1, z);
-//                 if (!chunk) continue;
-//                 // chunk->lightmap.clear();
-//                 // chunk->lightmap.mask.clear(false);
-//                 Engine::pLighting->prebuildSkyLight(chunk);
-//             // }
-//         }
-//     }
+    for (int x = 0; x < size; x++) {
+        for (int z = 0; z < size; z++) {
+            Chunk* chunk = Engine::pChunkMap->firstBuffer->get(x, z);
+            if (!chunk) continue;
+            Engine::pLighting->prebuildSkyLight(chunk);
+        }
+    }
 
-//     while (!Lighting::preBuildQueue.empty()) {
-//         Chunk* chunk = Lighting::preBuildQueue.front();
-//         Lighting::preBuildQueue.pop();
-//         Engine::pLighting->prebuildSkyLight(chunk);
-//     }
-// }
+    while (!Lighting::preBuildQueue.empty()) {
+        Chunk* chunk = Lighting::preBuildQueue.front();
+        Lighting::preBuildQueue.pop();
+        Engine::pLighting->prebuildSkyLight(chunk);
+    }
+}
 
 
-// void Lighting::prebuildSkyLight(Chunk* chunk){
+void Lighting::prebuildSkyLight(Chunk* chunk){
 
-//     chunk->lightmap.clear();
-//     chunk->lightmap.mask.clear(false);
-//     int cx = chunk->X;
-//     int cy = chunk->Y;
-//     int cz = chunk->Z;
-
-//     Chunk* topChunk = Engine::pChunkMap->get(cx, cy+1, cz);
-
-//     // std::cout << cx << " " << cy << " "<< cz << "\n"; 
-//     // std::cout << "Top exists: " << (topChunk ? "yes" : "no") << "\n";
+    chunk->lightmap.clear();
+    int cx = chunk->X;
+    int cz = chunk->Z;
     
-//     for (int z = 0; z < CHUNK_W; z++){
-//         for (int x = 0; x < CHUNK_W; x++){
-//             bool canLightPass = true;
-        
-//             if (topChunk) {
-//                 canLightPass = topChunk->lightmap.mask.get(x, z);
-//             } else {
-//                 canLightPass = true;
-//             }
-            
-//             if (!canLightPass) {
-//                 chunk->lightmap.mask.set(x, z, false);
-//                 continue;
-//             }
-            
-//             bool columnIsTransparent = true;
-//             for (int y = CHUNK_H-1; y >= 0; y--){ 
-//                 voxel vox = chunk->get_voxel(x, y, z);
+    for (int z = 0; z < CHUNK_W; z++){
+        for (int x = 0; x < CHUNK_W; x++){
+            for (int y = CHUNK_H-1; y >= 0; y--){ 
+                voxel vox = chunk->get_voxel(x, y, z);
                 
-//                 if (vox.id != 0) { 
-//                     columnIsTransparent = false;
-//                     break;
-//                 }
+                if (vox.id != 0) { 
+                    break;
+                }
                 
-//                 chunk->lightmap.setS(x, y, z, 15);
-//             }
-//             chunk->lightmap.mask.set(x, z, columnIsTransparent);
-//         }
-//     }
-//     chunk->modified = true;
-
-//     Chunk* bottomChunk = Engine::pChunkMap->get(cx, cy-1, cz);
-//     if (Engine::pChunkMap->is_inside(cx, cy-1, cz)) {
-//         Lighting::preBuildQueue.push(bottomChunk);
-//     }
-// }
+                chunk->lightmap.setS(x, y, z, 15);
+            }
+        }
+    }
+    chunk->modified = true;
+}
 
 
-// void Lighting::buildSkyLight(int cx, int cy, int cz) {
+// void Lighting::buildSkyLight(int cx, int cz) {
 
 //     Chunk* chunk = Engine::pChunkMap->get(cx, cy, cz);
 //     if (chunk == nullptr) return;

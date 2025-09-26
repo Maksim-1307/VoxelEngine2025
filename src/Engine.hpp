@@ -18,6 +18,7 @@
 #include "logic/ChunksController.hpp"
 #include "physics/Terrain.hpp"
 #include "graphics/Stats.hpp"
+#include "lighting/Lighting.hpp"
 
 
 class Engine {
@@ -48,4 +49,5 @@ class Engine {
         static ChunksController* pChunksController;
         static Terrain* pTerrain;
         static Stats* pStats;
+        static Lighting* pLighting;
 };

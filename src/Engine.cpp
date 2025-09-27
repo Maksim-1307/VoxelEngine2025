@@ -28,7 +28,7 @@ VoxelStorage* Engine::pVoxelStorage = nullptr;
 ChunksController* Engine::pChunksController = nullptr;
 Terrain* Engine::pTerrain = nullptr;
 Stats* Engine::pStats = nullptr;
-// Lighting* Engine::pLighting = nullptr;
+Lighting* Engine::pLighting = nullptr;
 
 void Engine::init()
 {
@@ -65,9 +65,9 @@ void Engine::init()
     // World
     Engine::pGenerator = new Generator();
     Engine::pChunkMap = new AreaMap2D<Chunk>(6);
-    
 
-    // Engine::pLighting = new Lighting(*Engine::pChunkMap);
+    // Lighting
+    Engine::pLighting = new Lighting(*Engine::pChunkMap);
     
 
     std::function<Chunk *(int, int)> gen_func = [](int x, int z) -> Chunk* 
@@ -141,7 +141,7 @@ void Engine::game_loop()
         bool obstacle = Engine::pTerrain->is_obstacle_at(camPos.x, camPos.y, camPos.z);
         Engine::pStats->set("Obstacle", obstacle ? "true" : "false");
         prevObstacle = obstacle;
-        int light = -1;//Engine::pVoxelStorage->get_light(floor(camPos.x), floor(camPos.y), floor(camPos.z)).getS();
+        int light = Engine::pVoxelStorage->get_light(floor(camPos.x), floor(camPos.y), floor(camPos.z)).getS();
         Engine::pStats->set("Light", std::to_string(light));
         Engine::pStats->set("X", std::to_string(camPos.x));
         Engine::pStats->set("Y", std::to_string(camPos.y));

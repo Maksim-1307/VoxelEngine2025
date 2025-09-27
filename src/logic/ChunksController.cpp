@@ -22,11 +22,12 @@ void ChunksController::update() {
 void ChunksController::handle_at(int x, int z) {
     Chunk* chunk = Engine::pChunkMap->get(x, z);
     if (!chunk) return;
-    try {
-        Engine::pLighting->prebuildSkyLight(chunk);
-    } catch (...) {
-        std::cerr << "Failed to build light of chunk " << "\n";
-    }
+    // try {
+    //     // Engine::pLighting->prebuildSkyLight(chunk);
+    //     Engine::pLighting->buildSkyLight(x, z);
+    // } catch (...) {
+    //     std::cerr << "Failed to build light of chunk " << "\n";
+    // }
     
     try {
         Mesh* mesh = Engine::pChunkMeshBuilder->buildMesh(*chunk);
@@ -46,9 +47,20 @@ void ChunksController::handle_at(int x, int z) {
 }
 
 void ChunksController::load_around(glm::ivec2 center) {
+    Engine::pLighting->clear();
+    int size = Engine::pChunkMap->size;
 
+    // std::cout << "\n\n--- FIRST LOOP -- \n\n";
+    for (int x = 0; x < size; x++) {
+        for (int z = 0; z < size; z++) {
+            std::cout << "(" << x << ", " << z << ")\n";
+            Engine::pLighting->buildSkyLight(x, z);
+        }
+    }
+    // std::cout << "\n\n--- SECOND LOOP -- \n\n";
     for (int x = center.x - distance; x <= center.x + distance; x++) {    
         for (int z = center.y - distance; z <= center.y + distance; z++) { // fix
+            std::cout << "(" << x << ", " << z << ")\n";
                 handle_at(x, z);
         }
     }

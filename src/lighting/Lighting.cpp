@@ -7,10 +7,10 @@ std::queue<Chunk*> Lighting::preBuildQueue;
 
 Lighting::Lighting(AreaMap2D<Chunk>& chunks) 
   : chunks(chunks) {
-    // solverR = std::make_unique<LightSolver>(chunks, 0);
-    // solverG = std::make_unique<LightSolver>(chunks, 1);
-    // solverB = std::make_unique<LightSolver>(chunks, 2);
-    // solverS = std::make_unique<LightSolver>(chunks, 3);
+    solverR = std::make_unique<LightSolver>(chunks, 0);
+    solverG = std::make_unique<LightSolver>(chunks, 1);
+    solverB = std::make_unique<LightSolver>(chunks, 2);
+    solverS = std::make_unique<LightSolver>(chunks, 3);
 }
 
 Lighting::~Lighting() = default;
@@ -24,22 +24,24 @@ void Lighting::clear(){
             Chunk* chunk = Engine::pChunkMap->firstBuffer->get(x, z);
             if (!chunk) continue;
             chunk->lightmap.clear();
+            Engine::pLighting->prebuildSkyLight(chunk);
+            // Engine::pLighting->buildSkyLight(x, z);
         }
     }
-
     for (int x = 0; x < size; x++) {
         for (int z = 0; z < size; z++) {
-            Chunk* chunk = Engine::pChunkMap->firstBuffer->get(x, z);
-            if (!chunk) continue;
-            Engine::pLighting->prebuildSkyLight(chunk);
+            // Chunk* chunk = Engine::pChunkMap->firstBuffer->get(x, z);
+            // if (!chunk) continue;
+            // chunk->lightmap.clear();
+            // Engine::pLighting->buildSkyLight(x, z);
         }
     }
 
-    while (!Lighting::preBuildQueue.empty()) {
-        Chunk* chunk = Lighting::preBuildQueue.front();
-        Lighting::preBuildQueue.pop();
-        Engine::pLighting->prebuildSkyLight(chunk);
-    }
+    // while (!Lighting::preBuildQueue.empty()) {
+    //     Chunk* chunk = Lighting::preBuildQueue.front();
+    //     Lighting::preBuildQueue.pop();
+    //     Engine::pLighting->prebuildSkyLight(chunk);
+    // }
 }
 
 
@@ -66,36 +68,36 @@ void Lighting::prebuildSkyLight(Chunk* chunk){
 }
 
 
-// void Lighting::buildSkyLight(int cx, int cz) {
+void Lighting::buildSkyLight(int cx, int cz) {
 
-//     Chunk* chunk = Engine::pChunkMap->get(cx, cy, cz);
-//     if (chunk == nullptr) return;
+    Chunk* chunk = Engine::pChunkMap->get(cx, cz);
+    if (chunk == nullptr) return;
 
-//     for (int z = 0; z < CHUNK_W; z++){
-//         for (int x = 0; x < CHUNK_W; x++){
-//             int gx = x + cx * CHUNK_W;
-//             int gz = z + cz * CHUNK_W;
-//             for (int y = CHUNK_H-1; y >= 0; y--){
-//                 int gy = y + cy * CHUNK_H;
-//                 // while (gy > 0 && Engine::pVoxelStorage->get_voxel(gx, gy, gz).id != 0) { // !blockDefs[chunk->voxels[vox_index(x, y, z)].id]->lightPassing
-//                 //     gy--;
-//                 // }
+    for (int z = 0; z < CHUNK_W; z++){
+        for (int x = 0; x < CHUNK_W; x++){
+            int gx = x + cx * CHUNK_W;
+            int gz = z + cz * CHUNK_W;
+            for (int y = CHUNK_H-1; y >= 0; y--){
+                int gy = y;
+                // while (gy > 0 && Engine::pVoxelStorage->get_voxel(gx, gy, gz).id != 0) { // !blockDefs[chunk->voxels[vox_index(x, y, z)].id]->lightPassing
+                //     gy--;
+                // }
                 
-//                 if (chunk->lightmap.getS(x, y, z) > 1) {
-//                 uint8_t light = chunk->lightmap.getS(x, y, z);
-//                     solverS->add(gx,gy+1,gz, light);
-//                     for (; y >= 0; y--){
-//                         solverS->add(gx+1,gy,gz, light);
-//                         solverS->add(gx-1,gy,gz, light);
-//                         solverS->add(gx,gy,gz+1, light);
-//                         solverS->add(gx,gy,gz-1, light);
-//                     }
-//                 }
-//             }
-//         }
-//     }
-//     solverS->solve();
-// }
+                // if (chunk->lightmap.getS(x, y, z) > 1) {
+                uint8_t light = chunk->lightmap.getS(x, y, z);
+                    solverS->add(gx,gy+1,gz, light);
+                    for (; y >= 0; y--){
+                        solverS->add(gx+1,gy,gz, light);
+                        solverS->add(gx-1,gy,gz, light);
+                        solverS->add(gx,gy,gz+1, light);
+                        solverS->add(gx,gy,gz-1, light);
+                    }
+                // }
+            }
+        }
+    }
+    solverS->solve();
+}
 
 
 

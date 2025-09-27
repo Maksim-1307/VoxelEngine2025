@@ -12,10 +12,10 @@
 class Lighting {
 
     AreaMap2D<Chunk>& chunks;
-    // std::unique_ptr<LightSolver> solverR;
-    // std::unique_ptr<LightSolver> solverG;
-    // std::unique_ptr<LightSolver> solverB;
-    // std::unique_ptr<LightSolver> solverS;
+    std::unique_ptr<LightSolver> solverR;
+    std::unique_ptr<LightSolver> solverG;
+    std::unique_ptr<LightSolver> solverB;
+    std::unique_ptr<LightSolver> solverS;
 public:
     Lighting(AreaMap2D<Chunk>& chunks);
     ~Lighting();

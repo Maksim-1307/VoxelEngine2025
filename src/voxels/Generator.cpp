@@ -1,4 +1,5 @@
 #include "Generator.hpp"
+#include "src/Engine.hpp"
 
 #define STB_PERLIN_IMPLEMENTATION
 #include "include/stb_perlin.h" 
@@ -10,6 +11,35 @@
 Chunk *Generator::generate_at(int x, int z)
 {
     return terrain_with_caves(x, 0, z);
+}
+
+void Generator::generate_ambient(int x, int z) {
+    Chunk* chunk = Engine::pChunkMap->get(x, z);
+    if (chunk->state >= STRUCTURES_GENERATED) {
+        std::cout << (int)chunk->state << "\n";
+        return;
+    }
+
+    std::hash<int> hasher;
+
+    int wx_start = chunk->X * CHUNK_W;
+    int wz_start = chunk->Z * CHUNK_W;
+
+    for (int wx = wx_start; wx < (x + 1) * CHUNK_W; wx++) {
+        for (int wz = wz_start; wz < (z + 1) * CHUNK_W; wz++) {  
+            int wy = CHUNK_H - 1;
+            for (; wy >= 0; wy--) {
+                if (Engine::pVoxelStorage->get_voxel(wx, wy, wz).id != 0) {
+                    wy += 1;
+                    break;
+                }
+            }
+            // std::cout <<   << "\n";
+            
+            if (random(wx, wz, seed) > 0.98) generate_tree(wx, wy, wz);
+        }   
+    }
+    chunk->state = STRUCTURES_GENERATED;
 }
 
 Chunk* Generator::terrain_with_caves(int x, int y, int z){
@@ -51,7 +81,7 @@ Chunk* Generator::terrain_with_caves(int x, int y, int z){
             }
         }
     }
-
+    chunk->state = TERRAIN_GENERATED;
     return chunk;
 }
 
@@ -79,6 +109,7 @@ Chunk* Generator::perlin_noise_3d(int x, int y, int z){
     }
     // chunk->modified = true;
     // chunk->lightmap.mask.clear(true);
+    chunk->state = TERRAIN_GENERATED;
     return chunk;
 }
 
@@ -108,5 +139,44 @@ Chunk* Generator::perlin_noise_2d(int x, int y, int z){
     }
     // chunk->modified = true;
     // chunk->lightmap.mask.clear(true);
+    chunk->state = TERRAIN_GENERATED;
     return chunk;
+}
+
+
+void Generator::generate_tree(int x, int y, int z) {
+    if (y == 0 || Engine::pVoxelStorage->get_voxel(x, y-1, z).id != 3) return;
+    // Генерация ствола дерева
+    int trunk_height = 4 + (x % 3); // Небольшая вариативность высоты
+    int crown_start_y = y + trunk_height;
+    
+    // Ствол
+    for (int i = 0; i < trunk_height; i++) {
+        Engine::pVoxelStorage->set_voxel(x, y + i, z, {4, 0}); // Ствол
+    }
+    
+    // Генерация кроны (листвы)
+    int crown_radius = 2;
+    
+    // Основание кроны
+    for (int dx = -crown_radius; dx <= crown_radius; dx++) {
+        for (int dz = -crown_radius; dz <= crown_radius; dz++) {
+            // Простая проверка для круглой формы
+            if (dx*dx + dz*dz <= crown_radius*crown_radius + 1) {
+                Engine::pVoxelStorage->set_voxel(x + dx, crown_start_y, z + dz, {5, 0}); // Листва
+            }
+        }
+    }
+    
+    // Верхний слой кроны
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dz = -1; dz <= 1; dz++) {
+            if (dx*dx + dz*dz <= 2) {
+                Engine::pVoxelStorage->set_voxel(x + dx, crown_start_y + 1, z + dz, {5, 0}); // Листва
+            }
+        }
+    }
+    
+    // Верхушка кроны
+    Engine::pVoxelStorage->set_voxel(x, crown_start_y + 2, z, {5, 0}); // Листва
 }

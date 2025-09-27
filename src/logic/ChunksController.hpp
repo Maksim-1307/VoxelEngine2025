@@ -23,7 +23,9 @@ class ChunksController {
     private:
         void handle_at(int x, int z);
         void load_around(glm::ivec2 center);
-        int distance = 4;
+        // int distance = 4;
+
+        std::queue<Chunk*> handleQueue;
         AreaMap2D<Chunk> *chunkMap;
         Camera* camera;
         glm::ivec2 camPos;

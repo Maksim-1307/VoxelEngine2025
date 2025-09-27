@@ -64,7 +64,7 @@ void Lighting::prebuildSkyLight(Chunk* chunk){
             }
         }
     }
-    chunk->modified = true;
+    chunk->state = LIGHTS_PRE_BUILT;
 }
 
 

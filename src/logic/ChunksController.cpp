@@ -1,5 +1,6 @@
 #include "ChunksController.hpp"
 #include "src/Engine.hpp"
+#include "src/logic/Settings.hpp"
 
 void ChunksController::update() {
     int X = std::floor((float)this->camera->position.x / CHUNK_W);
@@ -28,6 +29,11 @@ void ChunksController::handle_at(int x, int z) {
     // } catch (...) {
     //     std::cerr << "Failed to build light of chunk " << "\n";
     // }
+    if (chunk->state <= STRUCTURES_GENERATED) {
+        Engine::pGenerator->generate_ambient(x, z);
+    } 
+
+    Engine::pLighting->prebuildSkyLight(chunk);
     
     try {
         Mesh* mesh = Engine::pChunkMeshBuilder->buildMesh(*chunk);
@@ -39,7 +45,7 @@ void ChunksController::handle_at(int x, int z) {
             glm::mat4(1.0f),
             glm::vec3(chunk->X * CHUNK_W, 0, chunk->Z * CHUNK_W)
         );
-        chunk->modified = false;
+        chunk->state = VISIBLE;
     } catch (...) {
         std::cerr << "Failed to build mesh for chunk at " 
                   << x << ", " << z << "\n";
@@ -47,8 +53,9 @@ void ChunksController::handle_at(int x, int z) {
 }
 
 void ChunksController::load_around(glm::ivec2 center) {
-    Engine::pLighting->clear();
+    // Engine::pLighting->clear();
     int size = Engine::pChunkMap->size;
+    int distance = Settings::load_distance;
 
     // std::cout << "\n\n--- FIRST LOOP -- \n\n";
     for (int x = 0; x < size; x++) {
@@ -60,6 +67,9 @@ void ChunksController::load_around(glm::ivec2 center) {
     // std::cout << "\n\n--- SECOND LOOP -- \n\n";
     for (int x = center.x - distance; x <= center.x + distance; x++) {    
         for (int z = center.y - distance; z <= center.y + distance; z++) { // fix
+
+            // if (is_padding(1)) ...
+
             std::cout << "(" << x << ", " << z << ")\n";
                 handle_at(x, z);
         }
@@ -69,11 +79,12 @@ void ChunksController::load_around(glm::ivec2 center) {
 void ChunksController::draw_chunks() {
 
     glm::ivec2 center = this->camPos;
+    int distance = Settings::load_distance - 2;
     
     for (int x = center.x - distance; x <= center.x + distance; x++) {
         for (int z = center.y - distance; z <= center.y + distance; z++) { // fix
             Chunk* chunk = Engine::pChunkMap->get(x, z);
-            if (!chunk || !chunk->renderer) continue;
+            if (!chunk || !chunk->renderer || chunk->state < VISIBLE) continue;
             
             Engine::pMeshShader->set_matrix4("model", chunk->renderer->transform);
             chunk->renderer->draw();

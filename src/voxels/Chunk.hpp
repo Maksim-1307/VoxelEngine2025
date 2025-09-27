@@ -10,12 +10,42 @@
 #define CHUNK_W 16
 #define CHUNK_H 64
 
+/*
+
+PADDING 2
+1) Terrain generation. 
+
+PADDING 1
+2) Structures generation. 
+3) Lights pre-building. 
+4) Mesh building.  
+
+VISIBLE
+5) Lights building. 
+Can be shown
+
+*/
+
+enum ChunkState { 
+    INITIALIZED,
+    // padding 2
+    TERRAIN_GENERATED, 
+    // padding 1
+    STRUCTURES_GENERATED, 
+    MODIFIED,
+    LIGHTS_PRE_BUILT,
+    LIGHTS_BUILT,
+    MESH_BUILT,
+    // shown
+    VISIBLE 
+};
 
 class Chunk{
 public:
     Chunk(){
         Chunk::chunks += 1;
         lightmap.clear();
+        state = ChunkState::INITIALIZED;
     };
     Chunk(const Chunk &) = delete;
     Chunk &operator=(const Chunk &) = delete;
@@ -37,7 +67,7 @@ public:
     }
     
     static int chunks;
-    bool modified = false;
+    ChunkState state;
 
 private:
     Array3D<voxel> voxels = Array3D<voxel>(CHUNK_W, CHUNK_H, CHUNK_W);

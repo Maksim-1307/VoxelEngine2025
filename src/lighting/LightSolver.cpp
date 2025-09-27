@@ -28,7 +28,7 @@ void LightSolver::add(int x, int y, int z, unsigned char emission){
     if (emission < light) return;
     addqueue.push(lightentry {x, y, z, emission});
 
-    chunk->modified = true;
+    chunk->state = MODIFIED;
     chunk->lightmap.set(ix, iy, iz, channel, emission);
 }
 
@@ -82,7 +82,7 @@ void LightSolver::solve(){
                 int lx = x - cx * CHUNK_W;
                 int ly = y - cy * CHUNK_H;
                 int lz = z - cz * CHUNK_W;
-                chunk->modified = true;
+                chunk->state = MODIFIED;
 
                 uint8_t light = chunk->lightmap.get(lx, ly, lz, channel);
                 if (light != 0 && light == entry.light-1){
@@ -125,7 +125,7 @@ void LightSolver::solve(){
                 int lx = x - cx * CHUNK_W;
                 int ly = y - cy * CHUNK_H;
                 int lz = z - cz * CHUNK_W;
-                chunk->modified = true;
+                chunk->state = MODIFIED;
 
                 uint8_t light = chunk->lightmap.get(lx, ly, lz, channel);
                 voxel v = chunk->get_voxel(lx, ly, lz);

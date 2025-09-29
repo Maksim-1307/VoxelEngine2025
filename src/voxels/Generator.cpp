@@ -15,8 +15,9 @@ Chunk *Generator::generate_at(int x, int z)
 
 void Generator::generate_ambient(int x, int z) {
     Chunk* chunk = Engine::pChunkMap->get(x, z);
-    if (chunk->state >= STRUCTURES_GENERATED) {
-        std::cout << (int)chunk->state << "\n";
+
+    if (chunk->state != TERRAIN_GENERATED) {
+        std::cout << "WARNING: generate_ambient is called on chunk with a state other than TERRAIN_GENERATED\n";
         return;
     }
 
@@ -146,37 +147,31 @@ Chunk* Generator::perlin_noise_2d(int x, int y, int z){
 
 void Generator::generate_tree(int x, int y, int z) {
     if (y == 0 || Engine::pVoxelStorage->get_voxel(x, y-1, z).id != 3) return;
-    // Генерация ствола дерева
-    int trunk_height = 4 + (x % 3); // Небольшая вариативность высоты
+
+    int trunk_height = 4 + (x % 3); 
     int crown_start_y = y + trunk_height;
     
-    // Ствол
     for (int i = 0; i < trunk_height; i++) {
-        Engine::pVoxelStorage->set_voxel(x, y + i, z, {4, 0}); // Ствол
+        Engine::pVoxelStorage->set_voxel(x, y + i, z, {4, 0}); 
     }
     
-    // Генерация кроны (листвы)
     int crown_radius = 2;
     
-    // Основание кроны
     for (int dx = -crown_radius; dx <= crown_radius; dx++) {
         for (int dz = -crown_radius; dz <= crown_radius; dz++) {
-            // Простая проверка для круглой формы
             if (dx*dx + dz*dz <= crown_radius*crown_radius + 1) {
-                Engine::pVoxelStorage->set_voxel(x + dx, crown_start_y, z + dz, {5, 0}); // Листва
+                Engine::pVoxelStorage->set_voxel(x + dx, crown_start_y, z + dz, {5, 0}); 
             }
         }
     }
     
-    // Верхний слой кроны
     for (int dx = -1; dx <= 1; dx++) {
         for (int dz = -1; dz <= 1; dz++) {
             if (dx*dx + dz*dz <= 2) {
-                Engine::pVoxelStorage->set_voxel(x + dx, crown_start_y + 1, z + dz, {5, 0}); // Листва
+                Engine::pVoxelStorage->set_voxel(x + dx, crown_start_y + 1, z + dz, {5, 0}); 
             }
         }
     }
     
-    // Верхушка кроны
     Engine::pVoxelStorage->set_voxel(x, crown_start_y + 2, z, {5, 0}); // Листва
 }

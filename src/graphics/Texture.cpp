@@ -10,6 +10,8 @@ Texture::Texture(std::string texturePath, bool alpha){
     glGenTextures(1, &texID);
     glBindTexture(GL_TEXTURE_2D, texID);
 
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
     // filtering parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -24,6 +26,19 @@ Texture::Texture(std::string texturePath, bool alpha){
         throw std::runtime_error("ERROR! Cannot load image data from " + texturePath);
     }
     stbi_image_free(data);
+}
+
+Texture::Texture(unsigned char* data, int width, int height) {
+    
+    glGenTextures(1, &texID);
+    glBindTexture(GL_TEXTURE_2D, texID);
+
+    // filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 GLuint Texture::getID(){

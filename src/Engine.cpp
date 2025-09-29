@@ -29,6 +29,7 @@ ChunksController* Engine::pChunksController = nullptr;
 Terrain* Engine::pTerrain = nullptr;
 Stats* Engine::pStats = nullptr;
 Lighting* Engine::pLighting = nullptr;
+WorldLoadingIndicator* Engine::pWorldLoadingIndicator = nullptr;
 
 void Engine::init()
 {
@@ -81,6 +82,7 @@ void Engine::init()
     Engine::pChunksController = new ChunksController(Engine::pChunkMap, Engine::pCamera);
     Engine::pTerrain = new Terrain(*Engine::pVoxelStorage);
     Engine::pStats = new Stats();
+    Engine::pWorldLoadingIndicator = new WorldLoadingIndicator(Engine::pChunkMap->get_chunks());
 }
 
 void Engine::game_loop()
@@ -150,6 +152,22 @@ void Engine::game_loop()
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 250.0f, 0.0f));
         Engine::pTextShader->set_matrix4("projection", projection * glm::scale(transform, glm::vec3(1.0f, -1.0f, 1.0f)));
         Engine::pStats->draw();
+
+        // drawing world loading indicator
+        Engine::pTextShader->use();
+        Engine::pWorldLoadingIndicator->update();
+
+        int windowWidth = Engine::pWindow->get_width();
+        int windowHeight = Engine::pWindow->get_height();
+        float rightPosition = windowWidth - 82.0f; // 50px margin + 32px width
+        float topPosition = 80.0f; // 50px from top
+
+        transform = glm::translate(glm::mat4(1.0f), glm::vec3(rightPosition, topPosition, 0.0f));
+        transform = glm::scale(transform, glm::vec3(64.0f, 64.0f, 1.0f));
+
+        Engine::pTextShader->set_matrix4("projection", projection * transform);
+        Engine::pTextShader->set_texture("theTexture", Engine::pWorldLoadingIndicator->texture->getID());
+        Engine::pWorldLoadingIndicator->draw();
 
         glfwSwapBuffers(Engine::pWindow->get_glfw_window());
         glfwPollEvents();

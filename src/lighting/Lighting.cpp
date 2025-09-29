@@ -47,6 +47,10 @@ void Lighting::clear(){
 
 void Lighting::prebuildSkyLight(Chunk* chunk){
 
+    if (chunk->state < STRUCTURES_GENERATED) {
+        std::cout << chunk->state << " <- \n";
+        return;
+    }
     chunk->lightmap.clear();
     int cx = chunk->X;
     int cz = chunk->Z;

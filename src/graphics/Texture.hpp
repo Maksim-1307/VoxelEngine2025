@@ -8,8 +8,9 @@ class Texture
 
 public:
     Texture(std::string texturePath, bool alpha=false);
+    Texture(unsigned char* data, int width, int height);
     Texture(){};
-    ~Texture();
+    ~Texture(){};
 
     GLuint getID();
 

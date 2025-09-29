@@ -29,10 +29,9 @@ void ChunksController::handle_at(int x, int z) {
     // } catch (...) {
     //     std::cerr << "Failed to build light of chunk " << "\n";
     // }
-    if (chunk->state <= STRUCTURES_GENERATED) {
-        Engine::pGenerator->generate_ambient(x, z);
-    } 
-
+    // if (chunk->state < STRUCTURES_GENERATED) {
+    //     Engine::pGenerator->generate_ambient(x, z);
+    // } 
     Engine::pLighting->prebuildSkyLight(chunk);
     
     try {
@@ -57,23 +56,32 @@ void ChunksController::load_around(glm::ivec2 center) {
     int size = Engine::pChunkMap->size;
     int distance = Settings::load_distance;
 
-    // std::cout << "\n\n--- FIRST LOOP -- \n\n";
-    for (int x = 0; x < size; x++) {
-        for (int z = 0; z < size; z++) {
-            std::cout << "(" << x << ", " << z << ")\n";
-            Engine::pLighting->buildSkyLight(x, z);
-        }
+    for (Chunk* chunk : Engine::pChunkMap->padding_chunks(1)) {
+        // if (chunk->state < STRUCTURES_GENERATED) {
+            std::cout << "(" << chunk->X << " " << chunk->Z << ") < amb\n";
+            Engine::pGenerator->generate_ambient(chunk->X, chunk->Z);
+        // } 
     }
-    // std::cout << "\n\n--- SECOND LOOP -- \n\n";
-    for (int x = center.x - distance; x <= center.x + distance; x++) {    
-        for (int z = center.y - distance; z <= center.y + distance; z++) { // fix
-
-            // if (is_padding(1)) ...
-
-            std::cout << "(" << x << ", " << z << ")\n";
-                handle_at(x, z);
-        }
+    for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(2)) {
+        if (chunk->state >= STRUCTURES_GENERATED || true) {
+            std::cout << "(" << chunk->X << " " << chunk->Z << ") < bod\n";
+            handle_at(chunk->X, chunk->Z);
+        } 
     }
+
+    // for (int x = 2; x < size-2; x++) {
+    //     for (int z = 2; z < size-2; z++) {
+    //         // std::cout << "(" << x << ", " << z << ")\n";
+    //         Engine::pLighting->buildSkyLight(x, z);
+    //     }
+    // }
+    // for (int x = center.x - distance; x <= center.x + distance; x++) {    
+    //     for (int z = center.y - distance; z <= center.y + distance; z++) { // fix
+
+    //         std::cout << "(" << x << ", " << z << ")\n";
+    //             handle_at(x, z);
+    //     }
+    // }
 }
 
 void ChunksController::draw_chunks() {

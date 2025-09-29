@@ -19,6 +19,9 @@
 #include "physics/Terrain.hpp"
 #include "graphics/Stats.hpp"
 #include "lighting/Lighting.hpp"
+#include "graphics/WorldLoadingIndicator.hpp"
+
+#include "logic/Iterator.hpp"
 
 
 class Engine {
@@ -31,7 +34,6 @@ class Engine {
         static Shader* pSpriteShader;
         static Shader *pTextShader;
         static Shader* pMeshShader;
-        static Mesh* pMesh;
         static Mesh* pSprite;
         static MeshRenderer* pRenderer;
         static MeshRenderer *pSpriteRenderer;
@@ -50,4 +52,5 @@ class Engine {
         static Terrain* pTerrain;
         static Stats* pStats;
         static Lighting* pLighting;
+        static WorldLoadingIndicator* pWorldLoadingIndicator;
 };

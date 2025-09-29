@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Array2D.hpp"
+#include "Iterator.hpp"
 #include <functional>
 #include <vector>
 
@@ -106,6 +107,17 @@ public:
         return in_bounds(mx, mz);
     }
     
+    std::vector<T*> padding_chunks(int level){
+        return Iterator<T*>::padding(this->firstBuffer, level);
+    }
+    std::vector<T*> chunks_in_radius(int radius) {
+        return Iterator<T*>::in_radius(this->firstBuffer, radius);
+    }
+
+    Array2D<T*>* get_chunks() const {
+        return this->firstBuffer;
+    }
+
     // timely 
     int size;
 

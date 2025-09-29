@@ -27,17 +27,17 @@ Can be shown
 */
 
 enum ChunkState { 
-    INITIALIZED,
-    // padding 2
-    TERRAIN_GENERATED, 
+    INITIALIZED = 0,
+    // padding 0
+    TERRAIN_GENERATED = 1, 
     // padding 1
-    STRUCTURES_GENERATED, 
-    MODIFIED,
-    LIGHTS_PRE_BUILT,
-    LIGHTS_BUILT,
-    MESH_BUILT,
+    STRUCTURES_GENERATED = 2, 
+    MODIFIED = 3,
+    LIGHTS_PRE_BUILT = 4,
+    LIGHTS_BUILT = 5,
+    MESH_BUILT = 6,
     // shown
-    VISIBLE 
+    VISIBLE = 7
 };
 
 class Chunk{

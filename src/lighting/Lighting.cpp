@@ -80,33 +80,53 @@ void Lighting::prebuildSkyLight(Chunk* chunk){
 
 void Lighting::buildSkyLight(int cx, int cz) {
 
-    Chunk* chunk = Engine::pChunkMap->get(cx, cz);
-    if (chunk == nullptr) return;
+    auto& solverR = *this->solverR;
+    auto& solverG = *this->solverG;
+    auto& solverB = *this->solverB;
+    auto& solverS = *this->solverS;
 
-    for (int z = 0; z < CHUNK_W; z++){
-        for (int x = 0; x < CHUNK_W; x++){
-            int gx = x + cx * CHUNK_W;
-            int gz = z + cz * CHUNK_W;
-            for (int y = CHUNK_H-1; y >= 0; y--){
-                int gy = y;
-                // while (gy > 0 && Engine::pVoxelStorage->get_voxel(gx, gy, gz).id != 0) { // !blockDefs[chunk->voxels[vox_index(x, y, z)].id]->lightPassing
-                //     gy--;
-                // }
-                
-                // if (chunk->lightmap.getS(x, y, z) > 1) {
-                uint8_t light = chunk->lightmap.getS(x, y, z);
-                    solverS->add(gx,gy+1,gz, light);
-                    for (; y >= 0; y--){
-                        solverS->add(gx+1,gy,gz, light);
-                        solverS->add(gx-1,gy,gz, light);
-                        solverS->add(gx,gy,gz+1, light);
-                        solverS->add(gx,gy,gz-1, light);
+    Chunk* chunk = Engine::pChunkMap->get(cx, cz);
+    if (chunk == nullptr) {
+        // logger.error() << "attempted to build lights to chunk missing in local matrix";
+        return;
+    }
+    // for (uint y = 0; y < CHUNK_H; y++){
+    //     for (uint z = 0; z < CHUNK_W; z++){
+    //         for (uint x = 0; x < CHUNK_W; x++){
+    //             const voxel& vox = chunk->voxels[(y * CHUNK_W + z) * CHUNK_W + x];
+    //             const Block* block = blockDefs[vox.id];
+    //             int gx = x + cx * CHUNK_W;
+    //             int gz = z + cz * CHUNK_W;
+    //             if (block->rt.emissive){
+    //                 solverR.add(gx,y,gz,block->emission[0]);
+    //                 solverG.add(gx,y,gz,block->emission[1]);
+    //                 solverB.add(gx,y,gz,block->emission[2]);
+    //             }
+    //         }
+    //     }
+    // }
+
+
+        for (int x = 0; x < CHUNK_W; x ++) {
+            for (int y = 0; y < CHUNK_H; y++) {
+                for (int z = 0; z < CHUNK_W; z++) {
+                    int gx = x + cx * CHUNK_W;
+                    int gz = z + cz * CHUNK_W;
+                    light light = chunk->lightmap.get(x, y, z);
+                    if (light){
+                        solverR.add(gx,y,gz, light.getR());
+                        solverG.add(gx,y,gz, light.getG());
+                        solverB.add(gx,y,gz, light.getB());
+                        solverS.add(gx,y,gz, light.getS());
                     }
-                // }
+                }
             }
         }
-    }
-    solverS->solve();
+    solverR.solve();
+    solverG.solve();
+    solverB.solve();
+    solverS.solve();
+    chunk->state = LIGHTS_BUILT;
 }
 
 void Lighting::onChunkLoaded(int cx, int cz, bool expand) {

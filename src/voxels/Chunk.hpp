@@ -34,10 +34,11 @@ enum ChunkState {
     STRUCTURES_GENERATED = 2, 
     MODIFIED = 3,
     LIGHTS_PRE_BUILT = 4,
-    LIGHTS_BUILT = 5,
-    MESH_BUILT = 6,
+    CHUNK_LOADED = 5,
+    LIGHTS_BUILT = 6,
+    MESH_BUILT = 7,
     // shown
-    VISIBLE = 7
+    VISIBLE = 8
 };
 
 class Chunk{
@@ -50,6 +51,7 @@ public:
     Chunk(const Chunk &) = delete;
     Chunk &operator=(const Chunk &) = delete;
     ~Chunk(){
+        delete renderer;
         Chunk::chunks -= 1;
     };
 

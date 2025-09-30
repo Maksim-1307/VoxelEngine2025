@@ -32,7 +32,6 @@ void ChunksController::handle_at(int x, int z) {
     // if (chunk->state < STRUCTURES_GENERATED) {
     //     Engine::pGenerator->generate_ambient(x, z);
     // } 
-    Engine::pLighting->prebuildSkyLight(chunk);
     Engine::pLighting->onChunkLoaded(chunk->X, chunk->Z, true);
     Engine::pLighting->buildSkyLight(chunk->X, chunk->Z);
     
@@ -63,7 +62,12 @@ void ChunksController::load_around(glm::ivec2 center) {
             Engine::pGenerator->generate_ambient(chunk->X, chunk->Z);
         } 
     }
-    for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(5)) {
+    for (Chunk* chunk : Engine::pChunkMap->padding_chunks(2)) {
+        if (chunk->state == STRUCTURES_GENERATED) {
+            Engine::pLighting->prebuildSkyLight(chunk);
+        } 
+    }
+    for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(4)) {
         if (chunk->state >= STRUCTURES_GENERATED || true) {
             handle_at(chunk->X, chunk->Z);
         } 

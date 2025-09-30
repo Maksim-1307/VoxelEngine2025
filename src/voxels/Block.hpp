@@ -36,6 +36,7 @@ public :
 private : 
     static void add_block(Block *block)
     {
+        std::cout << "New Block with name " << block->name << " added." << std::endl;
         Block::blocks.push_back(block);
         block->voxelId = Block::blocks.size() - 1;
     }

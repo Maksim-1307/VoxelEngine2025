@@ -119,7 +119,7 @@ void ChunkMeshBuilder::CubeModel(int x, int y, int z)
 
 std::array<bool, 6> ChunkMeshBuilder::opened_around(int x, int y, int z)
 {
-    std::array<bool, 6> opened;
+    std::array<bool, 6> opened{};
     opened[0] = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX + 1, y + chunkY, z + chunkZ).id).opened_faces[adjacent(0)];
     opened[1] = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX - 1, y + chunkY, z + chunkZ).id).opened_faces[adjacent(1)];
     opened[2] = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX, y + chunkY + 1, z + chunkZ).id).opened_faces[adjacent(2)];

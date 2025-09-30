@@ -60,16 +60,19 @@ void WorldLoadingIndicator::update(Array2D<Chunk*>* chunks) {
                     textureData.push_back(255); textureData.push_back(255); textureData.push_back(255);
                     break;
                 case LIGHTS_BUILT:
-                    textureData.push_back(0); textureData.push_back(255); textureData.push_back(20);
+                    textureData.push_back(152); textureData.push_back(221); textureData.push_back(255);
+                    break;
+                case CHUNK_LOADED:
+                    textureData.push_back(59); textureData.push_back(190); textureData.push_back(255);
                     break;
                 case LIGHTS_PRE_BUILT:
-                    textureData.push_back(20); textureData.push_back(255); textureData.push_back(20);
+                    textureData.push_back(0); textureData.push_back(86); textureData.push_back(130);
                     break;
                 case MODIFIED:
                     textureData.push_back(0); textureData.push_back(255); textureData.push_back(255);
                     break;
                 case STRUCTURES_GENERATED:
-                    textureData.push_back(0); textureData.push_back(255); textureData.push_back(0);
+                    textureData.push_back(24); textureData.push_back(234); textureData.push_back(24);
                     break;
                 case TERRAIN_GENERATED:
                     textureData.push_back(6); textureData.push_back(64); textureData.push_back(46);

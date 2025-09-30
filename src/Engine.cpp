@@ -39,7 +39,7 @@ void Engine::init()
     new Block("stone", BlockModel::SOLID, {{1, 0}});
     new Block("grass", BlockModel::SOLID, {{1, 1}, {0, 0}, {0, 1}});
     new Block("oak_log", BlockModel::SOLID, {{2, 1}, {0, 2}, {2, 1}});
-    new Block("leaves", BlockModel::SOLID, {{1, 2}});
+    new Block("leaves", BlockModel::FOLIAGE, {{1, 2}});
 
     // Graphics
     WindowArgs wargs;

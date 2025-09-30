@@ -8,10 +8,15 @@ model(model)
 {
     set_UVs(UVs);
     Block::add_block(this);
-    if (model == BlockModel::AIR) {
-        this->opened_faces = {1, 1, 1, 1, 1, 1};
-    } else {
-        this->opened_faces = {0, 0, 0, 0, 0, 0};
+    switch (model) {
+        case BlockModel::AIR: case BlockModel::FOLIAGE:
+            this->opened_faces = {1, 1, 1, 1, 1, 1};
+            break;
+        case BlockModel::SOLID:
+            this->opened_faces = {0, 0, 0, 0, 0, 0};
+            break;
+        default:
+            this->opened_faces = {1, 1, 1, 1, 1, 1};
     }
 };
 

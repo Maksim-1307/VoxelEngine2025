@@ -3,6 +3,18 @@
 
 Mesh* ChunkMeshBuilder::buildMesh(Chunk &chunk)
 {
+
+    // if (chunk.state < LIGHTS_PRE_BUILT) {
+    //     // std::cout << "WARNING: buildMesh called on a chunk with state less than LIGHTS_BUILT. The state: " <<
+    //     //     (int)chunk.state;
+    //     return nullptr;
+    // }
+    // if (chunk.state > LIGHTS_BUILT) {
+    //     // std::cout << "WARNING: buildMesh called on an already handled chunk. The state: " <<
+    //     //     (int)chunk.state;
+    //     return nullptr;
+    // }
+
     vertices.clear();
     indices.clear();
     vertices.reserve(1000);

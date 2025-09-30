@@ -33,6 +33,8 @@ void ChunksController::handle_at(int x, int z) {
     //     Engine::pGenerator->generate_ambient(x, z);
     // } 
     Engine::pLighting->prebuildSkyLight(chunk);
+    Engine::pLighting->onChunkLoaded(chunk->X, chunk->Z, true);
+    Engine::pLighting->buildSkyLight(chunk->X, chunk->Z);
     
     try {
         Mesh* mesh = Engine::pChunkMeshBuilder->buildMesh(*chunk);

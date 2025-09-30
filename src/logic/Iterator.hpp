@@ -57,7 +57,7 @@ public:
         int centerY = size / 2;
         int x = centerX;
         int y = centerY;
-        for (int step = 0; step < size; step += 2) {
+        for (int step = 0; step < radius * 2; step += 2) {
             for (int dir = 0; dir < 4; dir++) {
                 int dx = directions[dir*2];
                 int dy = directions[dir*2+1];

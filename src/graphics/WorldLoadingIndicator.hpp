@@ -9,7 +9,7 @@ class WorldLoadingIndicator
 {
 public:
     WorldLoadingIndicator(Array2D<Chunk*>* chunks);
-    void update();
+    void update(Array2D<Chunk*>* chunks);
     void draw();
 
     Texture* texture;

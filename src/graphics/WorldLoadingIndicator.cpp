@@ -5,7 +5,7 @@ WorldLoadingIndicator::WorldLoadingIndicator(Array2D<Chunk*>* chunks) {
     renderer = new MeshRenderer(mesh, MeshType::SPRITE2D);
     this->chunks = chunks;
     
-    update();
+    update(this->chunks);
 }
 
 unsigned char* generateCheckerboardData(int width, int height) {
@@ -34,7 +34,9 @@ unsigned char* generateCheckerboardData(int width, int height) {
 }
 
 
-void WorldLoadingIndicator::update() {
+void WorldLoadingIndicator::update(Array2D<Chunk*>* chunks) {
+
+    this->chunks = chunks;
     int width = chunks->getSizeX();
     int height = chunks->getSizeY();
     
@@ -64,13 +66,13 @@ void WorldLoadingIndicator::update() {
                     textureData.push_back(20); textureData.push_back(255); textureData.push_back(20);
                     break;
                 case MODIFIED:
-                    textureData.push_back(0); textureData.push_back(255); textureData.push_back(0);
+                    textureData.push_back(0); textureData.push_back(255); textureData.push_back(255);
                     break;
                 case STRUCTURES_GENERATED:
                     textureData.push_back(0); textureData.push_back(255); textureData.push_back(0);
                     break;
                 case TERRAIN_GENERATED:
-                    textureData.push_back(0); textureData.push_back(255); textureData.push_back(0);
+                    textureData.push_back(6); textureData.push_back(64); textureData.push_back(46);
                     break;
                 case INITIALIZED:
                     textureData.push_back(0); textureData.push_back(0); textureData.push_back(0);

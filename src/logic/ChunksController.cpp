@@ -58,11 +58,11 @@ void ChunksController::load_around(glm::ivec2 center) {
 
     for (Chunk* chunk : Engine::pChunkMap->padding_chunks(1)) {
         // if (chunk->state < STRUCTURES_GENERATED) {
-            std::cout << "(" << chunk->X << " " << chunk->Z << ") < amb\n";
+            // std::cout << "(" << chunk->X << " " << chunk->Z << ") < amb\n";
             Engine::pGenerator->generate_ambient(chunk->X, chunk->Z);
         // } 
     }
-    for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(2)) {
+    for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(5)) {
         if (chunk->state >= STRUCTURES_GENERATED || true) {
             std::cout << "(" << chunk->X << " " << chunk->Z << ") < bod\n";
             handle_at(chunk->X, chunk->Z);

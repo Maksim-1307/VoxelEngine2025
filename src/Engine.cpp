@@ -155,7 +155,7 @@ void Engine::game_loop()
 
         // drawing world loading indicator
         Engine::pTextShader->use();
-        Engine::pWorldLoadingIndicator->update();
+        Engine::pWorldLoadingIndicator->update(Engine::pChunkMap->get_chunks());
 
         int windowWidth = Engine::pWindow->get_width();
         int windowHeight = Engine::pWindow->get_height();

@@ -130,6 +130,7 @@ void LightSolver::solve(){
                 uint8_t light = chunk->lightmap.get(lx, ly, lz, channel);
                 voxel v = chunk->get_voxel(lx, ly, lz);
                 // const Block* block = blockDefs[v.id];
+                bool lightPassing = Block::getBlockByVoxelId(v.id).lightPassing;
                 // if (block->lightPassing && light+2 <= entry.light){
                 //     chunk->lightmap.set(
                 //         x-cx*CHUNK_W, y-cy*CHUNK_H, z-cz*CHUNK_W, 
@@ -137,7 +138,7 @@ void LightSolver::solve(){
                 //         entry.light-1);
                 //     addqueue.push(lightentry {x, y, z, uint8_t(entry.light-1)});
                 // }
-                if (v.id == 0 && light+2 <= entry.light){
+                if (lightPassing && light+2 <= entry.light){
                     chunk->lightmap.set(
                         x-cx*CHUNK_W, y-cy*CHUNK_H, z-cz*CHUNK_W, 
                         channel, 

@@ -11,6 +11,7 @@ public :
     Block(std::string name, BlockModel model, std::vector<std::tuple<size_t, size_t>> UVs); //: name(name), model(model);
     
     const std::string name;
+    bool lightPassing = false;
     std::array<bool, 6> opened_faces;
 
     BlockModel getBlockModel() const { return model; }

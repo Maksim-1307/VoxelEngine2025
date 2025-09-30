@@ -11,6 +11,7 @@ model(model)
     switch (model) {
         case BlockModel::AIR: case BlockModel::FOLIAGE:
             this->opened_faces = {1, 1, 1, 1, 1, 1};
+            this->lightPassing = true;
             break;
         case BlockModel::SOLID:
             this->opened_faces = {0, 0, 0, 0, 0, 0};

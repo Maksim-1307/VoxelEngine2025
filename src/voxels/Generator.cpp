@@ -151,16 +151,19 @@ void Generator::generate_tree(int x, int y, int z) {
     int trunk_height = 4 + (x % 3); 
     int crown_start_y = y + trunk_height;
     
-    for (int i = 0; i < trunk_height; i++) {
-        Engine::pVoxelStorage->set_voxel(x, y + i, z, {4, 0}); 
-    }
-    
     int crown_radius = 2;
     
     for (int dx = -crown_radius; dx <= crown_radius; dx++) {
         for (int dz = -crown_radius; dz <= crown_radius; dz++) {
             if (dx*dx + dz*dz <= crown_radius*crown_radius + 1) {
                 Engine::pVoxelStorage->set_voxel(x + dx, crown_start_y, z + dz, {5, 0}); 
+            }
+        }
+    }
+    for (int dx = -crown_radius; dx <= crown_radius; dx++) {
+        for (int dz = -crown_radius; dz <= crown_radius; dz++) {
+            if (dx*dx + dz*dz <= crown_radius*crown_radius + 1) {
+                Engine::pVoxelStorage->set_voxel(x + dx, crown_start_y-1, z + dz, {5, 0}); 
             }
         }
     }
@@ -172,6 +175,11 @@ void Generator::generate_tree(int x, int y, int z) {
             }
         }
     }
+
+    for (int i = 0; i <= trunk_height; i++) {
+        Engine::pVoxelStorage->set_voxel(x, y + i, z, {4, 0}); 
+    }
+    Engine::pVoxelStorage->set_voxel(x, y - 1, z, {1, 0}); 
     
     Engine::pVoxelStorage->set_voxel(x, crown_start_y + 2, z, {5, 0}); // Листва
 }

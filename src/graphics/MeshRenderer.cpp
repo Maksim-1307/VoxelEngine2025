@@ -61,8 +61,6 @@ void MeshRenderer::gen_buffers(MeshType type){
             std::cerr << "ERROR! Type LINE3D is not supported yet.";
             break;
     }
-    
-
 }
 
 void MeshRenderer::draw(){

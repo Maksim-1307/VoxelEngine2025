@@ -112,6 +112,7 @@ void Engine::game_loop()
         fpsCounter->update(deltaTime);
         Engine::pInputController->update(deltaTime);
         Engine::pChunksController->update();
+        Engine::pWorldLoadingIndicator->update(Engine::pChunkMap->get_chunks());
 
         // drawing terrain
         Engine::pMeshShader->use();
@@ -154,8 +155,7 @@ void Engine::game_loop()
         Engine::pStats->draw();
 
         // drawing world loading indicator
-        Engine::pTextShader->use();
-        Engine::pWorldLoadingIndicator->update(Engine::pChunkMap->get_chunks());
+        Engine::pSpriteShader->use();
 
         int windowWidth = Engine::pWindow->get_width();
         int windowHeight = Engine::pWindow->get_height();
@@ -165,8 +165,8 @@ void Engine::game_loop()
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(rightPosition, topPosition, 0.0f));
         transform = glm::scale(transform, glm::vec3(64.0f, 64.0f, 1.0f));
 
-        Engine::pTextShader->set_matrix4("projection", projection * transform);
-        Engine::pTextShader->set_texture("theTexture", Engine::pWorldLoadingIndicator->texture->getID());
+        Engine::pSpriteShader->set_matrix4("projection", projection * transform);
+        Engine::pSpriteShader->set_texture("theTexture", Engine::pWorldLoadingIndicator->texture->getID());
         Engine::pWorldLoadingIndicator->draw();
 
         glfwSwapBuffers(Engine::pWindow->get_glfw_window());

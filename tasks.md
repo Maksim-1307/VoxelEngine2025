@@ -1,15 +1,6 @@
-Stats class. gets data and displays it 
-Fancy generator 
-AABB collisions 
-memory leak fix
+# Before Alpha
 
-VAO refactor (add Vertex struct)
-R G B S order
-
-
-## Finite Height Remake
-Generator 
-AreaMap2D
-ChunksController
-Lighting
-VoxelStorage
+- [ ] Memory leak fix
+- [ ] AABB collisions
+- [ ] Blocks placing and removing
+- [ ] Basic physix 

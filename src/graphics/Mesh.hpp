@@ -17,6 +17,9 @@ public:
         this->indices = std::vector<GLuint>(indices, indices + indicesLength);
     };
     Mesh() {};
+    ~Mesh () {
+        // std::cout << "Mesh deleted\n";
+    };
 
     std::vector<GLfloat> vertices;
     std::vector<GLuint> indices;

@@ -67,7 +67,7 @@ void MeshRenderer::draw(){
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glDrawElements(GL_TRIANGLES, pMesh->vertices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, pMesh->indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
 }

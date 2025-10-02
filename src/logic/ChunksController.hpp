@@ -23,7 +23,7 @@ class ChunksController {
     private:
         void handle_at(int x, int z);
         void load_around(glm::ivec2 center);
-        // int distance = 4;
+        bool firstLoad = true;
 
         std::queue<Chunk*> handleQueue;
         AreaMap2D<Chunk> *chunkMap;

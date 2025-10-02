@@ -33,9 +33,9 @@ void Text::draw()
 void Text::clear_data()
 {
     delete _renderer;
-    delete _mesh;
+    // delete _mesh;
     _renderer = nullptr;
-    _mesh = nullptr;
+    // _mesh = nullptr;
     _vertices.clear();
     _indices.clear();
     _indexOffset = 0;
@@ -101,8 +101,8 @@ void Text::index(uint a, uint b, uint c, uint d, uint e, uint f)
     _indexOffset += 4;
 }
 
-Mesh *Text::get_mesh()
+std::shared_ptr<Mesh> Text::get_mesh()
 {
-    _mesh = new Mesh(_vertices.data(), _vertices.size(), _indices.data(), _indices.size());
+    _mesh = std::make_shared<Mesh>(_vertices.data(), _vertices.size(), _indices.data(), _indices.size());
     return _mesh;
 }

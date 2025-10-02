@@ -27,7 +27,7 @@ private:
         3, 1, 0,
         2, 3, 0
     };
-    Mesh* mesh;
+    std::shared_ptr<Mesh> mesh;
     MeshRenderer* renderer;
     Array2D<Chunk*>* chunks;
     std::vector<unsigned char> textureData;

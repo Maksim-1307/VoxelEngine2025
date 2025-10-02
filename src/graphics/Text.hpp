@@ -7,7 +7,7 @@ class Text
 {
 public:
     Text(std::string &text);
-    Mesh *get_mesh();
+    std::shared_ptr<Mesh> get_mesh();
     void update(std::string text);
     void draw();
     Font *get_font()
@@ -24,7 +24,7 @@ private:
     std::vector<uint> _indices;
     uint _indexOffset = 0;
     Font *_font;
-    Mesh *_mesh;
+    std::shared_ptr<Mesh> _mesh;
     std::string _text;
     MeshRenderer *_renderer;
     glm::ivec2 _offset = glm::ivec2(0, 0);

@@ -1,4 +1,5 @@
 #pragma once
+#include "logic/pointers.hpp"
 
 #include "graphics/Window.hpp"
 #include "graphics/Mesh.hpp"

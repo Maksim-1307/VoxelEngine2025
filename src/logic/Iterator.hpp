@@ -57,6 +57,7 @@ public:
         int centerY = size / 2;
         int x = centerX;
         int y = centerY;
+        entries.emplace_back(matrix->get(x, y));
         for (int step = 0; step < radius * 2; step += 2) {
             for (int dir = 0; dir < 4; dir++) {
                 int dx = directions[dir*2];

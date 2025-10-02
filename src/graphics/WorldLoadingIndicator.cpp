@@ -1,7 +1,7 @@
 #include "WorldLoadingIndicator.hpp"
 
 WorldLoadingIndicator::WorldLoadingIndicator(Array2D<Chunk*>* chunks) {
-    mesh = new Mesh(vertices.data(), vertices.size(), indices.data(), indices.size());
+    mesh = std::make_shared<Mesh>(vertices.data(), vertices.size(), indices.data(), indices.size());
     renderer = new MeshRenderer(mesh, MeshType::SPRITE2D);
     this->chunks = chunks;
     

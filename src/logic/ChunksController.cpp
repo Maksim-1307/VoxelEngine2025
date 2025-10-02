@@ -32,19 +32,33 @@ void ChunksController::handle_at(int x, int z) {
     // if (chunk->state < STRUCTURES_GENERATED) {
     //     Engine::pGenerator->generate_ambient(x, z);
     // } 
-    Engine::pLighting->onChunkLoaded(chunk->X, chunk->Z, true);
-    Engine::pLighting->buildSkyLight(chunk->X, chunk->Z);
+    if (Settings::RECURSIVE_LIGHTING) {
+        Engine::pLighting->onChunkLoaded(chunk->X, chunk->Z, true);
+        Engine::pLighting->buildSkyLight(chunk->X, chunk->Z);
+    }
     
     try {
-        Mesh* mesh = Engine::pChunkMeshBuilder->buildMesh(*chunk);
-        if (!mesh) return;
-        
-        if (chunk->renderer) delete(chunk->renderer);
-        chunk->renderer = new MeshRenderer(mesh, MeshType::MESH3D);
-        chunk->renderer->transform = glm::translate(
-            glm::mat4(1.0f),
-            glm::vec3(chunk->X * CHUNK_W, 0, chunk->Z * CHUNK_W)
-        );
+        if (Settings::HARD_LOADING || !chunk->renderer || chunk->state == MODIFIED) {
+            std::shared_ptr<Mesh> mesh = Engine::pChunkMeshBuilder->buildMesh(*chunk);
+            if (!mesh) return;
+            
+            if (chunk->renderer) delete(chunk->renderer);
+            chunk->renderer = new MeshRenderer(mesh, MeshType::MESH3D);
+            chunk->renderer->transform = glm::translate(
+                glm::mat4(1.0f),
+                glm::vec3(chunk->X * CHUNK_W, 0, chunk->Z * CHUNK_W)
+            );
+        } else {
+            // std::shared_ptr<Mesh> mesh = Engine::pChunkMeshBuilder->buildMesh(*chunk);
+            // if (!mesh) return;
+            
+            // if (chunk->renderer) delete(chunk->renderer);
+            // chunk->renderer = new MeshRenderer(mesh, MeshType::MESH3D);
+            chunk->renderer->transform = glm::translate(
+                glm::mat4(1.0f),
+                glm::vec3(chunk->X * CHUNK_W, 0, chunk->Z * CHUNK_W)
+            );
+        }
         chunk->state = VISIBLE;
     } catch (...) {
         std::cerr << "Failed to build mesh for chunk at " 
@@ -53,9 +67,9 @@ void ChunksController::handle_at(int x, int z) {
 }
 
 void ChunksController::load_around(glm::ivec2 center) {
-    // Engine::pLighting->clear();
+
     int size = Engine::pChunkMap->size;
-    int distance = Settings::load_distance;
+    int distance = Settings::LOAD_DISTANCE;
 
     for (Chunk* chunk : Engine::pChunkMap->padding_chunks(1)) {
         if (chunk->state < STRUCTURES_GENERATED) {
@@ -65,33 +79,40 @@ void ChunksController::load_around(glm::ivec2 center) {
     for (Chunk* chunk : Engine::pChunkMap->padding_chunks(2)) {
         if (chunk->state == STRUCTURES_GENERATED) {
             Engine::pLighting->prebuildSkyLight(chunk);
-        } 
+        } else {
+            Engine::pGenerator->generate_ambient(chunk->X, chunk->Z);
+            Engine::pLighting->prebuildSkyLight(chunk);
+        }
+    }
+
+    if (firstLoad) {
+        for (int padding = 3; padding <= 5; padding++) {
+            for (Chunk* chunk : Engine::pChunkMap->padding_chunks(padding)) {
+                if (chunk->state == TERRAIN_GENERATED) { 
+                    Engine::pGenerator->generate_ambient(chunk->X, chunk->Z);
+                }
+                Engine::pLighting->prebuildSkyLight(chunk);
+            }
+        }
     }
     for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(4)) {
         if (chunk->state >= STRUCTURES_GENERATED || true) {
+            // if (firstLoad) {
+            //     if (chunk->state == TERRAIN_GENERATED) { 
+            //         Engine::pGenerator->generate_ambient(chunk->X, chunk->Z);
+            //     }
+            //     Engine::pLighting->prebuildSkyLight(chunk);
+            // }
             handle_at(chunk->X, chunk->Z);
         } 
     }
-
-    // for (int x = 2; x < size-2; x++) {
-    //     for (int z = 2; z < size-2; z++) {
-    //         // std::cout << "(" << x << ", " << z << ")\n";
-    //         Engine::pLighting->buildSkyLight(x, z);
-    //     }
-    // }
-    // for (int x = center.x - distance; x <= center.x + distance; x++) {    
-    //     for (int z = center.y - distance; z <= center.y + distance; z++) { // fix
-
-    //         std::cout << "(" << x << ", " << z << ")\n";
-    //             handle_at(x, z);
-    //     }
-    // }
+    firstLoad = false;
 }
 
 void ChunksController::draw_chunks() {
 
     glm::ivec2 center = this->camPos;
-    int distance = Settings::load_distance - 2;
+    int distance = Settings::LOAD_DISTANCE - 2;
     
     for (int x = center.x - distance; x <= center.x + distance; x++) {
         for (int z = center.y - distance; z <= center.y + distance; z++) { // fix

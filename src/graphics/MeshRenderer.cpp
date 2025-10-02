@@ -1,6 +1,10 @@
 #include "MeshRenderer.hpp"
 
 void MeshRenderer::gen_buffers(MeshType type){
+    if (!pMesh) { 
+        std::cerr << "ERROR: pMesh is null in gen_buffers!" << std::endl;
+        return;
+    }
     int stride = 0;
     switch (type){
         

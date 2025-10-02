@@ -1,13 +1,15 @@
 #pragma once
 
 #include <iostream>
+#include "src/logic/pointers.hpp"
 #include "Font.hpp"
+#include "src/logic/pointers.hpp"
 
 class Text
 {
 public:
     Text(std::string &text);
-    std::shared_ptr<Mesh> get_mesh();
+    sptr<Mesh> get_mesh();
     void update(std::string text);
     void draw();
     Font *get_font()
@@ -24,8 +26,8 @@ private:
     std::vector<uint> _indices;
     uint _indexOffset = 0;
     Font *_font;
-    std::shared_ptr<Mesh> _mesh;
+    sptr<Mesh> _mesh;
+    uptr<MeshRenderer> _renderer;
     std::string _text;
-    MeshRenderer *_renderer;
     glm::ivec2 _offset = glm::ivec2(0, 0);
 };

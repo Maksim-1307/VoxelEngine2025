@@ -11,15 +11,10 @@
 class Mesh
 {
 public:
-    Mesh(GLfloat *vertices, int verticesLength, GLuint *indices, int indicesLength)
-    {
-        this->vertices = std::vector<GLfloat>(vertices, vertices + verticesLength);
-        this->indices = std::vector<GLuint>(indices, indices + indicesLength);
-    };
-    Mesh() {};
-    ~Mesh () {
-        // std::cout << "Mesh deleted\n";
-    };
+    Mesh(std::vector<GLfloat>&& vertices, std::vector<GLuint>&& indices)
+        : vertices(std::move(vertices)), indices(std::move(indices))
+    {};
+    ~Mesh() {};
 
     std::vector<GLfloat> vertices;
     std::vector<GLuint> indices;

@@ -10,6 +10,9 @@ using sptr = std::shared_ptr<T>;
 template <typename T>
 using uptr = std::unique_ptr<T>;
 
+template <typename T>
+using wptr = std::weak_ptr<T>;
+
 template<typename T, typename... Args>
 auto make_sptr(Args&&... args) {
     return std::make_shared<T>(std::forward<Args>(args)...);
@@ -20,3 +23,7 @@ auto make_uptr(Args&&... args) {
     return std::make_unique<T>(std::forward<Args>(args)...);
 }
 
+template<typename T, typename... Args>
+auto make_wptr(Args&&... args) {
+    return std::weak_ptr<T>(std::forward<Args>(args)...);
+}

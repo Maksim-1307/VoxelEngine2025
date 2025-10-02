@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "src/logic/pointers.hpp"
 #include "src/logic/Array3D.hpp"
 #include "voxel.hpp"
 #include "src/graphics/MeshRenderer.hpp"
@@ -51,12 +52,12 @@ public:
     Chunk(const Chunk &) = delete;
     Chunk &operator=(const Chunk &) = delete;
     ~Chunk(){
-        delete renderer;
         std::cout << "chunks count is " << Chunk::chunks << "\n";
         Chunk::chunks -= 1;
     };
 
-    MeshRenderer* renderer;
+    uptr<MeshRenderer> renderer;
+
     int X, Y, Z;
     Lightmap lightmap = Lightmap(CHUNK_W, CHUNK_H, CHUNK_W);
 

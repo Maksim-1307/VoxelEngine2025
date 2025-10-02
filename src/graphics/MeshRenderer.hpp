@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <memory>
+#include "src/logic/pointers.hpp"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -19,8 +20,9 @@ enum class MeshType { MESH3D, SPRITE2D, LINE3D };
 
 class MeshRenderer {
     public:
-        MeshRenderer(std::shared_ptr<Mesh> pMesh, MeshType type) {
-            this->pMesh = std::move(pMesh);
+        MeshRenderer(sptr<Mesh> mesh, MeshType type) 
+            : pMesh(mesh)
+        {
             this->gen_buffers(type);
         };
         ~MeshRenderer(){
@@ -34,7 +36,7 @@ class MeshRenderer {
     private:
         void gen_buffers(MeshType type);
         void clear_data();
-        std::shared_ptr<Mesh> pMesh;
+        sptr<Mesh> pMesh;
         GLuint VAO;
         GLuint VBO;
         GLuint EBO;

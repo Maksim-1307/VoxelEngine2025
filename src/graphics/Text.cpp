@@ -21,21 +21,20 @@ void Text::draw()
 {
     if (_renderer == nullptr)
     {
-        if (_mesh == nullptr)
-        {
-            get_mesh();
+        if (_mesh == nullptr) {
+            _mesh = make_sptr<Mesh>(std::move(_vertices), std::move(_indices));
         }
-        _renderer = new MeshRenderer(_mesh, MeshType::SPRITE2D);
+        _renderer = make_uptr<MeshRenderer>(std::move(_mesh), MeshType::SPRITE2D);
     }
     _renderer->draw();
 }
 
 void Text::clear_data()
 {
-    delete _renderer;
+    // delete _renderer;
     // delete _mesh;
     _renderer = nullptr;
-    // _mesh = nullptr;
+    _mesh = nullptr;
     _vertices.clear();
     _indices.clear();
     _indexOffset = 0;
@@ -101,8 +100,8 @@ void Text::index(uint a, uint b, uint c, uint d, uint e, uint f)
     _indexOffset += 4;
 }
 
-std::shared_ptr<Mesh> Text::get_mesh()
-{
-    _mesh = std::make_shared<Mesh>(_vertices.data(), _vertices.size(), _indices.data(), _indices.size());
-    return _mesh;
-}
+// wptr<Mesh> Text::get_mesh()
+// {
+//     _mesh = make_sptr<Mesh>(std::move(_vertices), std::move(_indices));
+//     return _mesh;
+// }

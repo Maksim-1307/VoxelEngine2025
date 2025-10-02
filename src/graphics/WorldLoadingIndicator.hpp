@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include "src/logic/pointers.hpp"
 #include "src/logic/Array2D.hpp"
 #include "src/voxels/Chunk.hpp"
 #include "src/graphics/Texture.hpp"
@@ -27,7 +28,7 @@ private:
         3, 1, 0,
         2, 3, 0
     };
-    std::shared_ptr<Mesh> mesh;
+    sptr<Mesh> mesh;
     MeshRenderer* renderer;
     Array2D<Chunk*>* chunks;
     std::vector<unsigned char> textureData;

@@ -1,7 +1,7 @@
 #include "ChunkMeshBuilder.hpp"
 #include "src/Engine.hpp"
 
-std::shared_ptr<Mesh> ChunkMeshBuilder::buildMesh(Chunk &chunk)
+sptr<Mesh> ChunkMeshBuilder::buildMesh(Chunk &chunk)
 {
 
     // if (chunk.state < LIGHTS_PRE_BUILT) {
@@ -41,7 +41,7 @@ std::shared_ptr<Mesh> ChunkMeshBuilder::buildMesh(Chunk &chunk)
             }
         }
     }
-    return  std::make_shared<Mesh>(vertices.data(), vertices.size(), indices.data(), indices.size());
+    return  make_sptr<Mesh>(std::move(vertices), std::move(indices));
 }
 
 void ChunkMeshBuilder::CubeModel(int x, int y, int z)

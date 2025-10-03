@@ -107,21 +107,21 @@ void Lighting::buildSkyLight(int cx, int cz) {
     // }
 
 
-        for (int x = 0; x < CHUNK_W; x ++) {
-            for (int y = 0; y < CHUNK_H; y++) {
-                for (int z = 0; z < CHUNK_W; z++) {
-                    int gx = x + cx * CHUNK_W;
-                    int gz = z + cz * CHUNK_W;
-                    light light = chunk->lightmap.get(x, y, z);
-                    if (light){
-                        solverR.add(gx,y,gz, light.getR());
-                        solverG.add(gx,y,gz, light.getG());
-                        solverB.add(gx,y,gz, light.getB());
-                        solverS.add(gx,y,gz, light.getS());
-                    }
+    for (int x = 0; x < CHUNK_W; x ++) {
+        for (int y = 0; y < CHUNK_H; y++) {
+            for (int z = 0; z < CHUNK_W; z++) {
+                int gx = x + cx * CHUNK_W;
+                int gz = z + cz * CHUNK_W;
+                light light = chunk->lightmap.get(x, y, z);
+                if (light){
+                    solverR.add(gx,y,gz, light.getR());
+                    solverG.add(gx,y,gz, light.getG());
+                    solverB.add(gx,y,gz, light.getB());
+                    solverS.add(gx,y,gz, light.getS());
                 }
             }
         }
+    }
     solverR.solve();
     solverG.solve();
     solverB.solve();

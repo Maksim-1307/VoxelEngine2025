@@ -1,4 +1,5 @@
 #include "Block.hpp"
+#include "src/Engine.hpp"
 
 std::vector<Block *> Block::blocks = {};
 
@@ -74,5 +75,18 @@ void Block::set_UVs(std::vector<std::tuple<size_t, size_t>> &UV){
             std::string errMsg = "ERROR: " + std::to_string(UV.size()) + " different faces is not supported yet";
             throw std::invalid_argument(errMsg);
             break;
+    }
+}
+
+const std::vector<AABB> Block::getAABBs(int x, int y, int z){
+    voxel vox = Engine::pVoxelStorage->get_voxel(x, y, z);
+    BlockModel model = Block::getBlockByVoxelId(vox.id).getBlockModel();
+    switch (model) {
+        case BlockModel::AIR:
+            return {};
+        case BlockModel::SOLID:
+            return {AABB(glm::vec3(1.0f))};
+        default:
+            return {};
     }
 }

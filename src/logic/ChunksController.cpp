@@ -107,6 +107,8 @@ void ChunksController::draw_chunks() {
     // glm::ivec2 center = this->camPos;
     int distance = Settings::LOAD_DISTANCE;
     for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance-1)) {
+        if (chunk->state == MODIFIED) 
+            handle_at(chunk->X, chunk->Z);
         if (!chunk || !chunk->renderer || chunk->state < VISIBLE) continue;
         Engine::pMeshShader->set_matrix4("model", chunk->renderer->transform);
         chunk->renderer->draw();

@@ -29,4 +29,5 @@ void InputController::update(float deltaTime)
         pCamera->rotate(0, speed * deltaTime * 10, 0);
     if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_DOWN))
         pCamera->rotate(0, -speed * deltaTime * 10, 0);
+
 }

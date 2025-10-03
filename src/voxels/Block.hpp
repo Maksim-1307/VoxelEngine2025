@@ -4,7 +4,9 @@
 #include "BlockModel.hpp"
 #include "voxel.hpp"
 #include "src/physics/AABB.hpp"
+#include "VoxelStorage.hpp"
 
+class Engine;
 
 class Block{
 public :
@@ -21,17 +23,7 @@ public :
     {
         return *blocks[id];
     }
-    static const std::vector<AABB> getAABBs(voxel vox){
-        BlockModel model = Block::getBlockByVoxelId(vox.id).getBlockModel();
-        switch (model) {
-            case BlockModel::AIR:
-                return {};
-            case BlockModel::SOLID:
-                return {AABB(glm::vec3(1.0f))};
-            default:
-                return {};
-        }
-    }
+    static const std::vector<AABB> getAABBs(int x, int y, int z);
 
 private : 
     static void add_block(Block *block)

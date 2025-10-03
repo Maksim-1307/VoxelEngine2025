@@ -7,7 +7,8 @@
 
 #define MOD(a, b) ((((a) % (b)) + (b)) % (b))
 
-// wrapper for AreaMap3D operates on blocks, not chunks
+/* wrapper for AreaMap3D operates on blocks, not chunks */
+
 class VoxelStorage{
     public:
 
@@ -45,6 +46,24 @@ class VoxelStorage{
             int blockZ = get_block_coord(z, CHUNK_W);
 
             chunksMap->get(chunkX, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
+        };
+        void set_voxel_soft(int x, int y, int z, voxel vox){
+
+            int chunkX = get_chunk_coord(x, CHUNK_W);
+            int chunkY = get_chunk_coord(y, CHUNK_H);
+            int chunkZ = get_chunk_coord(z, CHUNK_W);
+
+            int blockX = get_block_coord(x, CHUNK_W);
+            int blockY = get_block_coord(y, CHUNK_H);
+            int blockZ = get_block_coord(z, CHUNK_W);
+
+            chunksMap->get(chunkX, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
+            chunksMap->get(chunkX, chunkZ)->state = MODIFIED;
+
+            if (blockX == 0) chunksMap->get(chunkX-1, chunkZ)->state = MODIFIED;
+            if (blockX == CHUNK_W-1) chunksMap->get(chunkX+1, chunkZ)->state = MODIFIED;
+            if (blockZ == 0) chunksMap->get(chunkX, chunkZ-1)->state = MODIFIED;
+            if (blockZ == CHUNK_W-1) chunksMap->get(chunkX, chunkZ+1)->state = MODIFIED;
         };
 
         light get_light(int x, int y, int z) const {

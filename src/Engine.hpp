@@ -24,7 +24,6 @@
 
 #include "logic/Iterator.hpp"
 
-
 class Engine {
     public:
         Engine();

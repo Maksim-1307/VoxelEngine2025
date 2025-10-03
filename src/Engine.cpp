@@ -114,6 +114,27 @@ void Engine::game_loop()
         Engine::pChunksController->update();
         Engine::pWorldLoadingIndicator->update(Engine::pChunkMap->get_chunks());
 
+        /* TESTING RAYCAST */
+        // test
+        if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_E)){
+            RaycastResult result = Engine::pTerrain->raycast(pCamera->position, pCamera->front, 1000.0f);
+            std::cout << "hit: " << result.hit << std::endl;
+            std::cout << "position: " << result.position.x << " " << result.position.y << " " << result.position.z << std::endl;
+            std::cout << "distance: " << result.distance << std::endl;
+            
+            voxel vox = Engine::pVoxelStorage->get_voxel(result.position.x, result.position.y, result.position.z);
+            std::string name = Block::getBlockByVoxelId(vox.id).name;
+            std::cout << name << std::endl;
+            if (result.hit && result.position.y >= 0 && result.position.y < 64) {
+                std::cout << "Setting block to air" << std::endl;
+                Engine::pVoxelStorage->set_voxel_soft(std::floor(result.position.x), std::floor(result.position.y), std::floor(result.position.z), {0, 0});
+            }
+        }
+
+        // if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_Q))
+        //     pCamera->rotate(0, -speed * deltaTime * 10, 0);
+        // test end
+
         // drawing terrain
         Engine::pMeshShader->use();
 

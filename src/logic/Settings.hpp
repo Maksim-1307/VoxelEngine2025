@@ -9,4 +9,5 @@ public:
     static constexpr int WINDOW_HEIGHT = 480;
     static constexpr bool MOUSE_CONTROL = true;
     static constexpr float MOUSE_SENSITIVITY = 20.0f;
+    static constexpr float BLOCK_BREAKING_DELAY = 0.3f;
 };

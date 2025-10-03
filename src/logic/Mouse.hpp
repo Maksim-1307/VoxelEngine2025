@@ -13,6 +13,7 @@ class Mouse {
     }
     void update(float deltaTime);
     private:
+    float pressTime = 0;
     Window* window;
     Camera* camera;
 };

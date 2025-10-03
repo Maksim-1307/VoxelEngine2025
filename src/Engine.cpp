@@ -114,17 +114,6 @@ void Engine::game_loop()
         Engine::pChunksController->update();
         Engine::pWorldLoadingIndicator->update(Engine::pChunkMap->get_chunks());
 
-        /* TESTING RAYCAST */
-        // test
-        if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_E)){
-            RaycastResult result = Engine::pTerrain->raycast(pCamera->position, pCamera->front, 15.0f);
-            if (result.hit) {
-                std::cout << "Setting block to air" << std::endl;
-                Engine::pVoxelStorage->set_voxel_soft(std::floor(result.position.x), std::floor(result.position.y), std::floor(result.position.z), {0, 0});
-            }
-        }
-        // test end
-
         // drawing terrain
         Engine::pMeshShader->use();
 

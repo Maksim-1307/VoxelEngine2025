@@ -1,6 +1,8 @@
 #include "Mouse.hpp"
 #include "src/graphics/Camera.hpp"
 #include "src/graphics/Window.hpp"
+#include "src/physics/Terrain.hpp"
+#include "src/Engine.hpp"
 
 void Mouse::update(float deltaTime) {
     if (!Settings::MOUSE_CONTROL) return;
@@ -12,4 +14,17 @@ void Mouse::update(float deltaTime) {
     glfwSetCursorPos(window->get_glfw_window(), window->get_width()/2, window->get_height()/2);
     float sensifity = Settings::MOUSE_SENSITIVITY;
     camera->rotate(xoffset * deltaTime * sensifity, yoffset * deltaTime * sensifity, 0);
+
+    if (glfwGetMouseButton(window->get_glfw_window(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS){
+        if (pressTime == 0 || pressTime > Settings::BLOCK_BREAKING_DELAY) {
+            RaycastResult result = Engine::pTerrain->raycast(camera->position, camera->front, 15.0f);
+            if (result.hit) {
+                Engine::pVoxelStorage->set_voxel_soft(std::floor(result.position.x), std::floor(result.position.y), std::floor(result.position.z), {0, 0});
+            }
+            pressTime = 0;
+        }
+        pressTime += deltaTime;
+    } else {
+        pressTime = 0;
+    }
 }

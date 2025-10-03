@@ -52,7 +52,6 @@ public:
     Chunk(const Chunk &) = delete;
     Chunk &operator=(const Chunk &) = delete;
     ~Chunk(){
-        std::cout << "chunks count is " << Chunk::chunks << "\n";
         Chunk::chunks -= 1;
     };
 

@@ -1,6 +1,6 @@
 # Before Alpha
 
-- [ ] Memory leak fix
+- [x] Memory leak fix
 - [ ] AABB collisions
 - [ ] Blocks placing and removing
 - [ ] Basic physix 

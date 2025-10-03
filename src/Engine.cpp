@@ -140,6 +140,7 @@ void Engine::game_loop()
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 120.0f, 0.0f));
         Engine::pTextShader->set_matrix4("projection", projection * glm::scale(transform, glm::vec3(1.0f, -1.0f, 1.0f)));
 
+        // updating stats 
         glm::vec3 camPos = Engine::pCamera->position;
         bool obstacle = Engine::pTerrain->is_obstacle_at(camPos.x, camPos.y, camPos.z);
         Engine::pStats->set("Obstacle", obstacle ? "true" : "false");
@@ -149,6 +150,7 @@ void Engine::game_loop()
         Engine::pStats->set("X", std::to_string(camPos.x));
         Engine::pStats->set("Y", std::to_string(camPos.y));
         Engine::pStats->set("Z", std::to_string(camPos.z));
+        Engine::pStats->set("Chunks count", std::to_string(Chunk::chunks));
 
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 250.0f, 0.0f));
         Engine::pTextShader->set_matrix4("projection", projection * glm::scale(transform, glm::vec3(1.0f, -1.0f, 1.0f)));

@@ -19,10 +19,10 @@ private:
     unsigned char* get_data();
 
     std::vector<GLfloat> vertices = {
-        -1, -1, 0, 0,
-        1, -1, 1, 0,
-        -1, 1, 0, 1,
-        1, 1, 1, 1
+        -1, -1, 0, 1,
+        1, -1, 1, 1,
+        -1, 1, 0, 0,
+        1, 1, 1, 0
     };
     std::vector<GLuint> indices = {
         3, 1, 0,

@@ -20,7 +20,7 @@ public:
     }
     bool is_obstacle_at(float x, float y, float z);
     bool is_opaque_at(float x, float y, float z);
-    RaycastResult raycast(glm::vec3 origin, glm::vec3 direction, float maxDistance);
+    RaycastResult raycast(glm::vec3 origin, glm::vec3 direction, float maxDistance, bool inside = true);
 
 private:
     VoxelStorage& voxelStorage;

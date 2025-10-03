@@ -13,7 +13,8 @@ class Mouse {
     }
     void update(float deltaTime);
     private:
-    float pressTime = 0;
+    float pressTimeLeft = 0;
+    float pressTimeRight = 0;
     Window* window;
     Camera* camera;
 };

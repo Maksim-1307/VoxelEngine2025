@@ -16,15 +16,27 @@ void Mouse::update(float deltaTime) {
     camera->rotate(xoffset * deltaTime * sensifity, yoffset * deltaTime * sensifity, 0);
 
     if (glfwGetMouseButton(window->get_glfw_window(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS){
-        if (pressTime == 0 || pressTime > Settings::BLOCK_BREAKING_DELAY) {
+        if (pressTimeLeft == 0 || pressTimeLeft > Settings::BLOCK_BREAKING_DELAY) {
             RaycastResult result = Engine::pTerrain->raycast(camera->position, camera->front, 15.0f);
             if (result.hit) {
                 Engine::pVoxelStorage->set_voxel_soft(std::floor(result.position.x), std::floor(result.position.y), std::floor(result.position.z), {0, 0});
             }
-            pressTime = 0;
+            pressTimeLeft = 0;
         }
-        pressTime += deltaTime;
+        pressTimeLeft += deltaTime;
     } else {
-        pressTime = 0;
+        pressTimeLeft = 0;
+    }
+    if (glfwGetMouseButton(window->get_glfw_window(), GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS){
+        if (pressTimeRight == 0 || pressTimeRight > Settings::BLOCK_PLACIND_DELAY) {
+            RaycastResult result = Engine::pTerrain->raycast(camera->position, camera->front, 15.0f, false);
+            if (result.hit) {
+                Engine::pVoxelStorage->set_voxel_soft(std::floor(result.position.x), std::floor(result.position.y), std::floor(result.position.z), {1, 0});
+            }
+            pressTimeRight = 0;
+        }
+        pressTimeRight += deltaTime;
+    } else {
+        pressTimeRight = 0;
     }
 }

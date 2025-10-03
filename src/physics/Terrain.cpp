@@ -32,16 +32,21 @@ bool Terrain::is_opaque_at(float x, float y, float z) {
 }
 
 
-RaycastResult Terrain::raycast(glm::vec3 origin, glm::vec3 direction, float maxDistance) {
+RaycastResult Terrain::raycast(glm::vec3 origin, glm::vec3 direction, float maxDistance, bool inside) {
 
     glm::vec3 step = 0.1f * direction;
     glm::vec3 current = origin;
     while (glm::length(current - origin) < maxDistance) {
         current += step;
         if (is_opaque_at(current.x, current.y, current.z)) {
+            if (inside) {
+                current += 0.05f * direction;
+            } else {
+                current -= step;
+            }
             return{
                 true,
-                current + 0.05f * direction,
+                current,
                 glm::length(current - origin)
             };
         }

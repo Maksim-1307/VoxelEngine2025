@@ -65,7 +65,7 @@ void Engine::init()
     
     // World
     Engine::pGenerator = new Generator();
-    Engine::pChunkMap = new AreaMap2D<Chunk>(6);
+    Engine::pChunkMap = new AreaMap2D<Chunk>(Settings::LOAD_DISTANCE + 1);
 
     // Lighting
     Engine::pLighting = new Lighting(*Engine::pChunkMap);

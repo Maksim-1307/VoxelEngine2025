@@ -86,7 +86,7 @@ void ChunksController::load_around(glm::ivec2 center) {
     }
 
     if (firstLoad) {
-        for (int padding = 3; padding <= 5; padding++) {
+        for (int padding = 3; padding <= distance; padding++) {
             for (Chunk* chunk : Engine::pChunkMap->padding_chunks(padding)) {
                 if (chunk->state == TERRAIN_GENERATED) { 
                     Engine::pGenerator->generate_ambient(chunk->X, chunk->Z);
@@ -95,14 +95,8 @@ void ChunksController::load_around(glm::ivec2 center) {
             }
         }
     }
-    for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(4)) {
+    for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance-1)) {
         if (chunk->state >= STRUCTURES_GENERATED || true) {
-            // if (firstLoad) {
-            //     if (chunk->state == TERRAIN_GENERATED) { 
-            //         Engine::pGenerator->generate_ambient(chunk->X, chunk->Z);
-            //     }
-            //     Engine::pLighting->prebuildSkyLight(chunk);
-            // }
             handle_at(chunk->X, chunk->Z);
         } 
     }
@@ -110,17 +104,21 @@ void ChunksController::load_around(glm::ivec2 center) {
 }
 
 void ChunksController::draw_chunks() {
-
-    glm::ivec2 center = this->camPos;
-    int distance = Settings::LOAD_DISTANCE - 2;
-    
-    for (int x = center.x - distance; x <= center.x + distance; x++) {
-        for (int z = center.y - distance; z <= center.y + distance; z++) { // fix
-            Chunk* chunk = Engine::pChunkMap->get(x, z);
-            if (!chunk || !chunk->renderer || chunk->state < VISIBLE) continue;
-            
-            Engine::pMeshShader->set_matrix4("model", chunk->renderer->transform);
-            chunk->renderer->draw();
-        }
+    // glm::ivec2 center = this->camPos;
+    int distance = Settings::LOAD_DISTANCE;
+    for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance-1)) {
+        if (!chunk || !chunk->renderer || chunk->state < VISIBLE) continue;
+        Engine::pMeshShader->set_matrix4("model", chunk->renderer->transform);
+        chunk->renderer->draw();
     }
+    
+    // for (int x = center.x - distance; x <= center.x + distance; x++) {
+    //     for (int z = center.y - distance; z <= center.y + distance; z++) { // fix
+    //         Chunk* chunk = Engine::pChunkMap->get(x, z);
+    //         if (!chunk || !chunk->renderer || chunk->state < VISIBLE) continue;
+            
+    //         Engine::pMeshShader->set_matrix4("model", chunk->renderer->transform);
+    //         chunk->renderer->draw();
+    //     }
+    // }
 }

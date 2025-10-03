@@ -2,5 +2,7 @@
 
 - [x] Memory leak fix
 - [x] AABB collisions
-- [ ] Blocks placing and removing
+- [x] Blocks placing and removing
+- [ ] Block indicator
 - [ ] Basic physix 
+

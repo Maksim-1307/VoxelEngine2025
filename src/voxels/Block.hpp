@@ -23,7 +23,7 @@ public :
     {
         return *blocks[id];
     }
-    static const std::vector<AABB> getAABBs(int x, int y, int z);
+    static const std::vector<AABB> getAABBs(int x, int y, int z, IteractionType type = COLLISION);
 
 private : 
     static void add_block(Block *block)

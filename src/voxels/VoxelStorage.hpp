@@ -47,7 +47,7 @@ class VoxelStorage{
 
             chunksMap->get(chunkX, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
         };
-        void set_voxel_soft(int x, int y, int z, voxel vox){
+        bool set_voxel_soft(int x, int y, int z, voxel vox){
 
             int chunkX = get_chunk_coord(x, CHUNK_W);
             int chunkY = get_chunk_coord(y, CHUNK_H);
@@ -57,6 +57,9 @@ class VoxelStorage{
             int blockY = get_block_coord(y, CHUNK_H);
             int blockZ = get_block_coord(z, CHUNK_W);
 
+            if (blockZ < 0 || blockZ >= CHUNK_H || !chunksMap->is_inside(chunkX, chunkZ))
+                return false;
+
             chunksMap->get(chunkX, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
             chunksMap->get(chunkX, chunkZ)->state = MODIFIED;
 
@@ -64,6 +67,7 @@ class VoxelStorage{
             if (blockX == CHUNK_W-1) chunksMap->get(chunkX+1, chunkZ)->state = MODIFIED;
             if (blockZ == 0) chunksMap->get(chunkX, chunkZ-1)->state = MODIFIED;
             if (blockZ == CHUNK_W-1) chunksMap->get(chunkX, chunkZ+1)->state = MODIFIED;
+            return true;
         };
 
         light get_light(int x, int y, int z) const {

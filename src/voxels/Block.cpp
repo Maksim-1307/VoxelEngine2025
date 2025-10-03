@@ -78,7 +78,7 @@ void Block::set_UVs(std::vector<std::tuple<size_t, size_t>> &UV){
     }
 }
 
-const std::vector<AABB> Block::getAABBs(int x, int y, int z){
+const std::vector<AABB> Block::getAABBs(int x, int y, int z, IteractionType type){
     voxel vox = Engine::pVoxelStorage->get_voxel(x, y, z);
     BlockModel model = Block::getBlockByVoxelId(vox.id).getBlockModel();
     switch (model) {
@@ -86,6 +86,12 @@ const std::vector<AABB> Block::getAABBs(int x, int y, int z){
             return {};
         case BlockModel::SOLID:
             return {AABB(glm::vec3(1.0f))};
+        case BlockModel::FOLIAGE:
+            if (type == RAYCAST) {
+                return {AABB(glm::vec3(1.0f))};
+            } else {
+                return {};
+            }
         default:
             return {};
     }

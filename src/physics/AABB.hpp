@@ -98,3 +98,8 @@ struct AABB {
         );
     }
 };
+
+enum IteractionType {
+    COLLISION,
+    RAYCAST 
+};

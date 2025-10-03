@@ -4,6 +4,7 @@ InputController::InputController(Camera &camera, Window &window)
 {
     this->pCamera = &camera;
     this->pWindow = &window;
+    this->pMouse = new Mouse(pWindow, pCamera);
 }
 
 void InputController::update(float deltaTime)
@@ -21,13 +22,17 @@ void InputController::update(float deltaTime)
         pCamera->move(0, speed * deltaTime, 0);
     if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_LEFT_SHIFT))
         pCamera->move(0, -speed * deltaTime, 0);
-    if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_RIGHT))
-        pCamera->rotate(-speed * deltaTime * 10, 0, 0);
-    if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_LEFT))
-        pCamera->rotate(speed * deltaTime * 10, 0, 0);
-    if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_UP))
-        pCamera->rotate(0, speed * deltaTime * 10, 0);
-    if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_DOWN))
-        pCamera->rotate(0, -speed * deltaTime * 10, 0);
+    if (Settings::MOUSE_CONTROL) {
+        pMouse->update(deltaTime);
+    } else {
+        if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_RIGHT))
+            pCamera->rotate(-speed * deltaTime * 10, 0, 0);
+        if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_LEFT))
+            pCamera->rotate(speed * deltaTime * 10, 0, 0);
+        if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_UP))
+            pCamera->rotate(0, speed * deltaTime * 10, 0);
+        if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_DOWN))
+            pCamera->rotate(0, -speed * deltaTime * 10, 0);
+    }
 
 }

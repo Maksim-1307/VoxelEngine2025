@@ -10,7 +10,6 @@ bool Terrain::is_obstacle_at(float x, float y, float z) {
     float ix = x - vx;
     float iy = y - vy;
     float iz = z - vz;
-    // voxel vox = voxelStorage.get_voxel(vx, vy, vz);
     std::vector<AABB> AABBs = Block::getAABBs(vx, vy, vz);
     for (AABB hitbox : AABBs){
         if (hitbox.contains(glm::vec3(ix, iy, iz))) return true;
@@ -25,7 +24,6 @@ bool Terrain::is_opaque_at(float x, float y, float z) {
     float ix = x - vx;
     float iy = y - vy;
     float iz = z - vz;
-    // voxel vox = voxelStorage.get_voxel(vx, vy, vz);
     std::vector<AABB> AABBs = Block::getAABBs(vx, vy, vz, IteractionType::RAYCAST);
     for (AABB hitbox : AABBs){
         if (hitbox.contains(glm::vec3(ix, iy, iz))) return true;

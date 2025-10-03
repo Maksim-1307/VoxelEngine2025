@@ -22,7 +22,8 @@ Window::Window(WindowArgs args)
     this->clearColor = args.clearColor;
     this->GLFWwindow = glfwCreateWindow(width, height, args.name.c_str(), nullptr, nullptr);
 
-    //glfwSetInputMode(this->GLFWwindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    if (Settings::MOUSE_CONTROL)
+        glfwSetInputMode(this->GLFWwindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if (!GLFWwindow)
     {

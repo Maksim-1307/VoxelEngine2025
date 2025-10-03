@@ -1,4 +1,5 @@
 #include "Block.hpp"
+#include "src/Engine.hpp"
 
 std::vector<Block *> Block::blocks = {};
 
@@ -8,10 +9,16 @@ model(model)
 {
     set_UVs(UVs);
     Block::add_block(this);
-    if (model == BlockModel::AIR) {
-        this->opened_faces = {1, 1, 1, 1, 1, 1};
-    } else {
-        this->opened_faces = {0, 0, 0, 0, 0, 0};
+    switch (model) {
+        case BlockModel::AIR: case BlockModel::FOLIAGE:
+            this->opened_faces = {1, 1, 1, 1, 1, 1};
+            this->lightPassing = true;
+            break;
+        case BlockModel::SOLID:
+            this->opened_faces = {0, 0, 0, 0, 0, 0};
+            break;
+        default:
+            this->opened_faces = {1, 1, 1, 1, 1, 1};
     }
 };
 
@@ -68,5 +75,24 @@ void Block::set_UVs(std::vector<std::tuple<size_t, size_t>> &UV){
             std::string errMsg = "ERROR: " + std::to_string(UV.size()) + " different faces is not supported yet";
             throw std::invalid_argument(errMsg);
             break;
+    }
+}
+
+const std::vector<AABB> Block::getAABBs(int x, int y, int z, IteractionType type){
+    voxel vox = Engine::pVoxelStorage->get_voxel(x, y, z);
+    BlockModel model = Block::getBlockByVoxelId(vox.id).getBlockModel();
+    switch (model) {
+        case BlockModel::AIR:
+            return {};
+        case BlockModel::SOLID:
+            return {AABB(glm::vec3(1.0f))};
+        case BlockModel::FOLIAGE:
+            if (type == RAYCAST) {
+                return {AABB(glm::vec3(1.0f))};
+            } else {
+                return {};
+            }
+        default:
+            return {};
     }
 }

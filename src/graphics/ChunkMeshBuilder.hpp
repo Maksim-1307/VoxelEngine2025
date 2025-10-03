@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include "src/logic/pointers.hpp"
 
 #define GLM_FORCE_CTOR_INIT
 #include <glm/glm.hpp>
@@ -19,7 +20,7 @@ class ChunkMeshBuilder {
 public:
     ChunkMeshBuilder (){}
 
-    Mesh* buildMesh(Chunk& chunk);
+    sptr<Mesh> buildMesh(Chunk& chunk);
 
     uint16_t packRGBS(uint8_t a, uint8_t b, uint8_t c, uint8_t d) {
         return (a & 0xF) << 12 | (b & 0xF) << 8 | (c & 0xF) << 4 | (d & 0xF);
@@ -52,6 +53,7 @@ private:
 
     std::vector<float> vertices = {};
     std::vector<uint> indices = {};
+
     int indexOffset = 0;
     int _x, _y, _z;
     int _face;

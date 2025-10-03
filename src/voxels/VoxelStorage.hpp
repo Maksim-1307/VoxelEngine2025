@@ -2,30 +2,31 @@
 
 #include <iostream>
 #include <cmath>
-#include "src/logic/AreaMap3D.hpp"
+#include "src/logic/AreaMap2D.hpp"
 #include "src/voxels/Chunk.hpp"
 
 #define MOD(a, b) ((((a) % (b)) + (b)) % (b))
 
-// wrapper for AreaMap3D operates on blocks, not chunks
+/* wrapper for AreaMap3D operates on blocks, not chunks */
+
 class VoxelStorage{
     public:
 
-        VoxelStorage(AreaMap3D<Chunk> *chunksMap)
+        VoxelStorage(AreaMap2D<Chunk> *chunksMap)
             : chunksMap(chunksMap) 
         {};
 
         voxel get_voxel(int x, int y, int z){
 
             int chunkX = get_chunk_coord(x, CHUNK_W);
-            int chunkY = get_chunk_coord(y, CHUNK_H);
+            int chunkY = 0; //get_chunk_coord(y, CHUNK_H);
             int chunkZ = get_chunk_coord(z, CHUNK_W);
 
             int blockX = get_block_coord(x, CHUNK_W);
             int blockY = get_block_coord(y, CHUNK_H);
             int blockZ = get_block_coord(z, CHUNK_W);
 
-            Chunk* ch = chunksMap->get(chunkX, chunkY, chunkZ);
+            Chunk* ch = chunksMap->get(chunkX, chunkZ);
             if (ch == nullptr) {
                 // std::cout << "ERROR: Chunk out of bounds at " << chunkX << " " << chunkY << " " << chunkZ << "\n";
                 return {2, 0};
@@ -44,7 +45,29 @@ class VoxelStorage{
             int blockY = get_block_coord(y, CHUNK_H);
             int blockZ = get_block_coord(z, CHUNK_W);
 
-            chunksMap->get(chunkX, chunkY, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
+            chunksMap->get(chunkX, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
+        };
+        bool set_voxel_soft(int x, int y, int z, voxel vox){
+
+            int chunkX = get_chunk_coord(x, CHUNK_W);
+            int chunkY = get_chunk_coord(y, CHUNK_H);
+            int chunkZ = get_chunk_coord(z, CHUNK_W);
+
+            int blockX = get_block_coord(x, CHUNK_W);
+            int blockY = get_block_coord(y, CHUNK_H);
+            int blockZ = get_block_coord(z, CHUNK_W);
+
+            if (blockZ < 0 || blockZ >= CHUNK_H || !chunksMap->is_inside(chunkX, chunkZ))
+                return false;
+
+            chunksMap->get(chunkX, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
+            chunksMap->get(chunkX, chunkZ)->state = MODIFIED;
+
+            if (blockX == 0) chunksMap->get(chunkX-1, chunkZ)->state = MODIFIED;
+            if (blockX == CHUNK_W-1) chunksMap->get(chunkX+1, chunkZ)->state = MODIFIED;
+            if (blockZ == 0) chunksMap->get(chunkX, chunkZ-1)->state = MODIFIED;
+            if (blockZ == CHUNK_W-1) chunksMap->get(chunkX, chunkZ+1)->state = MODIFIED;
+            return true;
         };
 
         light get_light(int x, int y, int z) const {
@@ -57,7 +80,7 @@ class VoxelStorage{
             int blockY = get_block_coord(y, CHUNK_H);
             int blockZ = get_block_coord(z, CHUNK_W);
 
-            return chunksMap->get(chunkX, chunkY, chunkZ)->lightmap.get(blockX, blockY, blockZ);
+            return chunksMap->get(chunkX, chunkZ)->lightmap.get(blockX, blockY, blockZ);
 
         };
 
@@ -71,7 +94,22 @@ class VoxelStorage{
             int blockY = get_block_coord(y, CHUNK_H);
             int blockZ = get_block_coord(z, CHUNK_W);
 
-            return chunksMap->get(chunkX, chunkY, chunkZ)->lightmap.get(blockX, blockY, blockZ, channel);
+            return chunksMap->get(chunkX, chunkZ)->lightmap.get(blockX, blockY, blockZ, channel);
+
+        };
+
+        // Remake !!! Only for testing 
+        void set_light(int x, int y, int z, uint8_t value) const {
+
+            int chunkX = get_chunk_coord(x, CHUNK_W);
+            int chunkY = get_chunk_coord(y, CHUNK_H);
+            int chunkZ = get_chunk_coord(z, CHUNK_W);
+
+            int blockX = get_block_coord(x, CHUNK_W);
+            int blockY = get_block_coord(y, CHUNK_H);
+            int blockZ = get_block_coord(z, CHUNK_W);
+
+            chunksMap->get(chunkX, chunkZ)->lightmap.setS(blockX, blockY, blockZ, value);
 
         };
 
@@ -87,7 +125,7 @@ class VoxelStorage{
         }
         return result;
     }
-    AreaMap3D<Chunk>* chunksMap;
+    AreaMap2D<Chunk>* chunksMap;
 
 };
    

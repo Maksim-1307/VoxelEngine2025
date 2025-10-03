@@ -32,7 +32,7 @@ void main(void)
     // unpacking face orientation
     uint face = uint(byte2);
 
-    vec3 totalLight = vec3(r, g, b) + skyColor * skyBrightness * s;
+    vec3 totalLight =  skyColor * skyBrightness * s;
 
     float faceDarkeing[6] = float[](0.2f, 0.7f, 0.0f, 0.8f, 0.3f, 0.5f);
     float faceFactor = 0.5;

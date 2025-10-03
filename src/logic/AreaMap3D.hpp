@@ -30,7 +30,7 @@ public:
     }
 
     T* get(int x, int y, int z) {
-        int mx = x - offsetX + size/2;  // Исправлено!
+        int mx = x - offsetX + size/2;  
         int my = y - offsetY + size/2;
         int mz = z - offsetZ + size/2;
         
@@ -38,6 +38,11 @@ public:
             return nullptr;
         }
         return firstBuffer->get(mx, my, mz);
+    }
+
+    // unsafe! 
+    T** get_volume(){
+        return this->firstBuffer->get_data();
     }
 
     void set_out_callback(std::function<T*(int, int, int)> callback) {
@@ -90,27 +95,24 @@ public:
             }
         }
 
-        // Обновляем offset с учётом оригинального сдвига (без инверсии)
         offsetX += dx;
         offsetY += dy;
         offsetZ += dz;
 
-        // // Заполняем пустые места с использованием нового offset
-        // for (int x = 0; x < size; x++) {
-        //     for (int y = 0; y < size; y++) {
-        //         for (int z = 0; z < size; z++) {
-        //             if (secondBuffer->get(x, y, z) == nullptr) {
-        //                 int wx = x - size/2 + offsetX;
-        //                 int wy = y - size/2 + offsetY;
-        //                 int wz = z - size/2 + offsetZ;
-        //                 secondBuffer->set(x, y, z, outCallback(wx, wy, wz));
-        //             }
-        //         }
-        //     }
-        // }
-
         std::swap(firstBuffer, secondBuffer);
-}
+
+        for (int x = 0; x < size; x++) {
+            for (int y = 0; y < size; y++) {
+                for (int z = 0; z < size; z++) {
+                    if (secondBuffer->get(x, y, z) != nullptr) {
+                        delete secondBuffer->get(x, y, z);
+                    }
+                }
+            }
+        }
+
+            
+    }
 
     bool is_inside(int x, int y, int z) {
         int mx = x - offsetX + size/2;
@@ -118,12 +120,15 @@ public:
         int mz = z - offsetZ + size/2;
         return in_bounds(mx, my, mz);
     }
+    
+    // timely 
+    int size;
 
-private:
+// private:
     Array3D<T*>* firstBuffer;
     Array3D<T*>* secondBuffer;
     int offsetX = 0, offsetY = 0, offsetZ = 0;
-    int size;
+    
     std::function<T*(int, int, int)> outCallback;
 
     bool in_bounds(int x, int y, int z) const {

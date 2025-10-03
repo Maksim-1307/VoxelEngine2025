@@ -2,20 +2,52 @@
 
 #include <iostream>
 
+#include "src/logic/pointers.hpp"
 #include "src/logic/Array3D.hpp"
 #include "voxel.hpp"
 #include "src/graphics/MeshRenderer.hpp"
 #include "src/lighting/Lightmap.hpp"
 
 #define CHUNK_W 16
-#define CHUNK_H 16
+#define CHUNK_H 64
 
+/*
+
+PADDING 2
+1) Terrain generation. 
+
+PADDING 1
+2) Structures generation. 
+3) Lights pre-building. 
+4) Mesh building.  
+
+VISIBLE
+5) Lights building. 
+Can be shown
+
+*/
+
+enum ChunkState { 
+    INITIALIZED = 0,
+    // padding 0
+    TERRAIN_GENERATED = 1, 
+    // padding 1
+    STRUCTURES_GENERATED = 2, 
+    MODIFIED = 3,
+    LIGHTS_PRE_BUILT = 4,
+    CHUNK_LOADED = 5,
+    LIGHTS_BUILT = 6,
+    MESH_BUILT = 7,
+    // shown
+    VISIBLE = 8
+};
 
 class Chunk{
 public:
     Chunk(){
         Chunk::chunks += 1;
         lightmap.clear();
+        state = ChunkState::INITIALIZED;
     };
     Chunk(const Chunk &) = delete;
     Chunk &operator=(const Chunk &) = delete;
@@ -23,7 +55,8 @@ public:
         Chunk::chunks -= 1;
     };
 
-    MeshRenderer* renderer;
+    uptr<MeshRenderer> renderer;
+
     int X, Y, Z;
     Lightmap lightmap = Lightmap(CHUNK_W, CHUNK_H, CHUNK_W);
 
@@ -35,8 +68,9 @@ public:
     {
         return voxels.get(x, y, z);
     }
+    
     static int chunks;
-    bool modified = false;
+    ChunkState state;
 
 private:
     Array3D<voxel> voxels = Array3D<voxel>(CHUNK_W, CHUNK_H, CHUNK_W);

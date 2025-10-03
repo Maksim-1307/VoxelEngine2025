@@ -4,13 +4,16 @@
 #include "BlockModel.hpp"
 #include "voxel.hpp"
 #include "src/physics/AABB.hpp"
+#include "VoxelStorage.hpp"
 
+class Engine;
 
 class Block{
 public :
     Block(std::string name, BlockModel model, std::vector<std::tuple<size_t, size_t>> UVs); //: name(name), model(model);
     
     const std::string name;
+    bool lightPassing = false;
     std::array<bool, 6> opened_faces;
 
     BlockModel getBlockModel() const { return model; }
@@ -20,21 +23,12 @@ public :
     {
         return *blocks[id];
     }
-    static const std::vector<AABB> getAABBs(voxel vox){
-        BlockModel model = Block::getBlockByVoxelId(vox.id).getBlockModel();
-        switch (model) {
-            case BlockModel::AIR:
-                return {};
-            case BlockModel::SOLID:
-                return {AABB(glm::vec3(1.0f))};
-            default:
-                return {};
-        }
-    }
+    static const std::vector<AABB> getAABBs(int x, int y, int z, IteractionType type = COLLISION);
 
 private : 
     static void add_block(Block *block)
     {
+        std::cout << "New Block with name " << block->name << " added." << std::endl;
         Block::blocks.push_back(block);
         block->voxelId = Block::blocks.size() - 1;
     }

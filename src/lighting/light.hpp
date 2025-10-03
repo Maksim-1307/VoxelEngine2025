@@ -29,4 +29,7 @@ struct light {
     bool operator<=(const light& other) const {
         return other.value <= this->value;
     }
+    operator bool() const {
+        return value != 0;
+    }
 };

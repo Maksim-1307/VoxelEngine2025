@@ -1,7 +1,8 @@
-Stats class. gets data and displays it 
-Fancy generator 
-AABB collisions 
-memory leak fix
+# Before Alpha
 
-VAO refactor (add Vertex struct)
-R G B S order
+- [x] Memory leak fix
+- [x] AABB collisions
+- [x] Blocks placing and removing
+- [ ] Block indicator
+- [ ] Basic physix 
+

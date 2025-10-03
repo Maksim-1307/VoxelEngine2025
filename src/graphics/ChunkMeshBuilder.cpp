@@ -1,8 +1,20 @@
 #include "ChunkMeshBuilder.hpp"
 #include "src/Engine.hpp"
 
-Mesh* ChunkMeshBuilder::buildMesh(Chunk &chunk)
+sptr<Mesh> ChunkMeshBuilder::buildMesh(Chunk &chunk)
 {
+
+    // if (chunk.state < LIGHTS_PRE_BUILT) {
+    //     // std::cout << "WARNING: buildMesh called on a chunk with state less than LIGHTS_BUILT. The state: " <<
+    //     //     (int)chunk.state;
+    //     return nullptr;
+    // }
+    // if (chunk.state > LIGHTS_BUILT) {
+    //     // std::cout << "WARNING: buildMesh called on an already handled chunk. The state: " <<
+    //     //     (int)chunk.state;
+    //     return nullptr;
+    // }
+
     vertices.clear();
     indices.clear();
     vertices.reserve(1000);
@@ -29,7 +41,7 @@ Mesh* ChunkMeshBuilder::buildMesh(Chunk &chunk)
             }
         }
     }
-    return new Mesh(vertices.data(), vertices.size(), indices.data(), indices.size());
+    return  make_sptr<Mesh>(std::move(vertices), std::move(indices));
 }
 
 void ChunkMeshBuilder::CubeModel(int x, int y, int z)
@@ -107,7 +119,7 @@ void ChunkMeshBuilder::CubeModel(int x, int y, int z)
 
 std::array<bool, 6> ChunkMeshBuilder::opened_around(int x, int y, int z)
 {
-    std::array<bool, 6> opened;
+    std::array<bool, 6> opened{};
     opened[0] = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX + 1, y + chunkY, z + chunkZ).id).opened_faces[adjacent(0)];
     opened[1] = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX - 1, y + chunkY, z + chunkZ).id).opened_faces[adjacent(1)];
     opened[2] = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX, y + chunkY + 1, z + chunkZ).id).opened_faces[adjacent(2)];

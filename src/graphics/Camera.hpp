@@ -21,7 +21,7 @@ class Camera
 public:
     Camera(Window &window);
 
-    vec3 position = vec3(0, 0, 0);
+    vec3 position = vec3(0, 30, 0);
     vec3 front;
     vec3 right;
     vec3 up;

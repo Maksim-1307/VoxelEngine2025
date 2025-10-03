@@ -3,7 +3,7 @@
 #include <queue>
 
 #include "light.hpp"
-#include "src/logic/AreaMap3D.hpp"
+#include "src/logic/AreaMap2D.hpp"
 #include "src/voxels/Chunk.hpp"
 
 // class AreaMap3D;
@@ -19,10 +19,10 @@ struct lightentry {
 class LightSolver {
     std::queue<lightentry> addqueue;
     std::queue<lightentry> remqueue;
-    AreaMap3D<Chunk>& chunks;
+    AreaMap2D<Chunk>& chunks;
     int channel;
 public:
-    LightSolver(AreaMap3D<Chunk>& chunks, int channel);
+    LightSolver(AreaMap2D<Chunk>& chunks, int channel);
 
     void add(int x, int y, int z);
     void add(int x, int y, int z, unsigned char emission);

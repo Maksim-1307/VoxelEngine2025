@@ -1,6 +1,10 @@
 #include "MeshRenderer.hpp"
 
 void MeshRenderer::gen_buffers(MeshType type){
+    if (!pMesh) { 
+        std::cerr << "ERROR: pMesh is null in gen_buffers!" << std::endl;
+        return;
+    }
     int stride = 0;
     switch (type){
         
@@ -61,15 +65,13 @@ void MeshRenderer::gen_buffers(MeshType type){
             std::cerr << "ERROR! Type LINE3D is not supported yet.";
             break;
     }
-    
-
 }
 
 void MeshRenderer::draw(){
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glDrawElements(GL_TRIANGLES, pMesh->vertices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, pMesh->indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
 }

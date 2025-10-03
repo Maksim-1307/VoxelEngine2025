@@ -8,8 +8,11 @@ class Texture
 
 public:
     Texture(std::string texturePath, bool alpha=false);
+    Texture(unsigned char* data, int width, int height);
     Texture(){};
-    ~Texture();
+    ~Texture(){
+        glDeleteTextures(1, &texID);
+    };
 
     GLuint getID();
 

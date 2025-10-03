@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <random>
+#include <functional>
 #include "src/voxels/Chunk.hpp"
 
 enum class GENERATION_TYPE {
@@ -23,10 +24,14 @@ class Generator {
         }
     };
 
-    Chunk* generate_at(int x, int y, int z);
+    Chunk* generate_at(int x, int z);
+    void generate_ambient(int x, int z);
+    void generate_tree(int x, int y, int z);
+
     Chunk* perlin_noise_2d(int x, int y, int z);
     Chunk* perlin_noise_3d(int x, int y, int z);
-
+    Chunk* terrain_with_caves(int x, int y, int z);
+    
     private:
         uint32_t crc32(const char *str)
         {
@@ -41,5 +46,19 @@ class Generator {
             }
             return ~crc;
         };
+        float random(int x, int y, unsigned int seed) {
+            uint32_t h = static_cast<uint32_t>(seed);
+            h ^= static_cast<uint32_t>(x) * 0x9e3779b9;
+            h ^= static_cast<uint32_t>(y) * 0x85ebca6b;
+            
+            // Finalize hash - avalanche bits
+            h ^= h >> 16;
+            h *= 0x85ebca6b;
+            h ^= h >> 13;
+            h *= 0xc2b2ae35;
+            h ^= h >> 16;
+            
+            return static_cast<float>(h) / 4294967295.0f; 
+        }
         uint32_t seed;
 };

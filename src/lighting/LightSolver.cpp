@@ -2,12 +2,14 @@
 
 #include "src/Engine.hpp"
 
-LightSolver::LightSolver(AreaMap3D<Chunk>& chunks, int channel)
+LightSolver::LightSolver(AreaMap2D<Chunk>& chunks, int channel)
     : chunks(chunks)
-{}
+{
+    this->channel = channel;
+}
 
 void LightSolver::add(int x, int y, int z){
-    unsigned char light = Engine::pVoxelStorage->get_light(x, y, z, channel);
+    uint8_t light = Engine::pVoxelStorage->get_light(x, y, z, channel);
     add(x, y, z, light);
 }
 void LightSolver::add(int x, int y, int z, unsigned char emission){
@@ -19,15 +21,14 @@ void LightSolver::add(int x, int y, int z, unsigned char emission){
     int ix = x - cx * CHUNK_W;
     int iy = y - cy * CHUNK_H;
     int iz = z - cz * CHUNK_W;
-    Chunk* chunk = chunks.get(cx, cy, cz);
+    Chunk* chunk = chunks.get(cx, cz);
     if (chunk == nullptr)
         return;
     unsigned char light = chunk->lightmap.get(ix, iy, iz, channel);
     if (emission < light) return;
-
     addqueue.push(lightentry {x, y, z, emission});
 
-    chunk->modified = true;
+    // chunk->state = MODIFIED;
     chunk->lightmap.set(ix, iy, iz, channel, emission);
 }
 
@@ -40,7 +41,7 @@ void LightSolver::remove(int x, int y, int z) {
     int ix = x - cx * CHUNK_W;
     int iy = y - cy * CHUNK_H;
     int iz = z - cz * CHUNK_W;
-    Chunk* chunk = chunks.get(cx, cy, cz);
+    Chunk* chunk = chunks.get(cx, cz);
     if (chunk == nullptr)
         return;
 
@@ -75,13 +76,13 @@ void LightSolver::solve(){
             int cx = std::floor((float)x / CHUNK_W);
             int cy = std::floor((float)y / CHUNK_H);
             int cz = std::floor((float)z / CHUNK_W);
-            Chunk* chunk = chunks.get(cx, cy, cz);
+            Chunk* chunk = chunks.get(cx, cz);
 
             if (chunk) {
                 int lx = x - cx * CHUNK_W;
                 int ly = y - cy * CHUNK_H;
                 int lz = z - cz * CHUNK_W;
-                chunk->modified = true;
+                // chunk->state = MODIFIED;
 
                 uint8_t light = chunk->lightmap.get(lx, ly, lz, channel);
                 if (light != 0 && light == entry.light-1){
@@ -118,17 +119,18 @@ void LightSolver::solve(){
             int cx = std::floor((float)x / CHUNK_W);
             int cy = std::floor((float)y / CHUNK_H);
             int cz = std::floor((float)z / CHUNK_W);
-            Chunk* chunk = chunks.get(cx, cy, cz);
+            Chunk* chunk = chunks.get(cx, cz);
 
             if (chunk) {
                 int lx = x - cx * CHUNK_W;
                 int ly = y - cy * CHUNK_H;
                 int lz = z - cz * CHUNK_W;
-                chunk->modified = true;
+                // chunk->state = MODIFIED;
 
                 uint8_t light = chunk->lightmap.get(lx, ly, lz, channel);
                 voxel v = chunk->get_voxel(lx, ly, lz);
                 // const Block* block = blockDefs[v.id];
+                bool lightPassing = Block::getBlockByVoxelId(v.id).lightPassing;
                 // if (block->lightPassing && light+2 <= entry.light){
                 //     chunk->lightmap.set(
                 //         x-cx*CHUNK_W, y-cy*CHUNK_H, z-cz*CHUNK_W, 
@@ -136,12 +138,12 @@ void LightSolver::solve(){
                 //         entry.light-1);
                 //     addqueue.push(lightentry {x, y, z, uint8_t(entry.light-1)});
                 // }
-                if (v.id == 0 && light+2 <= entry.light){
+                if (lightPassing && light+2 <= entry.light){
                     chunk->lightmap.set(
                         x-cx*CHUNK_W, y-cy*CHUNK_H, z-cz*CHUNK_W, 
                         channel, 
                         entry.light-1);
-                    addqueue.push(lightentry {x, y, z, uint8_t(entry.light-1)});
+                    addqueue.push(lightentry {x, y, z, (uint8_t)(entry.light-1)});
                 }
             }
         }

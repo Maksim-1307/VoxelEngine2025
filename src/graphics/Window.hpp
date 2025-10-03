@@ -6,13 +6,13 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-
+#include "src/logic/Settings.hpp"
 
 struct WindowArgs
 {
     std::string name = "OpenGL Window";
-    GLuint width = 649;
-    GLuint height = 480;
+    GLuint width = Settings::WINDOW_WIDTH;
+    GLuint height = Settings::WINDOW_HEIGHT;
     bool isResizable = true;
     glm::vec3 clearColor = glm::vec3(0.0f, 0.0f, 0.0f);
 };

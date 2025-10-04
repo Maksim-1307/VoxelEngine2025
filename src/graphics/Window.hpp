@@ -53,7 +53,12 @@ public:
     {
         return (float)this->width / this->height;
     }
-
+    void set_mouse_lock(bool active) {
+        if (active)
+            glfwSetInputMode(this->GLFWwindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        else
+            glfwSetInputMode(this->GLFWwindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
 private:
     GLuint width;
     GLuint height;

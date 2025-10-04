@@ -3,8 +3,7 @@
 
 #include "Engine.hpp"
 
-#include <RmlUi/Core.h>
-#include <RmlUi/Debugger.h>
+// #include "logic/State.hpp"
 
 using namespace std::chrono;
 
@@ -113,6 +112,7 @@ void Engine::game_loop()
         Engine::pInputController->update(deltaTime);
         Engine::pChunksController->update();
         Engine::pWorldLoadingIndicator->update(Engine::pChunkMap->get_chunks());
+        Engine::pWindow->set_mouse_lock(State::MOUSE_CONTROL);
 
         // drawing terrain
         Engine::pMeshShader->use();

@@ -1,4 +1,5 @@
 #include "InputController.hpp"
+#include "State.hpp"
 
 InputController::InputController(Camera &camera, Window &window)
 {
@@ -22,7 +23,9 @@ void InputController::update(float deltaTime)
         pCamera->move(0, speed * deltaTime, 0);
     if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_LEFT_SHIFT))
         pCamera->move(0, -speed * deltaTime, 0);
-    if (Settings::MOUSE_CONTROL) {
+    if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_ESCAPE))
+        State::MOUSE_CONTROL = !State::MOUSE_CONTROL;
+    if (State::MOUSE_CONTROL) {
         pMouse->update(deltaTime);
     } else {
         if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_RIGHT))

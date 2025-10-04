@@ -21,6 +21,9 @@
 #include "graphics/Stats.hpp"
 #include "lighting/Lighting.hpp"
 #include "graphics/WorldLoadingIndicator.hpp"
+#include "logic/State.hpp"
+
+// class State;
 
 #include "logic/Iterator.hpp"
 

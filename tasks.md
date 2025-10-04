@@ -5,4 +5,5 @@
 - [x] Blocks placing and removing
 - [ ] Block indicator
 - [ ] Basic physix 
+- [ ] Block lihting 
 

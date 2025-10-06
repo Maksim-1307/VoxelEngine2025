@@ -3,7 +3,7 @@
 - [x] Memory leak fix
 - [x] AABB collisions
 - [x] Blocks placing and removing
-- [ ] Block indicator
+- [x] Block indicator
 - [ ] Basic physix 
 - [ ] Block lihting 
 
@@ -11,8 +11,8 @@
 - [ ] Deal with chunks handling warnings
 - [ ] Fix lighing bug (when block placed)
 - [ ] Separate class for block model
-- [ ] Separate clask for textures atlas
+- [ ] Separate class for textures atlas
 - [ ] Separate pack-in-float function
-- [ ] Escape delay
-- [ ] Rendering in texture
+- [x] Escape delay
+- [x] Rendering in texture
 - [ ] Screencshots

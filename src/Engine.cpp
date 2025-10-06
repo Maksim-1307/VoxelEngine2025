@@ -71,7 +71,6 @@ void Engine::init()
     // Lighting
     Engine::pLighting = new Lighting(*Engine::pChunkMap);
     
-
     std::function<Chunk *(int, int)> gen_func = [](int x, int z) -> Chunk* 
     { 
         return Engine::pGenerator->generate_at(x, z);
@@ -85,7 +84,21 @@ void Engine::init()
     Engine::pStats = new Stats();
     Engine::pWorldLoadingIndicator = new WorldLoadingIndicator(Engine::pChunkMap->get_chunks());
     Engine::pBlockMeshBuilder = new BlockMeshBuilder();
-    // Engine::pBlockIcon = new BlockIcon(Block::getBlockByVoxelId(3));
+
+    // Input Callbacks
+    Engine::pInputController->onPress(GLFW_KEY_TAB, []() {
+        State::PLACING_VOXEL.id += 1;
+        int count = Block::getBlocksCount();
+        if (State::PLACING_VOXEL.id >= count) {
+            State::PLACING_VOXEL.id = State::PLACING_VOXEL.id % count;
+        }
+        if (State::PLACING_VOXEL.id == 0) {
+            State::PLACING_VOXEL.id = 1;
+        }
+    });
+    Engine::pInputController->onPress(GLFW_KEY_ESCAPE, []() {
+        State::MOUSE_CONTROL = !State::MOUSE_CONTROL;
+    });
 }
 
 void Engine::game_loop()
@@ -176,9 +189,9 @@ void Engine::game_loop()
         Engine::pWorldLoadingIndicator->draw();
 
         // drawing placing block indicator
-        topPosition = windowHeight - 50.0f; //50px from bottom
+        topPosition = windowHeight - 90.0f; //50px from bottom
         transform = glm::translate(glm::mat4(1.0f), glm::vec3(rightPosition, topPosition, 0.0f));
-        transform = glm::scale(transform, glm::vec3(64.0f, 64.0f, 1.0f));
+        transform = glm::scale(transform, glm::vec3(128.0f, 128.0f, 1.0f));
 
         Engine::pSpriteShader->set_matrix4("projection", projection * transform);
         Engine::pSpriteShader->set_texture("theTexture", Engine::pWorldLoadingIndicator->texture->getID());

@@ -28,6 +28,8 @@ public :
         return *icon;
     }
 
+    static int getBlocksCount() { return blocks.size(); }
+
     static Block& getBlockByVoxelId(size_t id) 
     {
         return *blocks[id];

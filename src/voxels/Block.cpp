@@ -4,8 +4,7 @@
 std::vector<Block *> Block::blocks = {};
 
 Block::Block(std::string name, BlockModel model, std::vector<std::tuple<size_t, size_t>> UVs) 
-: name(name),
-model(model)                                                                                
+: name(name), model(model)                                 
 {
     set_UVs(UVs);
     Block::add_block(this);

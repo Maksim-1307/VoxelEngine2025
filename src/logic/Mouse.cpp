@@ -3,6 +3,7 @@
 #include "src/graphics/Window.hpp"
 #include "src/physics/Terrain.hpp"
 #include "src/Engine.hpp"
+#include "src/logic/State.hpp"
 
 #define MAX_MOUSE_OFFSET 100
 
@@ -25,7 +26,12 @@ void Mouse::update(float deltaTime) {
         if (pressTimeLeft == 0 || pressTimeLeft > Settings::BLOCK_BREAKING_DELAY) {
             RaycastResult result = Engine::pTerrain->raycast(camera->position, camera->front, 15.0f);
             if (result.hit) {
-                Engine::pVoxelStorage->set_voxel_soft(std::floor(result.position.x), std::floor(result.position.y), std::floor(result.position.z), {0, 0});
+                Engine::pVoxelStorage->set_voxel_soft(
+                    std::floor(result.position.x), 
+                    std::floor(result.position.y), 
+                    std::floor(result.position.z), 
+                    {0, 0}
+                );
             }
             pressTimeLeft = 0;
         }
@@ -37,7 +43,12 @@ void Mouse::update(float deltaTime) {
         if (pressTimeRight == 0 || pressTimeRight > Settings::BLOCK_PLACIND_DELAY) {
             RaycastResult result = Engine::pTerrain->raycast(camera->position, camera->front, 15.0f, false);
             if (result.hit) {
-                Engine::pVoxelStorage->set_voxel_soft(std::floor(result.position.x), std::floor(result.position.y), std::floor(result.position.z), {1, 0});
+                Engine::pVoxelStorage->set_voxel_soft(
+                    std::floor(result.position.x), 
+                    std::floor(result.position.y), 
+                    std::floor(result.position.z), 
+                    State::PLACING_VOXEL
+                );
             }
             pressTimeRight = 0;
         }

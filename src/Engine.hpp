@@ -22,6 +22,8 @@
 #include "lighting/Lighting.hpp"
 #include "graphics/WorldLoadingIndicator.hpp"
 #include "logic/State.hpp"
+#include "graphics/BlockMeshBuilder.hpp"
+// #include "graphics/BlockIcon.hpp"
 
 // class State;
 
@@ -56,4 +58,6 @@ class Engine {
         static Stats* pStats;
         static Lighting* pLighting;
         static WorldLoadingIndicator* pWorldLoadingIndicator;
+        static BlockMeshBuilder* pBlockMeshBuilder;
+        // static BlockIcon* pBlockIcon;
 };

@@ -55,13 +55,23 @@ mat4 Camera::getViewFromNull()
     return lookAt(-front, vec3(0), vec3(0, 1, 0));
 }
 
+mat4 Camera::getViewFromNullTo(glm::vec3 dir)
+{
+    return lookAt(dir, vec3(0), vec3(0, 1, 0));
+}
+
 mat4 Camera::getProjection()
 {
     return perspective(glm::radians(fov), (float)window.get_width() / (float)window.get_height(), 0.01f, 1500.0f);
 }
 
-mat4 Camera::get_orthographic_projection()
+mat4 Camera::getOrthographicProjection()
 {
     float aspectRatio = window.get_ratio();
+    return ortho(-1.0f, 1.0f, -1.0f / aspectRatio, 1.0f / aspectRatio, -1.0f, 1.0f);
+}
+mat4 Camera::getOrthographicProjection(int width, int height)
+{
+    float aspectRatio = width / height;
     return ortho(-1.0f, 1.0f, -1.0f / aspectRatio, 1.0f / aspectRatio, -1.0f, 1.0f);
 }

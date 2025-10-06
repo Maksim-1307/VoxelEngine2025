@@ -36,14 +36,15 @@ public:
 
     // view matrix
     mat4 getView();
-
     mat4 getViewFromNull();
+    mat4 getViewFromNullTo(glm::vec3 dir);
 
     // projection matrix
     mat4 getProjection();
 
-    // orthographic projection (for 2d sprites)
-    mat4 get_orthographic_projection();
+    // orthographic projection 
+    mat4 getOrthographicProjection();
+    mat4 getOrthographicProjection(int width, int height);
 
     void move(float x, float y, float z);
 

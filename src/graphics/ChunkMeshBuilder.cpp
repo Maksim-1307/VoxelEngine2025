@@ -48,7 +48,7 @@ void ChunkMeshBuilder::CubeModel(int x, int y, int z)
 {
 
     std::array<bool, 6> openedFaces = opened_around(x, y, z);
-    Block block = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX, y + chunkY, z + chunkZ).id);
+    Block& block = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX, y + chunkY, z + chunkZ).id);
 
     for (int face = 0; face < 6; face++)
     {

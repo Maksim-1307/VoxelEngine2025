@@ -29,6 +29,8 @@ Terrain* Engine::pTerrain = nullptr;
 Stats* Engine::pStats = nullptr;
 Lighting* Engine::pLighting = nullptr;
 WorldLoadingIndicator* Engine::pWorldLoadingIndicator = nullptr;
+BlockMeshBuilder* Engine::pBlockMeshBuilder = nullptr;
+// BlockIcon* Engine::pBlockIcon = nullptr;
 
 void Engine::init()
 {
@@ -82,6 +84,8 @@ void Engine::init()
     Engine::pTerrain = new Terrain(*Engine::pVoxelStorage);
     Engine::pStats = new Stats();
     Engine::pWorldLoadingIndicator = new WorldLoadingIndicator(Engine::pChunkMap->get_chunks());
+    Engine::pBlockMeshBuilder = new BlockMeshBuilder();
+    // Engine::pBlockIcon = new BlockIcon(Block::getBlockByVoxelId(3));
 }
 
 void Engine::game_loop()
@@ -170,6 +174,17 @@ void Engine::game_loop()
         Engine::pSpriteShader->set_matrix4("projection", projection * transform);
         Engine::pSpriteShader->set_texture("theTexture", Engine::pWorldLoadingIndicator->texture->getID());
         Engine::pWorldLoadingIndicator->draw();
+
+        // drawing placing block indicator
+        topPosition = windowHeight - 50.0f; //50px from bottom
+        transform = glm::translate(glm::mat4(1.0f), glm::vec3(rightPosition, topPosition, 0.0f));
+        transform = glm::scale(transform, glm::vec3(64.0f, 64.0f, 1.0f));
+
+        Engine::pSpriteShader->set_matrix4("projection", projection * transform);
+        Engine::pSpriteShader->set_texture("theTexture", Engine::pWorldLoadingIndicator->texture->getID());
+        Block& placingBlock = Block::getBlockByVoxelId(State::PLACING_VOXEL.id);
+        Engine::pSpriteShader->set_texture("theTexture", placingBlock.getIcon().getTexture()->getID());
+        placingBlock.getIcon().draw();
 
         glfwSwapBuffers(Engine::pWindow->get_glfw_window());
         glfwPollEvents();

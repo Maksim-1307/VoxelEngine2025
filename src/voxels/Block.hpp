@@ -5,6 +5,8 @@
 #include "voxel.hpp"
 #include "src/physics/AABB.hpp"
 #include "VoxelStorage.hpp"
+#include "src/graphics/BlockIcon.hpp"
+#include "src/logic/pointers.hpp"
 
 class Engine;
 
@@ -19,13 +21,21 @@ public :
     BlockModel getBlockModel() const { return model; }
     std::tuple<size_t, size_t> getUV(int face);
 
-    static const Block& getBlockByVoxelId(size_t id) 
+    BlockIcon& getIcon() const {
+        if (!icon) {
+            icon = std::make_unique<BlockIcon>(this->voxelId); 
+        }
+        return *icon;
+    }
+
+    static Block& getBlockByVoxelId(size_t id) 
     {
         return *blocks[id];
     }
     static const std::vector<AABB> getAABBs(int x, int y, int z, IteractionType type = COLLISION);
 
 private : 
+    mutable std::unique_ptr<BlockIcon> icon;
     static void add_block(Block *block)
     {
         std::cout << "New Block with name " << block->name << " added." << std::endl;

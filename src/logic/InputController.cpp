@@ -1,5 +1,6 @@
 #include "InputController.hpp"
 #include "State.hpp"
+#include "src/voxels/Block.hpp"
 
 InputController::InputController(Camera &camera, Window &window)
 {
@@ -25,6 +26,12 @@ void InputController::update(float deltaTime)
         pCamera->move(0, -speed * deltaTime, 0);
     if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_ESCAPE))
         State::MOUSE_CONTROL = !State::MOUSE_CONTROL;
+    if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_TAB)) {
+        State::PLACING_VOXEL.id += 1;
+        if (State::PLACING_VOXEL.id >= 4) {
+            State::PLACING_VOXEL.id = State::PLACING_VOXEL.id % 4;
+        }
+    }
     if (State::MOUSE_CONTROL) {
         pMouse->update(deltaTime);
     } else {

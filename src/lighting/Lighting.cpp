@@ -58,6 +58,7 @@ void Lighting::prebuildSkyLight(Chunk* chunk){
     //     return;
     // }
     chunk->lightmap.clear();
+
     int cx = chunk->X;
     int cz = chunk->Z;
     
@@ -65,11 +66,9 @@ void Lighting::prebuildSkyLight(Chunk* chunk){
         for (int x = 0; x < CHUNK_W; x++){
             for (int y = CHUNK_H-1; y >= 0; y--){ 
                 voxel vox = chunk->get_voxel(x, y, z);
-                
                 if (vox.id != 0) { 
                     break;
                 }
-                
                 chunk->lightmap.setS(x, y, z, 15);
             }
         }
@@ -130,6 +129,7 @@ void Lighting::buildSkyLight(int cx, int cz) {
 }
 
 void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
+
     auto& solverR = *this->solverR;
     auto& solverG = *this->solverG;
     auto& solverB = *this->solverB;

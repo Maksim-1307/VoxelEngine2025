@@ -32,7 +32,7 @@ public:
         data[x * (Y * Z) + y * Z + z] = val;
     }
     void clear(T val){
-        for (int i = 0; i > X * Y * Z; i++){
+        for (int i = 0; i < X * Y * Z; i++){
             data[i] = val;
         }
     }

@@ -28,20 +28,7 @@ void Lighting::clear(){
             // Engine::pLighting->buildSkyLight(x, z);
         }
     }
-    for (int x = 0; x < size; x++) {
-        for (int z = 0; z < size; z++) {
-            // Chunk* chunk = Engine::pChunkMap->firstBuffer->get(x, z);
-            // if (!chunk) continue;
-            // chunk->lightmap.clear();
-            // Engine::pLighting->buildSkyLight(x, z);
-        }
-    }
 
-    // while (!Lighting::preBuildQueue.empty()) {
-    //     Chunk* chunk = Lighting::preBuildQueue.front();
-    //     Lighting::preBuildQueue.pop();
-    //     Engine::pLighting->prebuildSkyLight(chunk);
-    // }
 }
 
 
@@ -137,24 +124,24 @@ void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
 
     Chunk* chunk = Engine::pChunkMap->get(cx, cz);
     if (chunk == nullptr) {
-        // logger.error() << "attempted to build lights to chunk missing in local matrix";
         return;
     }
-    // for (uint y = 0; y < CHUNK_H; y++){
-    //     for (uint z = 0; z < CHUNK_W; z++){
-    //         for (uint x = 0; x < CHUNK_W; x++){
-    //             const voxel& vox = chunk->voxels[(y * CHUNK_W + z) * CHUNK_W + x];
-    //             const Block* block = blockDefs[vox.id];
-    //             int gx = x + cx * CHUNK_W;
-    //             int gz = z + cz * CHUNK_W;
-    //             if (block->rt.emissive){
-    //                 solverR.add(gx,y,gz,block->emission[0]);
-    //                 solverG.add(gx,y,gz,block->emission[1]);
-    //                 solverB.add(gx,y,gz,block->emission[2]);
-    //             }
-    //         }
-    //     }
-    // }
+    for (uint y = 0; y < CHUNK_H; y++){
+        for (uint z = 0; z < CHUNK_W; z++){
+            for (uint x = 0; x < CHUNK_W; x++){
+                const voxel& vox = chunk->get_voxel(x, y, z);
+                const Block& block = Block::getBlockByVoxelId(vox.id);
+                int gx = x + cx * CHUNK_W;
+                int gz = z + cz * CHUNK_W;
+                if (block.emissive){
+                    std::cout << "emissive \n";
+                    solverR.add(gx, y, gz, block.emission[0]);
+                    solverG.add(gx, y, gz, block.emission[1]);
+                    solverB.add(gx, y, gz, block.emission[2]);
+                }
+            }
+        }
+    }
 
     if (expand) {
         for (int x = 0; x < CHUNK_W; x += CHUNK_W-1) {

@@ -14,7 +14,7 @@ uniform mat4 projection;
 void main(void)
 {
     // make uniform
-    float skyBrightness = 1.0;
+    float skyBrightness = 1.0f;
     vec3 skyColor = vec3(1, 1, 1);
 
     // unpacking float to two bytes
@@ -24,15 +24,15 @@ void main(void)
 
     // unpacking light
     uint packed16 = byte1;
-    float r = float(uint((packed16 >> 12) & 0xFu) + uint(2)) / 17.0; 
-    float g = float(uint((packed16 >> 8)  & 0xFu) + uint(2)) / 17.0; 
-    float b = float(uint((packed16 >> 4)  & 0xFu) + uint(2)) / 17.0; 
+    float r = float(uint((packed16 >> 12) & 0xFu)) / 15.0; 
+    float g = float(uint((packed16 >> 8)  & 0xFu)) / 15.0; 
+    float b = float(uint((packed16 >> 4)  & 0xFu)) / 15.0; 
     float s = float(uint(packed16         & 0xFu) + uint(2)) / 17.0; 
 
     // unpacking face orientation
     uint face = uint(byte2);
 
-    vec3 totalLight =  skyColor * skyBrightness * s;
+    vec3 totalLight =  skyColor * skyBrightness * s + vec3(r, g, b);
 
     float faceDarkeing[6] = float[](0.2f, 0.7f, 0.0f, 0.8f, 0.3f, 0.5f);
     float faceFactor = 0.5;

@@ -41,6 +41,7 @@ void Engine::init()
     new Block("grass", BlockModel::SOLID, {{1, 1}, {0, 0}, {0, 1}});
     new Block("oak_log", BlockModel::SOLID, {{2, 1}, {0, 2}, {2, 1}});
     new Block("leaves", BlockModel::FOLIAGE, {{1, 2}});
+    new Block("lamp", BlockModel::FOLIAGE, {{2, 0}}, true, {0, 0, 15});
 
     // Graphics
     WindowArgs wargs;
@@ -162,8 +163,16 @@ void Engine::game_loop()
         bool obstacle = Engine::pTerrain->is_obstacle_at(camPos.x, camPos.y, camPos.z);
         Engine::pStats->set("Obstacle", obstacle ? "true" : "false");
         prevObstacle = obstacle;
-        int light = Engine::pVoxelStorage->get_light(floor(camPos.x), floor(camPos.y), floor(camPos.z)).getS();
-        Engine::pStats->set("Light", std::to_string(light));
+        
+        // int rlight = Engine::pVoxelStorage->get_light(floor(camPos.x), floor(camPos.y), floor(camPos.z)).getR();
+        // int glight = Engine::pVoxelStorage->get_light(floor(camPos.x), floor(camPos.y), floor(camPos.z)).getG();
+        // int blight = Engine::pVoxelStorage->get_light(floor(camPos.x), floor(camPos.y), floor(camPos.z)).getB();
+        int skyLight = Engine::pVoxelStorage->get_light(floor(camPos.x), floor(camPos.y), floor(camPos.z)).getS();
+        Engine::pStats->set("Sky Light", std::to_string(skyLight));
+        // Engine::pStats->set("R Light", std::to_string(rlight));
+        // Engine::pStats->set("G Light", std::to_string(glight)); 
+        // Engine::pStats->set("B Light", std::to_string(blight));
+
         Engine::pStats->set("X", std::to_string(camPos.x));
         Engine::pStats->set("Y", std::to_string(camPos.y));
         Engine::pStats->set("Z", std::to_string(camPos.z));

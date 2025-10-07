@@ -3,8 +3,13 @@
 
 std::vector<Block *> Block::blocks = {};
 
-Block::Block(std::string name, BlockModel model, std::vector<std::tuple<size_t, size_t>> UVs) 
-: name(name), model(model)                                 
+Block::Block(
+    std::string name, 
+    BlockModel model, 
+    std::vector<std::tuple<size_t, size_t>> UVs,
+    bool emissive, 
+    std::array<uint8_t, 3> emission
+) : name(name), model(model), emissive(emissive), emission(emission)                                 
 {
     set_UVs(UVs);
     Block::add_block(this);

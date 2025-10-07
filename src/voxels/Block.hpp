@@ -12,10 +12,18 @@ class Engine;
 
 class Block{
 public :
-    Block(std::string name, BlockModel model, std::vector<std::tuple<size_t, size_t>> UVs); //: name(name), model(model);
+    Block(
+        std::string name, 
+        BlockModel model, 
+        std::vector<std::tuple<size_t, size_t>> UVs, 
+        bool emissive = false, 
+        std::array<uint8_t, 3> emission = {0, 0, 0}
+    ); 
     
     const std::string name;
     bool lightPassing = false;
+    bool emissive;
+    std::array<uint8_t, 3> emission;
     std::array<bool, 6> opened_faces;
 
     BlockModel getBlockModel() const { return model; }

@@ -3,6 +3,7 @@
 #include "src/logic/pointers.hpp"
 #include "src/physics/Hitbox.hpp"
 #include "src/graphics/Camera.hpp"
+#include "src/logic/Settings.hpp"
 
 #include <unordered_set>
 
@@ -13,12 +14,13 @@ public:
         this->camera = camera;
         this->camera->position = position + glm::vec3(0, 1.6f-0.9f, 0);
         this->hitbox = make_uptr<Hitbox>(position, glm::vec3(0.8f, 1.8f, 0.8f));
+        this->hitbox->gravityFactor = 2.0f;
         this->hitbox->position = position;
     };
     ~Player() {};
 
     void jump() {
-        if (this->hitbox->isGrounded) this->hitbox->velocity.y = 10.0f;
+        if (this->hitbox->isGrounded) this->hitbox->velocity.y = 8.0f;
     }
     void move_forward() {
         movingDirections.push_back(glm::vec2(1.0f, 0));
@@ -44,8 +46,8 @@ public:
             direction = forward * direction.x + right * direction.z;
             direction.y = 0;
             direction = glm::normalize(direction);
-            this->hitbox->velocity.x = direction.x * 10.0f;
-            this->hitbox->velocity.z = direction.z * 10.0f;
+            this->hitbox->velocity.x = direction.x * Settings::PLAYER_SPEED;
+            this->hitbox->velocity.z = direction.z * Settings::PLAYER_SPEED;
         } else {
             this->hitbox->velocity.x = 0.0f;
             this->hitbox->velocity.z = 0.0f;

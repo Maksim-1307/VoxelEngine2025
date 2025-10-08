@@ -3,7 +3,7 @@
 
 void Physics::step(float deltaTime) {
     for (auto hitbox : Hitbox::hitboxes) {
-        hitbox->velocity += gravity * deltaTime;
+        hitbox->velocity += gravity * hitbox->gravityFactor * deltaTime;
         collisions(*hitbox, deltaTime);
         hitbox->position += hitbox->velocity * deltaTime;
     }

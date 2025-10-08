@@ -4,7 +4,7 @@
 - [x] AABB collisions
 - [x] Blocks placing and removing
 - [x] Block indicator
-- [ ] Basic physix 
+- [x] Basic physix 
 - [x] Block lihting 
 
 # Global 

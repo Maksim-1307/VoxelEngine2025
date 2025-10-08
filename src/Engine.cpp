@@ -60,7 +60,7 @@ void Engine::init()
     Engine::pCanvas = new Canvas(*Engine::pWindow);
     
     // Texts 
-    std::string ss = "Making a Minecraft clone on OpenGL";
+    std::string ss = "VoxelGame pre Alpha";
     Engine::pText = new Text(ss);
     std::string sss = "fps: ";
     Engine::pFpsText = new Text(sss);

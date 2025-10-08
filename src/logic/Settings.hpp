@@ -11,4 +11,5 @@ public:
     static constexpr float MOUSE_SENSITIVITY = 20.0f;
     static constexpr float BLOCK_BREAKING_DELAY = 0.3f;
     static constexpr float BLOCK_PLACIND_DELAY = 0.2f;
+    static constexpr float PLAYER_SPEED = 5.0f;
 };

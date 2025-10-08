@@ -30,7 +30,7 @@ Stats* Engine::pStats = nullptr;
 Lighting* Engine::pLighting = nullptr;
 WorldLoadingIndicator* Engine::pWorldLoadingIndicator = nullptr;
 BlockMeshBuilder* Engine::pBlockMeshBuilder = nullptr;
-// BlockIcon* Engine::pBlockIcon = nullptr;
+Player* Engine::pPlayer = nullptr;
 
 void Engine::init()
 {
@@ -41,7 +41,7 @@ void Engine::init()
     new Block("grass", BlockModel::SOLID, {{1, 1}, {0, 0}, {0, 1}});
     new Block("oak_log", BlockModel::SOLID, {{2, 1}, {0, 2}, {2, 1}});
     new Block("leaves", BlockModel::FOLIAGE, {{1, 2}});
-    new Block("lamp", BlockModel::FOLIAGE, {{2, 0}}, true, {0, 0, 15});
+    new Block("lamp", BlockModel::FOLIAGE, {{3, 2}}, true, {0, 10, 0});
 
     // Graphics
     WindowArgs wargs;
@@ -85,6 +85,7 @@ void Engine::init()
     Engine::pStats = new Stats();
     Engine::pWorldLoadingIndicator = new WorldLoadingIndicator(Engine::pChunkMap->get_chunks());
     Engine::pBlockMeshBuilder = new BlockMeshBuilder();
+    Engine::pPlayer = new Player(glm::vec3(0, 30, 0), Engine::pCamera);
 
     // Input Callbacks
     Engine::pInputController->onPress(GLFW_KEY_TAB, []() {
@@ -100,6 +101,22 @@ void Engine::init()
     Engine::pInputController->onPress(GLFW_KEY_ESCAPE, []() {
         State::MOUSE_CONTROL = !State::MOUSE_CONTROL;
     });
+    Engine::pInputController->onPress(GLFW_KEY_SPACE, []() { 
+        Engine::pPlayer->jump();
+    });
+    Engine::pInputController->whileHolding(GLFW_KEY_W, []() { 
+        Engine::pPlayer->move_forward();
+    });
+    Engine::pInputController->whileHolding(GLFW_KEY_A, []() { 
+        Engine::pPlayer->move_left();
+    });
+    Engine::pInputController->whileHolding(GLFW_KEY_S, []() { 
+        Engine::pPlayer->move_backward();
+    });
+    Engine::pInputController->whileHolding(GLFW_KEY_D, []() { 
+        Engine::pPlayer->move_right();
+    });
+
 }
 
 void Engine::game_loop()
@@ -131,6 +148,8 @@ void Engine::game_loop()
         Engine::pChunksController->update();
         Engine::pWorldLoadingIndicator->update(Engine::pChunkMap->get_chunks());
         Engine::pWindow->set_mouse_lock(State::MOUSE_CONTROL);
+        Physics::step(deltaTime);
+        Engine::pPlayer->update();
 
         // drawing terrain
         Engine::pMeshShader->use();

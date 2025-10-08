@@ -5,7 +5,7 @@
 - [x] Blocks placing and removing
 - [x] Block indicator
 - [ ] Basic physix 
-- [ ] Block lihting 
+- [x] Block lihting 
 
 # Global 
 - [ ] Deal with chunks handling warnings
@@ -16,3 +16,4 @@
 - [x] Escape delay
 - [x] Rendering in texture
 - [ ] Screencshots
+- [ ] Neightbour chunks updating when block placed

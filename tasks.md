@@ -7,6 +7,11 @@
 - [x] Basic physix 
 - [x] Block lihting 
 
+# Improve
+- [ ] Laggy physics 
+- [ ] Lights building time optimization
+- [ ] Time messurement
+
 # Global 
 - [ ] Deal with chunks handling warnings
 - [ ] Fix lighing bug (when block placed)

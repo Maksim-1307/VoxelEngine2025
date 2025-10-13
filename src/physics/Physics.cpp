@@ -1,67 +1,69 @@
 #include "Physics.hpp"
 #include "src/Engine.hpp"
 
+#define E 0.01f
+
 void Physics::step(float deltaTime) {
     for (auto hitbox : Hitbox::hitboxes) {
+        // applying forces
         hitbox->velocity += gravity * hitbox->gravityFactor * deltaTime;
-        collisions(*hitbox, deltaTime);
-        hitbox->position += hitbox->velocity * deltaTime;
+        // calculating movement
+        glm::vec3 movement = hitbox->velocity * deltaTime;
+        // then correcting the movement accorging to physical iteractions with terrain
+        movement = resolveCollisions(*hitbox, movement);
+        hitbox->position += movement;
     }
 }
 
-void Physics::collisions(Hitbox& hitbox, float deltaTime) {
-    float step = 0.5f;
-    glm::vec3 npos = hitbox.position + hitbox.velocity * deltaTime;
-    glm::vec3 halfSize = hitbox.halfSize;
-    glm::vec3 a = npos - halfSize;
-    glm::vec3 b = npos + halfSize;
+glm::vec3 Physics::resolveCollisions(Hitbox& hitbox, const glm::vec3& movement) {
+    glm::vec3 result = movement;
+
+    // for ecah axis separately
+    result.x = resolveAxis(hitbox, result, 0);
+    result.z = resolveAxis(hitbox, result, 2);
+    result.y = resolveAxis(hitbox, result, 1);
     
-    // check for collisions for each side
-    bool isFree = true;
-    for (float x = a.x; x <= b.x; x += 2*halfSize.x) {
-        for (float y = a.y+0.01f; y <= b.y; y += step) {
-            for (float z = a.z; z <= b.z; z += step) {
-                if (Engine::pTerrain->is_obstacle_at(x, y, z)) {
-                    isFree = false;
-                    break;
-                }
-            }
-        }
-    }
-    if (!isFree) {
-        hitbox.velocity.x = 0;
-    }
+    return result;
+}
 
-    isFree = true;
-    for (float x = a.x; x <= b.x; x += step) {
-        for (float y = a.y; y <= b.y; y += 2*halfSize.y) {
-            for (float z = a.z; z <= b.z; z += step) {
-                if (Engine::pTerrain->is_obstacle_at(x, y, z)) {
-                    isFree = false;
-                    break;
-                }
-            }
-        }
+float Physics::resolveAxis(Hitbox& hitbox, const glm::vec3& movement, int axis) {
+    float proposedMove = axis == 0 ? movement.x : (axis == 1 ? movement.y : movement.z);
+    if (proposedMove == 0) return 0;
+    
+    glm::vec3 testPos = hitbox.position;
+    if (axis == 0) testPos.x += proposedMove;
+    else if (axis == 1) testPos.y += proposedMove;
+    else testPos.z += proposedMove;
+    
+    if (!isColliding(testPos, hitbox.halfSize)) {
+        return proposedMove;
     }
-    if (!isFree) {
-        hitbox.velocity.y = 0;
-        hitbox.isGrounded = true;
-    } else {
-        hitbox.isGrounded = false;
-    }
+    
+    hitbox.isGrounded = (axis == 1 && proposedMove < 0);
+    
+    if (axis == 0) hitbox.velocity.x = 0;
+    else if (axis == 1) hitbox.velocity.y = 0;
+    else hitbox.velocity.z = 0;
+    
+    return 0;
+}
 
-    isFree = true;
-    for (float x = a.x; x <= b.x; x += step) {
-        for (float y = a.y+0.01f; y <= b.y; y += step) {
-            for (float z = a.z; z <= b.z; z += 2*halfSize.z) {
+bool Physics::isColliding(const glm::vec3& center, const glm::vec3& halfSize) {
+    glm::vec3 min = center - halfSize;
+    glm::vec3 max = center + halfSize;
+    
+    int minX = floor(min.x), maxX = ceil(max.x);
+    int minY = floor(min.y), maxY = ceil(max.y);  
+    int minZ = floor(min.z), maxZ = ceil(max.z);
+    
+    for (int x = minX; x <= maxX; x++) {
+        for (int y = minY; y <= maxY; y++) {
+            for (int z = minZ; z <= maxZ; z++) {
                 if (Engine::pTerrain->is_obstacle_at(x, y, z)) {
-                    isFree = false;
-                    break;
+                    return true;
                 }
             }
         }
     }
-    if (!isFree) {
-        hitbox.velocity.z = 0;
-    }
+    return false;
 }

@@ -51,19 +51,20 @@ float Physics::resolveAxis(Hitbox& hitbox, const glm::vec3& movement, int axis) 
 bool Physics::isColliding(const glm::vec3& center, const glm::vec3& halfSize) {
     glm::vec3 min = center - halfSize;
     glm::vec3 max = center + halfSize;
-    
-    int minX = floor(min.x), maxX = ceil(max.x);
-    int minY = floor(min.y), maxY = ceil(max.y);  
-    int minZ = floor(min.z), maxZ = ceil(max.z);
-    
-    for (int x = minX; x <= maxX; x++) {
-        for (int y = minY; y <= maxY; y++) {
-            for (int z = minZ; z <= maxZ; z++) {
+
+    float dX = (max.x - min.x) / 10;
+    float dY = (max.y - min.y) / 10;
+    float dZ = (max.z - min.z) / 10;
+
+    for (float x = min.x; x <= max.x; x += dX) {
+        for (float y = min.y; y <= max.y; y += dY) {
+            for (float z = min.z; z <= max.z; z += dZ) {
                 if (Engine::pTerrain->is_obstacle_at(x, y, z)) {
                     return true;
                 }
             }
         }
     }
+
     return false;
 }

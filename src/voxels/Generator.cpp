@@ -21,8 +21,6 @@ void Generator::generate_ambient(int x, int z) {
         return;
     }
 
-    std::hash<int> hasher;
-
     int wx_start = chunk->X * CHUNK_W;
     int wz_start = chunk->Z * CHUNK_W;
 
@@ -35,9 +33,14 @@ void Generator::generate_ambient(int x, int z) {
                     break;
                 }
             }
-            // std::cout <<   << "\n";
-            
-            if (random(wx, wz, seed) > 0.98) generate_tree(wx, wy, wz);
+            float treeNoise = stb_perlin_noise3_seed(
+                (x + X) / SIZE_FACTOR * 5, 
+                0.0f, 
+                (z + Z) / SIZE_FACTOR * 5, 
+                0, 0, 0, this->seed
+            );
+            if (random(wx, wz, seed) > 0.98 && treeNoise > 0.015f) 
+                generate_tree(wx, wy, wz);
         }   
     }
     chunk->state = STRUCTURES_GENERATED;

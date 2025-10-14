@@ -58,18 +58,22 @@ bool Window::should_close(){
 }
 
 void windowSizeCallback(GLFWwindow * pWindow, int width, int height)
-{
-    /*
-    Width and height from argument are two times smaller than values obtained
-    from glfwGetFramebufferSize.
-    Maybe because of retina
-    */
-   
+{  
     int window_width = width;
     int window_height = height;
     glfwGetFramebufferSize(pWindow, &window_width, &window_height);
+    
+    #ifdef __APPLE__
+        window_width /= 2;
+        window_height /= 2;
+    #endif
     Engine::pWindow->set_width(window_width);
     Engine::pWindow->set_height(window_height);
-    glViewport(0, 0, window_width, window_height);
+
+    #ifdef __APPLE__
+        glViewport(0, 0, window_width*2, window_height*2);
+    #else
+        glViewport(0, 0, window_width, window_height);
+    #endif
 }
 

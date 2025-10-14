@@ -41,7 +41,10 @@ void Engine::init()
     new Block("grass", BlockModel::SOLID, {{1, 1}, {0, 0}, {0, 1}});
     new Block("oak_log", BlockModel::SOLID, {{2, 1}, {0, 2}, {2, 1}});
     new Block("leaves", BlockModel::FOLIAGE, {{1, 2}});
-    new Block("lamp", BlockModel::FOLIAGE, {{3, 2}}, true, {0, 10, 0});
+    new Block("red_lamp", BlockModel::SOLID, {{3, 2}}, true, {12, 0, 0});
+    new Block("green_lamp", BlockModel::SOLID, {{3, 2}}, true, {0, 12, 0});
+    new Block("blue_lamp", BlockModel::SOLID, {{3, 2}}, true, {0, 0, 12});
+    new Block("lamp", BlockModel::SOLID, {{3, 2}}, true, {12, 12, 10});
 
     // Graphics
     WindowArgs wargs;

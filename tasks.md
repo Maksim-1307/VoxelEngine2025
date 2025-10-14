@@ -8,7 +8,7 @@
 - [x] Block lihting 
 
 # Improve
-- [ ] Laggy physics 
+- [x] Laggy physics 
 - [ ] Lights building time optimization
 - [ ] Time messurement
 

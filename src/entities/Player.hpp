@@ -20,7 +20,7 @@ public:
     ~Player() {};
 
     void jump() {
-        if (this->hitbox->isGrounded) this->hitbox->velocity.y = 8.0f;
+        if (this->hitbox->isGrounded) this->hitbox->velocity.y = 12.0f;
     }
     void move_forward() {
         movingDirections.push_back(glm::vec2(1.0f, 0));

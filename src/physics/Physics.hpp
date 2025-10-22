@@ -11,7 +11,7 @@ public:
     Physics() {};
     ~Physics() {};
 
-    inline static glm::vec3 gravity = glm::vec3(0, -9.81f, 0);
+    inline static glm::vec3 gravity = glm::vec3(0, -9.81f, 0) * 2.0f;
     static void collisions(Hitbox& hitbox, float deltaTime);
     static void checkDir(Axis dir, Hitbox& hitbox, float deltaTime);
     static void step(float deltaTime);

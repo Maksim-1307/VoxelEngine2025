@@ -3,6 +3,7 @@
 #include "Array3D.hpp"
 #include <functional>
 #include <vector>
+#include "Iterator.hpp"
 
 template <class T>
 class AreaMap3D
@@ -47,6 +48,10 @@ public:
 
     void set_out_callback(std::function<T*(int, int, int)> callback) {
         this->outCallback = callback;
+    }
+
+    Array3D<T*>* get_chunks() const {
+        return this->firstBuffer;
     }
 
     void fill() {
@@ -119,6 +124,14 @@ public:
         int my = y - offsetY + size/2;
         int mz = z - offsetZ + size/2;
         return in_bounds(mx, my, mz);
+    }
+
+        
+    std::vector<T*> padding_chunks(int level){
+        return Iterator<T*>::padding_3d(this->firstBuffer, level);
+    }
+    std::vector<T*> chunks_in_radius(int radius) {
+        return Iterator<T*>::in_radius_3d(this->firstBuffer, radius);
     }
     
     // timely 

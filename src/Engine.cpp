@@ -21,16 +21,16 @@ Texture *Engine::pTexture = nullptr;
 Text *Engine::pText = nullptr;
 Text *Engine::pFpsText = nullptr;
 ChunkMeshBuilder *Engine::pChunkMeshBuilder = nullptr;
-AreaMap2D<Chunk>* Engine::pChunkMap = nullptr;
 Generator *Engine::pGenerator = nullptr;
 VoxelStorage* Engine::pVoxelStorage = nullptr;
 ChunksController* Engine::pChunksController = nullptr;
 Terrain* Engine::pTerrain = nullptr;
 Stats* Engine::pStats = nullptr;
 Lighting* Engine::pLighting = nullptr;
-WorldLoadingIndicator* Engine::pWorldLoadingIndicator = nullptr;
+// WorldLoadingIndicator* Engine::pWorldLoadingIndicator = nullptr;
 BlockMeshBuilder* Engine::pBlockMeshBuilder = nullptr;
 Player* Engine::pPlayer = nullptr;
+AreaMap3D<Chunk>* Engine::pChunkMap = nullptr;
 
 void Engine::init()
 {
@@ -70,12 +70,12 @@ void Engine::init()
     
     // World
     Engine::pGenerator = new Generator();
-    Engine::pChunkMap = new AreaMap2D<Chunk>(Settings::LOAD_DISTANCE + 1);
+    Engine::pChunkMap = new AreaMap3D<Chunk>(Settings::LOAD_DISTANCE + 1);
 
     // Lighting
     Engine::pLighting = new Lighting(*Engine::pChunkMap);
     
-    std::function<Chunk *(int, int)> gen_func = [](int x, int z) -> Chunk* 
+    std::function<Chunk *(int, int, int)> gen_func = [](int x, int y,int z) -> Chunk* 
     { 
         return Engine::pGenerator->generate_at(x, z);
     };
@@ -86,7 +86,7 @@ void Engine::init()
     Engine::pChunksController = new ChunksController(Engine::pChunkMap, Engine::pCamera);
     Engine::pTerrain = new Terrain(*Engine::pVoxelStorage);
     Engine::pStats = new Stats();
-    Engine::pWorldLoadingIndicator = new WorldLoadingIndicator(Engine::pChunkMap->get_chunks());
+    // Engine::pWorldLoadingIndicator = new WorldLoadingIndicator(Engine::pChunkMap->get_chunks());
     Engine::pBlockMeshBuilder = new BlockMeshBuilder();
     Engine::pPlayer = new Player(glm::vec3(0, 30, 0), Engine::pCamera);
 
@@ -149,10 +149,10 @@ void Engine::game_loop()
         fpsCounter->update(deltaTime);
         Engine::pInputController->update(deltaTime);
         Engine::pChunksController->update();
-        Engine::pWorldLoadingIndicator->update(Engine::pChunkMap->get_chunks());
+        // Engine::pWorldLoadingIndicator->update(Engine::pChunkMap->get_chunks());
         Engine::pWindow->set_mouse_lock(State::MOUSE_CONTROL);
-        Physics::step(deltaTime);
-        Engine::pPlayer->update();
+        // Physics::step(deltaTime);
+        // Engine::pPlayer->update();
 
         // drawing terrain
         Engine::pMeshShader->use();
@@ -216,8 +216,8 @@ void Engine::game_loop()
         transform = glm::scale(transform, glm::vec3(64.0f, 64.0f, 1.0f));
 
         Engine::pSpriteShader->set_matrix4("projection", projection * transform);
-        Engine::pSpriteShader->set_texture("theTexture", Engine::pWorldLoadingIndicator->texture->getID());
-        Engine::pWorldLoadingIndicator->draw();
+        // Engine::pSpriteShader->set_texture("theTexture", Engine::pWorldLoadingIndicator->texture->getID());
+        // Engine::pWorldLoadingIndicator->draw();
 
         // drawing placing block indicator
         topPosition = windowHeight - 90.0f; //50px from bottom
@@ -225,7 +225,7 @@ void Engine::game_loop()
         transform = glm::scale(transform, glm::vec3(128.0f, 128.0f, 1.0f));
 
         Engine::pSpriteShader->set_matrix4("projection", projection * transform);
-        Engine::pSpriteShader->set_texture("theTexture", Engine::pWorldLoadingIndicator->texture->getID());
+        // Engine::pSpriteShader->set_texture("theTexture", Engine::pWorldLoadingIndicator->texture->getID());
         Block& placingBlock = Block::getBlockByVoxelId(State::PLACING_VOXEL.id);
         Engine::pSpriteShader->set_texture("theTexture", placingBlock.getIcon().getTexture()->getID());
         placingBlock.getIcon().draw();

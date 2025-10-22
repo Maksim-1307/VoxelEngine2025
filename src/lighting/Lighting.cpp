@@ -5,7 +5,7 @@
 
 std::queue<Chunk*> Lighting::preBuildQueue;
 
-Lighting::Lighting(AreaMap2D<Chunk>& chunks) 
+Lighting::Lighting(AreaMap3D<Chunk>& chunks) 
   : chunks(chunks) {
     solverR = std::make_unique<LightSolver>(chunks, 0);
     solverG = std::make_unique<LightSolver>(chunks, 1);
@@ -20,12 +20,14 @@ void Lighting::clear(){
     int size = Engine::pChunkMap->size;
 
     for (int x = 0; x < size; x++) {
-        for (int z = 0; z < size; z++) {
-            Chunk* chunk = Engine::pChunkMap->firstBuffer->get(x, z);
-            if (!chunk) continue;
-            chunk->lightmap.clear();
-            Engine::pLighting->prebuildSkyLight(chunk);
-            // Engine::pLighting->buildSkyLight(x, z);
+        for (int y = 0; y < size; y++) {
+            for (int z = 0; z < size; z++) {
+                Chunk* chunk = Engine::pChunkMap->firstBuffer->get(x, y, z);
+                if (!chunk) continue;
+                chunk->lightmap.clear();
+                Engine::pLighting->prebuildSkyLight(chunk);
+                // Engine::pLighting->buildSkyLight(x, z);
+            }
         }
     }
 
@@ -47,6 +49,7 @@ void Lighting::prebuildSkyLight(Chunk* chunk){
     chunk->lightmap.clear();
 
     int cx = chunk->X;
+    int cy = chunk->Y;
     int cz = chunk->Z;
     
     for (int z = 0; z < CHUNK_W; z++){
@@ -64,14 +67,14 @@ void Lighting::prebuildSkyLight(Chunk* chunk){
 }
 
 
-void Lighting::buildSkyLight(int cx, int cz) {
+void Lighting::buildSkyLight(int cx, int cy, int cz) {
 
     auto& solverR = *this->solverR;
     auto& solverG = *this->solverG;
     auto& solverB = *this->solverB;
     auto& solverS = *this->solverS;
 
-    Chunk* chunk = Engine::pChunkMap->get(cx, cz);
+    Chunk* chunk = Engine::pChunkMap->get(cx, cy, cz);
     if (chunk == nullptr) {
         // logger.error() << "attempted to build lights to chunk missing in local matrix";
         return;
@@ -97,13 +100,14 @@ void Lighting::buildSkyLight(int cx, int cz) {
         for (int y = 0; y < CHUNK_H; y++) {
             for (int z = 0; z < CHUNK_W; z++) {
                 int gx = x + cx * CHUNK_W;
+                int gy = y + cy * CHUNK_H;
                 int gz = z + cz * CHUNK_W;
                 light light = chunk->lightmap.get(x, y, z);
                 if (light){
-                    solverR.add(gx,y,gz, light.getR());
-                    solverG.add(gx,y,gz, light.getG());
-                    solverB.add(gx,y,gz, light.getB());
-                    solverS.add(gx,y,gz, light.getS());
+                    solverR.add(gx,gy,gz, light.getR());
+                    solverG.add(gx,gy,gz, light.getG());
+                    solverB.add(gx,gy,gz, light.getB());
+                    solverS.add(gx,gy,gz, light.getS());
                 }
             }
         }
@@ -115,14 +119,14 @@ void Lighting::buildSkyLight(int cx, int cz) {
     chunk->state = LIGHTS_BUILT;
 }
 
-void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
+void Lighting::onChunkLoaded(int cx, int cy, int cz, bool expand) {
 
     auto& solverR = *this->solverR;
     auto& solverG = *this->solverG;
     auto& solverB = *this->solverB;
     auto& solverS = *this->solverS;
 
-    Chunk* chunk = Engine::pChunkMap->get(cx, cz);
+    Chunk* chunk = Engine::pChunkMap->get(cx, cy, cz);
     if (chunk == nullptr) {
         return;
     }
@@ -132,12 +136,13 @@ void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
                 const voxel& vox = chunk->get_voxel(x, y, z);
                 const Block& block = Block::getBlockByVoxelId(vox.id);
                 int gx = x + cx * CHUNK_W;
+                int gy = y + cy * CHUNK_H;
                 int gz = z + cz * CHUNK_W;
                 if (block.emissive){
                     std::cout << "emissive \n";
-                    solverR.add(gx, y, gz, block.emission[0]);
-                    solverG.add(gx, y, gz, block.emission[1]);
-                    solverB.add(gx, y, gz, block.emission[2]);
+                    solverR.add(gx, gy, gz, block.emission[0]);
+                    solverG.add(gx, gy, gz, block.emission[1]);
+                    solverB.add(gx, gy, gz, block.emission[2]);
                 }
             }
         }
@@ -148,13 +153,14 @@ void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
             for (int y = 0; y < CHUNK_H; y++) {
                 for (int z = 0; z < CHUNK_W; z++) {
                     int gx = x + cx * CHUNK_W;
+                    int gy = y + cy * CHUNK_H;
                     int gz = z + cz * CHUNK_W;
                     light light = chunk->lightmap.get(x, y, z);
                     if (light){
-                        solverR.add(gx,y,gz, light.getR());
-                        solverG.add(gx,y,gz, light.getG());
-                        solverB.add(gx,y,gz, light.getB());
-                        solverS.add(gx,y,gz, light.getS());
+                        solverR.add(gx,gy,gz, light.getR());
+                        solverG.add(gx,gy,gz, light.getG());
+                        solverB.add(gx,gy,gz, light.getB());
+                        solverS.add(gx,gy,gz, light.getS());
                     }
                 }
             }
@@ -163,13 +169,14 @@ void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
             for (int y = 0; y < CHUNK_H; y++) {
                 for (int x = 0; x < CHUNK_W; x++) {
                     int gx = x + cx * CHUNK_W;
+                    int gy = y + cy * CHUNK_H;
                     int gz = z + cz * CHUNK_W;
                     light light = chunk->lightmap.get(x, y, z);
                     if (light){
-                        solverR.add(gx,y,gz, light.getR());
-                        solverG.add(gx,y,gz, light.getG());
-                        solverB.add(gx,y,gz, light.getB());
-                        solverS.add(gx,y,gz, light.getS());
+                        solverR.add(gx,gy,gz, light.getR());
+                        solverG.add(gx,gy,gz, light.getG());
+                        solverB.add(gx,gy,gz, light.getB());
+                        solverS.add(gx,gy,gz, light.getS());
                     }
                 }
             }

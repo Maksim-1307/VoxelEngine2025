@@ -36,7 +36,7 @@ public:
     }
 
     void update() {
-        camera->position = hitbox->position + glm::vec3(0, 1.6f-0.9f, 0);
+        // camera->position = hitbox->position + glm::vec3(0, 1.6f-0.9f, 0);
 
         glm::vec3 forward = camera->front;
         glm::vec3 right = camera->right;

@@ -2,7 +2,7 @@
 
 #include "src/Engine.hpp"
 
-LightSolver::LightSolver(AreaMap2D<Chunk>& chunks, int channel)
+LightSolver::LightSolver(AreaMap3D<Chunk>& chunks, int channel)
     : chunks(chunks)
 {
     this->channel = channel;
@@ -21,7 +21,7 @@ void LightSolver::add(int x, int y, int z, unsigned char emission){
     int ix = x - cx * CHUNK_W;
     int iy = y - cy * CHUNK_H;
     int iz = z - cz * CHUNK_W;
-    Chunk* chunk = chunks.get(cx, cz);
+    Chunk* chunk = chunks.get(cx, cy, cz);
     if (chunk == nullptr)
         return;
     unsigned char light = chunk->lightmap.get(ix, iy, iz, channel);
@@ -41,7 +41,7 @@ void LightSolver::remove(int x, int y, int z) {
     int ix = x - cx * CHUNK_W;
     int iy = y - cy * CHUNK_H;
     int iz = z - cz * CHUNK_W;
-    Chunk* chunk = chunks.get(cx, cz);
+    Chunk* chunk = chunks.get(cx, cy, cz);
     if (chunk == nullptr)
         return;
 
@@ -76,7 +76,7 @@ void LightSolver::solve(){
             int cx = std::floor((float)x / CHUNK_W);
             int cy = std::floor((float)y / CHUNK_H);
             int cz = std::floor((float)z / CHUNK_W);
-            Chunk* chunk = chunks.get(cx, cz);
+            Chunk* chunk = chunks.get(cx, cy, cz);
 
             if (chunk) {
                 int lx = x - cx * CHUNK_W;
@@ -119,7 +119,7 @@ void LightSolver::solve(){
             int cx = std::floor((float)x / CHUNK_W);
             int cy = std::floor((float)y / CHUNK_H);
             int cz = std::floor((float)z / CHUNK_W);
-            Chunk* chunk = chunks.get(cx, cz);
+            Chunk* chunk = chunks.get(cx, cy, cz);
 
             if (chunk) {
                 int lx = x - cx * CHUNK_W;

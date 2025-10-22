@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <cmath>
-#include "src/logic/AreaMap2D.hpp"
+#include "src/logic/AreaMap3D.hpp"
 #include "src/voxels/Chunk.hpp"
 
 #define MOD(a, b) ((((a) % (b)) + (b)) % (b))
@@ -12,21 +12,21 @@
 class VoxelStorage{
     public:
 
-        VoxelStorage(AreaMap2D<Chunk> *chunksMap)
+        VoxelStorage(AreaMap3D<Chunk> *chunksMap)
             : chunksMap(chunksMap) 
         {};
 
         voxel get_voxel(int x, int y, int z){
 
             int chunkX = get_chunk_coord(x, CHUNK_W);
-            int chunkY = 0; //get_chunk_coord(y, CHUNK_H);
+            int chunkY = get_chunk_coord(y, CHUNK_H);
             int chunkZ = get_chunk_coord(z, CHUNK_W);
 
             int blockX = get_block_coord(x, CHUNK_W);
             int blockY = get_block_coord(y, CHUNK_H);
             int blockZ = get_block_coord(z, CHUNK_W);
 
-            Chunk* ch = chunksMap->get(chunkX, chunkZ);
+            Chunk* ch = chunksMap->get(chunkX, chunkY, chunkZ);
             if (ch == nullptr) {
                 // std::cout << "ERROR: Chunk out of bounds at " << chunkX << " " << chunkY << " " << chunkZ << "\n";
                 return {2, 0};
@@ -45,7 +45,7 @@ class VoxelStorage{
             int blockY = get_block_coord(y, CHUNK_H);
             int blockZ = get_block_coord(z, CHUNK_W);
 
-            chunksMap->get(chunkX, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
+            chunksMap->get(chunkX, chunkY, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
         };
         bool set_voxel_soft(int x, int y, int z, voxel vox){
 
@@ -57,16 +57,18 @@ class VoxelStorage{
             int blockY = get_block_coord(y, CHUNK_H);
             int blockZ = get_block_coord(z, CHUNK_W);
 
-            if (blockZ < 0 || blockZ >= CHUNK_H || !chunksMap->is_inside(chunkX, chunkZ))
+            if (!chunksMap->is_inside(chunkX, chunkY, chunkZ))
                 return false;
 
-            chunksMap->get(chunkX, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
-            chunksMap->get(chunkX, chunkZ)->state = MODIFIED;
+            chunksMap->get(chunkX, chunkY, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
+            chunksMap->get(chunkX, chunkY, chunkZ)->state = MODIFIED;
 
-            if (blockX == 0) chunksMap->get(chunkX-1, chunkZ)->state = MODIFIED;
-            if (blockX == CHUNK_W-1) chunksMap->get(chunkX+1, chunkZ)->state = MODIFIED;
-            if (blockZ == 0) chunksMap->get(chunkX, chunkZ-1)->state = MODIFIED;
-            if (blockZ == CHUNK_W-1) chunksMap->get(chunkX, chunkZ+1)->state = MODIFIED;
+            if (blockX == 0) chunksMap->get(chunkX-1, chunkY, chunkZ)->state = MODIFIED;
+            if (blockX == CHUNK_W-1) chunksMap->get(chunkX+1, chunkY, chunkZ)->state = MODIFIED;
+            if (blockZ == 0) chunksMap->get(chunkX, chunkY, chunkZ-1)->state = MODIFIED;
+            if (blockZ == CHUNK_W-1) chunksMap->get(chunkX, chunkY, chunkZ+1)->state = MODIFIED;
+            if (blockY == 0) chunksMap->get(chunkX, chunkY-1, chunkZ)->state = MODIFIED;
+            if (blockY == CHUNK_H-1) chunksMap->get(chunkX, chunkY+1, chunkZ)->state = MODIFIED;
             return true;
         };
 
@@ -80,7 +82,7 @@ class VoxelStorage{
             int blockY = get_block_coord(y, CHUNK_H);
             int blockZ = get_block_coord(z, CHUNK_W);
 
-            return chunksMap->get(chunkX, chunkZ)->lightmap.get(blockX, blockY, blockZ);
+            return chunksMap->get(chunkX, chunkY, chunkZ)->lightmap.get(blockX, blockY, blockZ);
 
         };
 
@@ -94,22 +96,7 @@ class VoxelStorage{
             int blockY = get_block_coord(y, CHUNK_H);
             int blockZ = get_block_coord(z, CHUNK_W);
 
-            return chunksMap->get(chunkX, chunkZ)->lightmap.get(blockX, blockY, blockZ, channel);
-
-        };
-
-        // Remake !!! Only for testing 
-        void set_light(int x, int y, int z, uint8_t value) const {
-
-            int chunkX = get_chunk_coord(x, CHUNK_W);
-            int chunkY = get_chunk_coord(y, CHUNK_H);
-            int chunkZ = get_chunk_coord(z, CHUNK_W);
-
-            int blockX = get_block_coord(x, CHUNK_W);
-            int blockY = get_block_coord(y, CHUNK_H);
-            int blockZ = get_block_coord(z, CHUNK_W);
-
-            chunksMap->get(chunkX, chunkZ)->lightmap.setS(blockX, blockY, blockZ, value);
+            return chunksMap->get(chunkX, chunkY, chunkZ)->lightmap.get(blockX, blockY, blockZ, channel);
 
         };
 
@@ -125,7 +112,7 @@ class VoxelStorage{
         }
         return result;
     }
-    AreaMap2D<Chunk>* chunksMap;
+    AreaMap3D<Chunk>* chunksMap;
 
 };
    

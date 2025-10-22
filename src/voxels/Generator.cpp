@@ -10,11 +10,11 @@
 
 Chunk *Generator::generate_at(int x, int z)
 {
-    return terrain_with_caves(x, 0, z);
+    return perlin_noise_3d(x, 0, z);
 }
 
 void Generator::generate_ambient(int x, int z) {
-    Chunk* chunk = Engine::pChunkMap->get(x, z);
+    Chunk* chunk = Engine::pChunkMap->get(x, 0, z); /// fix !!!
 
     if (chunk->state != TERRAIN_GENERATED) {
         std::cout << "WARNING: generate_ambient is called on chunk with a state other than TERRAIN_GENERATED\n";

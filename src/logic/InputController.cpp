@@ -47,18 +47,20 @@ void InputController::update(float deltaTime)
     }
 
     float speed = 10.0f;
-    // if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_W)) 
-    //     pCamera->move(0, 0, -speed*deltaTime);
-    // if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_A))
-    //     pCamera->move(-speed * deltaTime, 0, 0);
-    // if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_S))
-    //     pCamera->move(0, 0, speed * deltaTime);
-    // if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_D))
-    //     pCamera->move(speed * deltaTime, 0, 0);
-    // if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_SPACE))
-    //     pCamera->move(0, speed * deltaTime, 0);
-    // if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_LEFT_SHIFT))
-    //     pCamera->move(0, -speed * deltaTime, 0);
+    // 
+    if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_W)) 
+        pCamera->move(0, 0, -speed*deltaTime);
+    if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_A))
+        pCamera->move(-speed * deltaTime, 0, 0);
+    if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_S))
+        pCamera->move(0, 0, speed * deltaTime);
+    if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_D))
+        pCamera->move(speed * deltaTime, 0, 0);
+    if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_SPACE))
+        pCamera->move(0, speed * deltaTime, 0);
+    if (glfwGetKey(pWindow->get_glfw_window(), GLFW_KEY_LEFT_SHIFT))
+        pCamera->move(0, -speed * deltaTime, 0);
+    //
         
     if (State::MOUSE_CONTROL) {
         pMouse->update(deltaTime);

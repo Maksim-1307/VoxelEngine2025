@@ -233,6 +233,7 @@ void Engine::game_loop()
         glfwSwapBuffers(Engine::pWindow->get_glfw_window());
         glfwPollEvents();
     }
+    Profiler::print_results();
     std::cout << "game loop interrupted";
 }
 

@@ -1,6 +1,10 @@
 #include "MeshRenderer.hpp"
+#include "src/time/Profiler.hpp"
 
 void MeshRenderer::gen_buffers(MeshType type){
+
+    Profiler t("gen_buffers");
+
     if (!pMesh) { 
         std::cerr << "ERROR: pMesh is null in gen_buffers!" << std::endl;
         return;

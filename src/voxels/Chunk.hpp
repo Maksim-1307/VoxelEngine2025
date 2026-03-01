@@ -9,7 +9,7 @@
 #include "src/lighting/Lightmap.hpp"
 
 #define CHUNK_W 16
-#define CHUNK_H 64
+#define CHUNK_H 256
 
 /*
 
@@ -67,6 +67,9 @@ public:
     const voxel get_voxel(size_t x, size_t y, size_t z) const
     {
         return voxels.get(x, y, z);
+    }
+    voxel* get_raw_data() const {
+        return voxels.get_data();
     }
     
     static int chunks;

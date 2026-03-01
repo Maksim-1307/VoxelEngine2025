@@ -10,6 +10,7 @@
 
 Chunk *Generator::generate_at(int x, int z)
 {
+    Profiler t("generate_at");
     return terrain_with_caves(x, 0, z);
 }
 
@@ -130,7 +131,6 @@ Chunk* Generator::perlin_noise_2d(int x, int y, int z){
     for (int x = 0; x < CHUNK_W; x++){
         for (int z = 0; z < CHUNK_W; z++){
             for (int y = 0; y < CHUNK_H; y++){
-            
                 float perlin = stb_perlin_noise3_seed((x + X) / SIZE_FACTOR, 0.0f, (z + Z) / SIZE_FACTOR, 0, 0, 0, this->seed);
                 float height = perlin * 10 + 15;
                 if (Y + y > height){

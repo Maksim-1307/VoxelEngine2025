@@ -21,6 +21,9 @@ void ChunksController::update() {
 }
 
 void ChunksController::handle_at(int x, int z) {
+
+    Profiler t("handle_at");
+
     Chunk* chunk = Engine::pChunkMap->get(x, z);
     if (!chunk) return;
     // try {
@@ -34,7 +37,9 @@ void ChunksController::handle_at(int x, int z) {
     // } 
     
     try {
-        if (Settings::HARD_LOADING || !chunk->renderer || chunk->state <= VISIBLE) {
+
+        // building or updating sky light if its needed
+        if (Settings::HARD_LOADING || !chunk->renderer || chunk->state < VISIBLE) {
 
             if (chunk->state == MODIFIED) Engine::pLighting->prebuildSkyLight(chunk);
 

@@ -25,6 +25,7 @@
 #include "graphics/BlockMeshBuilder.hpp"
 #include "entities/Player.hpp"
 #include "physics/Physics.hpp"
+#include "src/time/Profiler.hpp"
 
 // class State;
 

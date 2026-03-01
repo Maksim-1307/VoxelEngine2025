@@ -16,6 +16,7 @@ Lighting::Lighting(AreaMap2D<Chunk>& chunks)
 Lighting::~Lighting() = default;
 
 void Lighting::clear(){
+
     Chunk** chunks = Engine::pChunkMap->get_volume();
     int size = Engine::pChunkMap->size;
 
@@ -33,6 +34,8 @@ void Lighting::clear(){
 
 
 void Lighting::prebuildSkyLight(Chunk* chunk){
+
+    Profiler t("prebuildSkyLight");
 
     // if (chunk->state < STRUCTURES_GENERATED) {
     //     // std::cout << "WARNING: prebuildSkyLight called for a non fully generated chunk! The chunk state is " 
@@ -65,6 +68,8 @@ void Lighting::prebuildSkyLight(Chunk* chunk){
 
 
 void Lighting::buildSkyLight(int cx, int cz) {
+
+    Profiler p("buildSkyLight");
 
     auto& solverR = *this->solverR;
     auto& solverG = *this->solverG;
@@ -116,6 +121,8 @@ void Lighting::buildSkyLight(int cx, int cz) {
 }
 
 void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
+
+    Profiler p ("onChunkLoaded");
 
     auto& solverR = *this->solverR;
     auto& solverG = *this->solverG;

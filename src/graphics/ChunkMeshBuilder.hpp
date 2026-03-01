@@ -14,6 +14,7 @@
 #include "src/voxels/Chunk.hpp"
 
 #define ATLAS_SIZE 6
+#define GET_VOXEL_INDEX(x, y, z) ((x) * CHUNK_H * CHUNK_W + (y) * CHUNK_W + (z))
 
 
 class ChunkMeshBuilder {
@@ -50,6 +51,9 @@ private:
     void vertex(float x, float y, float z, float u, float v);
     void index(uint a, uint b, uint c, uint d, uint e, uint f);
     uint16_t calculate_light();
+    inline voxel get_voxel_fast(int x, int y, int z); // uses chached chunks
+    inline light get_light_fast(int x, int y, int z);
+    inline bool is_in_bounds(int x, int y, int z);
 
     std::vector<float> vertices = {};
     std::vector<uint> indices = {};
@@ -59,4 +63,11 @@ private:
     int _face;
     int chunkX, chunkY, chunkZ;
     Chunk* chunk;
+
+    // Caching voxels of chunks 
+    const voxel* currD;
+    const voxel* nxD;
+    const voxel* pxD;
+    const voxel* nzD;
+    const voxel* pzD;
 };

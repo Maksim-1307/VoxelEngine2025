@@ -4,6 +4,8 @@
 sptr<Mesh> ChunkMeshBuilder::buildMesh(Chunk &chunk)
 {
 
+    Profiler t("buildMesh");
+
     // if (chunk.state < LIGHTS_PRE_BUILT) {
     //     // std::cout << "WARNING: buildMesh called on a chunk with state less than LIGHTS_BUILT. The state: " <<
     //     //     (int)chunk.state;
@@ -17,16 +19,26 @@ sptr<Mesh> ChunkMeshBuilder::buildMesh(Chunk &chunk)
 
     vertices.clear();
     indices.clear();
-    vertices.reserve(1000);
-    indices.reserve(500);
+    vertices.reserve(5000);
+    indices.reserve(2000);
 
     this->chunk = &chunk;
+    int X = this->chunk->X;
+    int Y = this->chunk->Y;
+    int Z = this->chunk->Z;
+
+    // chaching
+    this->currD = Engine::pChunkMap->get(X, Z)->get_raw_data();
+    this->nxD = Engine::pChunkMap->get(X-1, Z)->get_raw_data();
+    this->pxD = Engine::pChunkMap->get(X+1, Z)->get_raw_data();
+    this->nzD = Engine::pChunkMap->get(X, Z-1)->get_raw_data();
+    this->pzD = Engine::pChunkMap->get(X, Z+1)->get_raw_data();
 
     indexOffset = 0;
 
-    this->chunkX = this->chunk->X * CHUNK_W;
-    this->chunkY = this->chunk->Y * CHUNK_H;
-    this->chunkZ = this->chunk->Z * CHUNK_W;
+    this->chunkX = X * CHUNK_W;
+    this->chunkY = Y * CHUNK_H;
+    this->chunkZ = Z * CHUNK_W;
 
     for (_x = 0; _x < CHUNK_W; _x++)
     {
@@ -34,7 +46,7 @@ sptr<Mesh> ChunkMeshBuilder::buildMesh(Chunk &chunk)
         {
             for (_z = 0; _z < CHUNK_W; _z++)
             {
-                if (Engine::pVoxelStorage->get_voxel(_x + chunkX, _y + chunkY, _z + chunkZ).id != 0)
+                if (get_voxel_fast(_x, _y, _z).id != 0)
                 {
                     CubeModel(_x, _y, _z);
                 }
@@ -48,7 +60,7 @@ void ChunkMeshBuilder::CubeModel(int x, int y, int z)
 {
 
     std::array<bool, 6> openedFaces = opened_around(x, y, z);
-    Block& block = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX, y + chunkY, z + chunkZ).id);
+    Block& block = Block::getBlockByVoxelId(get_voxel_fast(x, y, z).id);
 
     for (int face = 0; face < 6; face++)
     {
@@ -120,14 +132,37 @@ void ChunkMeshBuilder::CubeModel(int x, int y, int z)
 std::array<bool, 6> ChunkMeshBuilder::opened_around(int x, int y, int z)
 {
     std::array<bool, 6> opened{};
-    opened[0] = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX + 1, y + chunkY, z + chunkZ).id).opened_faces[adjacent(0)];
-    opened[1] = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX - 1, y + chunkY, z + chunkZ).id).opened_faces[adjacent(1)];
-    opened[2] = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX, y + chunkY + 1, z + chunkZ).id).opened_faces[adjacent(2)];
-    opened[3] = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX, y + chunkY - 1, z + chunkZ).id).opened_faces[adjacent(3)];
-    opened[4] = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX, y + chunkY, z + chunkZ + 1).id).opened_faces[adjacent(4)];
-    opened[5] = Block::getBlockByVoxelId(Engine::pVoxelStorage->get_voxel(x + chunkX, y + chunkY, z + chunkZ - 1).id).opened_faces[adjacent(5)];
+    opened[0] = Block::getBlockByVoxelId(get_voxel_fast(x + 1, y, z).id).opened_faces[adjacent(0)];
+    opened[1] = Block::getBlockByVoxelId(get_voxel_fast(x - 1, y, z).id).opened_faces[adjacent(1)];
+    opened[2] = Block::getBlockByVoxelId(get_voxel_fast(x, y + 1, z).id).opened_faces[adjacent(2)];
+    opened[3] = Block::getBlockByVoxelId(get_voxel_fast(x, y - 1, z).id).opened_faces[adjacent(3)];
+    opened[4] = Block::getBlockByVoxelId(get_voxel_fast(x, y, z + 1).id).opened_faces[adjacent(4)];
+    opened[5] = Block::getBlockByVoxelId(get_voxel_fast(x, y, z - 1).id).opened_faces[adjacent(5)];
 
     return opened;
+}
+
+inline voxel ChunkMeshBuilder::get_voxel_fast(int x, int y, int z) {
+
+    if (is_in_bounds(x, y, z)) return currD[GET_VOXEL_INDEX(x, y, z)];
+    if (x == -1) return nxD[GET_VOXEL_INDEX(CHUNK_W-1, y, z)];
+    if (x == CHUNK_W) return pxD[GET_VOXEL_INDEX(0, y, z)];
+    if (y == -1 || y == CHUNK_H) return {0, 0}; // air 
+    if (z == -1) return nzD[GET_VOXEL_INDEX(x, y, CHUNK_W-1)];
+    if (z == CHUNK_W) return pzD[GET_VOXEL_INDEX(x, y, 0)];
+
+    std::cout << "WARNING: Bad position in ChunkMeshBuilder::get_voxel_fast. Worst case called" << std::endl;
+    std::cout << x << " " << y << " " << z << "\n";
+    return Engine::pVoxelStorage->get_voxel(x + chunkX, y + chunkY, z + chunkZ);
+}
+
+// not fast yet 
+inline light ChunkMeshBuilder::get_light_fast(int x, int y, int z) {
+    return Engine::pVoxelStorage->get_light(x + chunkX, y + chunkY, z + chunkZ);
+}
+
+inline bool ChunkMeshBuilder::is_in_bounds(int x, int y, int z) {
+    return x >= 0 && x < CHUNK_W && y >= 0 && y < CHUNK_H && z >= 0 && z < CHUNK_W;
 }
 
 int ChunkMeshBuilder::adjacent(int face)
@@ -172,6 +207,6 @@ uint16_t ChunkMeshBuilder::calculate_light(){
     int y = _y + coords[face * 3 + 1];
     int z = _z + coords[face * 3 + 2];
 
-    return Engine::pVoxelStorage->get_light(x + chunkX, y + chunkY, z + chunkZ).value;
+    return get_light_fast(x, y, z).value;
 
 }

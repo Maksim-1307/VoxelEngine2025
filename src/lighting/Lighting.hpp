@@ -24,6 +24,7 @@ public:
     void buildSkyLight(int cx, int cz);
     void onChunkLoaded(int cx, int cz, bool expand);
     void onBlockSet(int x, int y, int z, uint8_t id);
+    void syncBorders(Chunk* main, int nX, int nZ, int side);
 
     static void prebuildSkyLight(Chunk* chunk);
 private:

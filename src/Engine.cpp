@@ -131,6 +131,11 @@ void Engine::init()
     // remove
     loadingScreen->on_exit();
     //
+
+    // remove
+    GameplayScreen* gameplayScreen = new GameplayScreen();
+    gameplayScreen->on_enter();
+    //
 }
 
 void Engine::game_loop()

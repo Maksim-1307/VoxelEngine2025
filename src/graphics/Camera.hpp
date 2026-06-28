@@ -26,7 +26,7 @@ public:
     vec3 right;
     vec3 up;
     vec3 absoluteUp = vec3(0, 1, 0);
-    float fov = 45.0f;
+    float fov = 60.0f;
 
     // horizontal and vertical camera rotation
     float horizontalRot = 270.0f; // from 0 to 360

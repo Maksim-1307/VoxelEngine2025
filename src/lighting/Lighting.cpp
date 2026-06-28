@@ -7,10 +7,7 @@ std::queue<Chunk*> Lighting::preBuildQueue;
 
 Lighting::Lighting(AreaMap2D<Chunk>& chunks) 
   : chunks(chunks) {
-    solverR = std::make_unique<LightSolver>(chunks, 0);
-    solverG = std::make_unique<LightSolver>(chunks, 1);
-    solverB = std::make_unique<LightSolver>(chunks, 2);
-    solverS = std::make_unique<LightSolver>(chunks, 3);
+    solver = std::make_unique<LightSolver>(chunks);
 }
 
 Lighting::~Lighting() = default;
@@ -26,7 +23,6 @@ void Lighting::clear(){
             if (!chunk) continue;
             chunk->lightmap.clear();
             Engine::pLighting->prebuildSkyLight(chunk);
-            // Engine::pLighting->buildSkyLight(x, z);
         }
     }
 
@@ -37,16 +33,6 @@ void Lighting::prebuildSkyLight(Chunk* chunk){
 
     Profiler t("prebuildSkyLight");
 
-    // if (chunk->state < STRUCTURES_GENERATED) {
-    //     // std::cout << "WARNING: prebuildSkyLight called for a non fully generated chunk! The chunk state is " 
-    //     //     << (int)chunk->state << "\n";
-    //     return;
-    // }
-    // if (chunk->state > STRUCTURES_GENERATED) {
-    //     // std::cout << "WARNING: prebuildSkyLight called for a chunk already lighted! The chunk state is " 
-    //     //     << (int)chunk->state << "\n";
-    //     return;
-    // }
     chunk->lightmap.clear();
 
     int cx = chunk->X;
@@ -71,63 +57,30 @@ void Lighting::buildSkyLight(int cx, int cz) {
 
     Profiler p("buildSkyLight");
 
-    auto& solverR = *this->solverR;
-    auto& solverG = *this->solverG;
-    auto& solverB = *this->solverB;
-    auto& solverS = *this->solverS;
-
     Chunk* chunk = Engine::pChunkMap->get(cx, cz);
     if (chunk == nullptr) {
-        // logger.error() << "attempted to build lights to chunk missing in local matrix";
         return;
     }
-    // for (uint y = 0; y < CHUNK_H; y++){
-    //     for (uint z = 0; z < CHUNK_W; z++){
-    //         for (uint x = 0; x < CHUNK_W; x++){
-    //             const voxel& vox = chunk->voxels[(y * CHUNK_W + z) * CHUNK_W + x];
-    //             const Block* block = blockDefs[vox.id];
-    //             int gx = x + cx * CHUNK_W;
-    //             int gz = z + cz * CHUNK_W;
-    //             if (block->rt.emissive){
-    //                 solverR.add(gx,y,gz,block->emission[0]);
-    //                 solverG.add(gx,y,gz,block->emission[1]);
-    //                 solverB.add(gx,y,gz,block->emission[2]);
-    //             }
-    //         }
-    //     }
-    // }
-
 
     for (int x = 0; x < CHUNK_W; x ++) {
         for (int y = 0; y < CHUNK_H; y++) {
             for (int z = 0; z < CHUNK_W; z++) {
                 int gx = x + cx * CHUNK_W;
                 int gz = z + cz * CHUNK_W;
-                light light = chunk->lightmap.get(x, y, z);
-                if (light){
-                    solverR.add(gx,y,gz, light.getR());
-                    solverG.add(gx,y,gz, light.getG());
-                    solverB.add(gx,y,gz, light.getB());
-                    solverS.add(gx,y,gz, light.getS());
+                light l = chunk->lightmap.get(x, y, z);
+                if (l){
+                    solver->add(gx, y, gz, l);
                 }
             }
         }
     }
-    solverR.solve();
-    solverG.solve();
-    solverB.solve();
-    solverS.solve();
+    solver->solve();
     chunk->state = LIGHTS_BUILT;
 }
 
 void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
 
     Profiler p ("onChunkLoaded");
-
-    auto& solverR = *this->solverR;
-    auto& solverG = *this->solverG;
-    auto& solverB = *this->solverB;
-    auto& solverS = *this->solverS;
 
     Chunk* chunk = Engine::pChunkMap->get(cx, cz);
     if (chunk == nullptr) {
@@ -141,10 +94,11 @@ void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
                 int gx = x + cx * CHUNK_W;
                 int gz = z + cz * CHUNK_W;
                 if (block.emissive){
-                    std::cout << "emissive \n";
-                    solverR.add(gx, y, gz, block.emission[0]);
-                    solverG.add(gx, y, gz, block.emission[1]);
-                    solverB.add(gx, y, gz, block.emission[2]);
+                    light l = {0};
+                    l.setR(block.emission[0]);
+                    l.setG(block.emission[1]);
+                    l.setB(block.emission[2]);
+                    solver->add(gx, y, gz, l);
                 }
             }
         }
@@ -156,12 +110,9 @@ void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
                 for (int z = 0; z < CHUNK_W; z++) {
                     int gx = x + cx * CHUNK_W;
                     int gz = z + cz * CHUNK_W;
-                    light light = chunk->lightmap.get(x, y, z);
-                    if (light){
-                        solverR.add(gx,y,gz, light.getR());
-                        solverG.add(gx,y,gz, light.getG());
-                        solverB.add(gx,y,gz, light.getB());
-                        solverS.add(gx,y,gz, light.getS());
+                    light l = chunk->lightmap.get(x, y, z);
+                    if (l){
+                        solver->add(gx, y, gz, l);
                     }
                 }
             }
@@ -171,21 +122,13 @@ void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
                 for (int x = 0; x < CHUNK_W; x++) {
                     int gx = x + cx * CHUNK_W;
                     int gz = z + cz * CHUNK_W;
-                    light light = chunk->lightmap.get(x, y, z);
-                    if (light){
-                        solverR.add(gx,y,gz, light.getR());
-                        solverG.add(gx,y,gz, light.getG());
-                        solverB.add(gx,y,gz, light.getB());
-                        solverS.add(gx,y,gz, light.getS());
+                    light l = chunk->lightmap.get(x, y, z);
+                    if (l){
+                        solver->add(gx, y, gz, l);
                     }
                 }
             }
         }
     }
-    solverR.solve();
-    solverG.solve();
-    solverB.solve();
-    solverS.solve();
+    solver->solve();
 }
-
-

@@ -133,8 +133,8 @@ void Engine::init()
     //
 
     // remove
-    GameplayScreen* gameplayScreen = new GameplayScreen();
-    gameplayScreen->on_enter();
+    // GameplayScreen* gameplayScreen = new GameplayScreen();
+    // gameplayScreen->on_enter();
     //
 }
 

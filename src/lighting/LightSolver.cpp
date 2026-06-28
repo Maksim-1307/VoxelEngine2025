@@ -2,55 +2,69 @@
 
 #include "src/Engine.hpp"
 
-LightSolver::LightSolver(AreaMap2D<Chunk>& chunks, int channel)
+LightSolver::LightSolver(AreaMap2D<Chunk>& chunks)
     : chunks(chunks)
 {
-    this->channel = channel;
 }
 
 void LightSolver::add(int x, int y, int z){
-    uint8_t light = Engine::pVoxelStorage->get_light(x, y, z, channel);
-    add(x, y, z, light);
+    light l = Engine::pVoxelStorage->get_light(x, y, z);
+    add(x, y, z, l);
 }
-void LightSolver::add(int x, int y, int z, unsigned char emission){
-    if (emission <= 1)
+
+void LightSolver::add(int x, int y, int z, light emission){
+    if (emission.value == 0)
         return;
-    int cx = std::floor((float)x / CHUNK_W);
-    int cy = std::floor((float)y / CHUNK_H);
-    int cz = std::floor((float)z / CHUNK_W);
-    int ix = x - cx * CHUNK_W;
-    int iy = y - cy * CHUNK_H;
-    int iz = z - cz * CHUNK_W;
+
+    if (y < 0 || y >= CHUNK_H) return;
+
+    int cx = (x >= 0) ? (x >> 4) : (x - 15) / 16;
+    int cz = (z >= 0) ? (z >> 4) : (z - 15) / 16;
+    int ix = x & 15;
+    int iz = z & 15;
+
     Chunk* chunk = chunks.get(cx, cz);
     if (chunk == nullptr)
         return;
-    unsigned char light = chunk->lightmap.get(ix, iy, iz, channel);
-    if (emission < light) return;
-    addqueue.push(lightentry {x, y, z, emission});
 
-    // chunk->state = MODIFIED;
-    chunk->lightmap.set(ix, iy, iz, channel, emission);
+    light current = chunk->lightmap.map.get(ix, y, iz);
+
+    light merged = current;
+    bool canPush = false;
+    for (int c = 0; c < 4; c++) {
+        uint8_t em = emission.get(c);
+        if (em >= current.get(c)) {
+            if (em > current.get(c)) {
+                merged.set(c, em);
+            }
+            canPush = true;
+        }
+    }
+    if (!canPush) return;
+
+    chunk->lightmap.map.set(ix, y, iz, merged);
+    addqueue.push({x, y, z, merged});
 }
-
 
 
 void LightSolver::remove(int x, int y, int z) {
-    int cx = std::floor((float)x / CHUNK_W);
-    int cy = std::floor((float)y / CHUNK_H);
-    int cz = std::floor((float)z / CHUNK_W);
-    int ix = x - cx * CHUNK_W;
-    int iy = y - cy * CHUNK_H;
-    int iz = z - cz * CHUNK_W;
+    if (y < 0 || y >= CHUNK_H) return;
+
+    int cx = (x >= 0) ? (x >> 4) : (x - 15) / 16;
+    int cz = (z >= 0) ? (z >> 4) : (z - 15) / 16;
+    int ix = x & 15;
+    int iz = z & 15;
+
     Chunk* chunk = chunks.get(cx, cz);
     if (chunk == nullptr)
         return;
 
-    uint8_t light = chunk->lightmap.get(ix, iy, iz, channel);
-    if (light == 0){
+    light current = chunk->lightmap.map.get(ix, y, iz);
+    if (current.value == 0)
         return;
-    }
-    remqueue.push(lightentry {x, y, z, light});
-    chunk->lightmap.set(ix, iy, iz, channel, 0);
+
+    remqueue.push({x, y, z, current});
+    chunk->lightmap.map.set(ix, y, iz, {0});
 }
 
 void LightSolver::solve(){
@@ -72,35 +86,52 @@ void LightSolver::solve(){
             int x = entry.x+coords[imul3];
             int y = entry.y+coords[imul3+1];
             int z = entry.z+coords[imul3+2];
-            
-            int cx = std::floor((float)x / CHUNK_W);
-            int cy = std::floor((float)y / CHUNK_H);
-            int cz = std::floor((float)z / CHUNK_W);
+
+            if (y < 0 || y >= CHUNK_H) continue;
+
+            int cx = (x >= 0) ? (x >> 4) : (x - 15) / 16;
+            int cz = (z >= 0) ? (z >> 4) : (z - 15) / 16;
             Chunk* chunk = chunks.get(cx, cz);
 
             if (chunk) {
-                int lx = x - cx * CHUNK_W;
-                int ly = y - cy * CHUNK_H;
-                int lz = z - cz * CHUNK_W;
-                // chunk->state = MODIFIED;
+                int lx = x & 15;
+                int lz = z & 15;
 
-                uint8_t light = chunk->lightmap.get(lx, ly, lz, channel);
-                if (light != 0 && light == entry.light-1){
-                    voxel vox = Engine::pVoxelStorage->get_voxel(x, y, z);
-                    if (vox.id != 0) {
-                        // const Block* block = blockDefs[vox->id];
-                        // if (uint8_t emission = block->emission[channel]) {
-                        //     addqueue.push(lightentry {x, y, z, emission});
-                        //     chunk->lightmap.set(lx, ly, lz, channel, emission);
-                        // }
-                        // else chunk->lightmap.set(lx, ly, lz, channel, 0);
-                        chunk->lightmap.set(lx, ly, lz, channel, 0);
+                light current = chunk->lightmap.map.get(lx, y, lz);
+                if (current.value == 0) continue;
+
+                uint8_t cascadeMask = 0;
+                uint8_t readdMask = 0;
+
+                for (int c = 0; c < 4; c++) {
+                    uint8_t cv = current.get(c);
+                    uint8_t ev = entry.value.get(c);
+                    if (ev > 0 && cv != 0 && cv == ev - 1) {
+                        cascadeMask |= (1 << c);
+                    } else if (ev > 0 && cv >= ev) {
+                        readdMask |= (1 << c);
                     }
-                    else chunk->lightmap.set(lx, ly, lz, channel, 0);
-                    remqueue.push(lightentry {x, y, z, light});
                 }
-                else if (light >= entry.light){
-                    addqueue.push(lightentry {x, y, z, light});
+
+                if (cascadeMask) {
+                    light newlight = current;
+                    for (int c = 0; c < 4; c++) {
+                        if (cascadeMask & (1 << c)) {
+                            newlight.set(c, 0);
+                        }
+                    }
+                    chunk->lightmap.map.set(lx, y, lz, newlight);
+
+                    light remval = {0};
+                    for (int c = 0; c < 4; c++) {
+                        if (cascadeMask & (1 << c)) {
+                            remval.set(c, current.get(c));
+                        }
+                    }
+                    remqueue.push({x, y, z, remval});
+                }
+                else if (readdMask) {
+                    addqueue.push({x, y, z, current});
                 }
             }
         }
@@ -116,34 +147,37 @@ void LightSolver::solve(){
             int y = entry.y+coords[imul3+1];
             int z = entry.z+coords[imul3+2];
 
-            int cx = std::floor((float)x / CHUNK_W);
-            int cy = std::floor((float)y / CHUNK_H);
-            int cz = std::floor((float)z / CHUNK_W);
+            if (y < 0 || y >= CHUNK_H) continue;
+
+            int cx = (x >= 0) ? (x >> 4) : (x - 15) / 16;
+            int cz = (z >= 0) ? (z >> 4) : (z - 15) / 16;
             Chunk* chunk = chunks.get(cx, cz);
 
             if (chunk) {
-                int lx = x - cx * CHUNK_W;
-                int ly = y - cy * CHUNK_H;
-                int lz = z - cz * CHUNK_W;
-                // chunk->state = MODIFIED;
+                int lx = x & 15;
+                int lz = z & 15;
 
-                uint8_t light = chunk->lightmap.get(lx, ly, lz, channel);
-                voxel v = chunk->get_voxel(lx, ly, lz);
-                // const Block* block = blockDefs[v.id];
+                light current = chunk->lightmap.map.get(lx, y, lz);
+                voxel v = chunk->get_voxel(lx, y, lz);
                 bool lightPassing = Block::getBlockByVoxelId(v.id).lightPassing;
-                // if (block->lightPassing && light+2 <= entry.light){
-                //     chunk->lightmap.set(
-                //         x-cx*CHUNK_W, y-cy*CHUNK_H, z-cz*CHUNK_W, 
-                //         channel, 
-                //         entry.light-1);
-                //     addqueue.push(lightentry {x, y, z, uint8_t(entry.light-1)});
-                // }
-                if (lightPassing && light+2 <= entry.light){
-                    chunk->lightmap.set(
-                        x-cx*CHUNK_W, y-cy*CHUNK_H, z-cz*CHUNK_W, 
-                        channel, 
-                        entry.light-1);
-                    addqueue.push(lightentry {x, y, z, (uint8_t)(entry.light-1)});
+
+                if (!lightPassing) continue;
+
+                light newlight = current;
+                bool changed = false;
+
+                for (int c = 0; c < 4; c++) {
+                    uint8_t cv = current.get(c);
+                    uint8_t ev = entry.value.get(c);
+                    if (ev > 1 && cv + 2 <= ev) {
+                        newlight.set(c, ev - 1);
+                        changed = true;
+                    }
+                }
+
+                if (changed) {
+                    chunk->lightmap.map.set(lx, y, lz, newlight);
+                    addqueue.push({x, y, z, newlight});
                 }
             }
         }

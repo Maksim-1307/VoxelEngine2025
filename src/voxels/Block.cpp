@@ -14,7 +14,7 @@ Block::Block(
     set_UVs(UVs);
     Block::add_block(this);
     switch (model) {
-        case BlockModel::AIR: case BlockModel::FOLIAGE:
+        case BlockModel::AIR: case BlockModel::FOLIAGE: case BlockModel::GRASS:
             this->opened_faces = {1, 1, 1, 1, 1, 1};
             this->lightPassing = true;
             break;
@@ -93,6 +93,14 @@ const std::vector<AABB> Block::getAABBs(int x, int y, int z, IteractionType type
         case BlockModel::FOLIAGE:
             if (type == RAYCAST) {
                 return {AABB(glm::vec3(1.0f))};
+            } else {
+                return {};
+            }
+        case BlockModel::GRASS:
+            if (type == RAYCAST) {
+                // delta = 0.5 - 0.5 * cos(45 degrees)
+                const float d = 0.146f;
+                return {AABB(glm::vec3(d, 0, d), glm::vec3(1.0f-d))};
             } else {
                 return {};
             }

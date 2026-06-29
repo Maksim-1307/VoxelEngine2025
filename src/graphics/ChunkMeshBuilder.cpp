@@ -46,9 +46,19 @@ sptr<Mesh> ChunkMeshBuilder::buildMesh(Chunk &chunk)
         {
             for (_z = 0; _z < CHUNK_W; _z++)
             {
-                if (get_voxel_fast(_x, _y, _z).id != 0)
-                {
-                    CubeModel(_x, _y, _z);
+                // Air always has id == 0
+                if (get_voxel_fast(_x, _y, _z).id == 0) continue;
+                Block& block = Block::getBlockByVoxelId(get_voxel_fast(_x, _y, _z).id);
+                switch (block.getBlockModel()) {
+                    case BlockModel::SOLID:
+                    case BlockModel::FOLIAGE:
+                        CubeModel(_x, _y, _z);
+                        break;
+                    case BlockModel::GRASS:
+                        GrassModel(_x, _y, _z);
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -58,7 +68,6 @@ sptr<Mesh> ChunkMeshBuilder::buildMesh(Chunk &chunk)
 
 void ChunkMeshBuilder::CubeModel(int x, int y, int z)
 {
-
     std::array<bool, 6> openedFaces = opened_around(x, y, z);
     Block& block = Block::getBlockByVoxelId(get_voxel_fast(x, y, z).id);
 
@@ -127,6 +136,40 @@ void ChunkMeshBuilder::CubeModel(int x, int y, int z)
             }
         }
     }
+}
+
+void ChunkMeshBuilder::GrassModel(int x, int y, int z) 
+{
+    std::array<bool, 6> openedFaces = opened_around(x, y, z);
+    Block& block = Block::getBlockByVoxelId(get_voxel_fast(x, y, z).id);
+
+    bool isOpened = std::any_of(openedFaces.begin(), openedFaces.end(), [](bool b) { return b; });
+    if (!isOpened) return;
+
+    size_t UVx = std::get<0>(block.getUV(0));
+    size_t UVy = std::get<1>(block.getUV(0));
+    glm::vec2 uv = glm::vec2((float)UVx / ATLAS_SIZE, (float)UVy / ATLAS_SIZE);
+
+    // delta = 0.5 - 0.5 * cos(45 degrees)
+    const float d = 0.146f;
+
+    _face = 6; // Grass model doesnt have faces. Use inner light calculation for all vertices
+
+    // First sprite
+    vertex(d, 0.0f, d, uv.x, uv.y);
+    vertex(d, 1.0f, d, uv.x, uv.y + 1.0f / ATLAS_SIZE);
+    vertex(1.0f-d, 1.0f, 1.0f-d, uv.x + 1.0f / ATLAS_SIZE, uv.y + 1.0f / ATLAS_SIZE);
+    vertex(1.0f-d, 0.0f, 1.0f-d, uv.x + 1.0f / ATLAS_SIZE, uv.y);
+
+    index(0, 1, 3, 1, 2, 3);
+
+    // Second sprite
+    vertex(d, 0.0f, 1.0f-d, uv.x, uv.y);
+    vertex(d, 1.0f, 1.0f-d, uv.x, uv.y + 1.0f / ATLAS_SIZE);
+    vertex(1.0f-d, 1.0f, d, uv.x + 1.0f / ATLAS_SIZE, uv.y + 1.0f / ATLAS_SIZE);
+    vertex(1.0f-d, 0.0f, d, uv.x + 1.0f / ATLAS_SIZE, uv.y);
+
+    index(0, 1, 3, 1, 2, 3);
 }
 
 std::array<bool, 6> ChunkMeshBuilder::opened_around(int x, int y, int z)
@@ -200,7 +243,8 @@ uint16_t ChunkMeshBuilder::calculate_light(){
         0, 1, 0, // y+
         0,-1, 0, // ...
         0, 0, 1,
-        0, 0,-1
+        0, 0,-1,
+        0, 0, 0  // inside
     };
     int face = _face;
     int x = _x + coords[face * 3 + 0];

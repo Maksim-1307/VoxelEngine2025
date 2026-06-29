@@ -42,6 +42,8 @@ void Generator::generate_ambient(int x, int z) {
             );
             if (random(wx, wz, seed) > 0.98 && treeNoise > 0.015f) 
                 generate_tree(wx, wy, wz);
+            if (random(wx, wz, seed) > 0.9f)
+                generate_grass(wx, wy, wz);
         }   
     }
     chunk->state = STRUCTURES_GENERATED;
@@ -184,5 +186,14 @@ void Generator::generate_tree(int x, int y, int z) {
     }
     Engine::pVoxelStorage->set_voxel(x, y - 1, z, {1, 0}); 
     
-    Engine::pVoxelStorage->set_voxel(x, crown_start_y + 2, z, {5, 0}); // Листва
+    Engine::pVoxelStorage->set_voxel(x, crown_start_y + 2, z, {5, 0}); // Foliage
+}
+
+void Generator::generate_grass(int x, int y, int z) {
+    if (y <= 0 || y >= CHUNK_H) return;
+    voxel bottomVoxel = Engine::pVoxelStorage->get_voxel(x, y-1, z);
+    voxel currentVoxel = Engine::pVoxelStorage->get_voxel(x, y, z);
+    if (bottomVoxel.id != 3 && bottomVoxel.id != 1) return; // Only grass on grass or dirt
+    if (currentVoxel.id != 0) return; // Grass can only be placed on empty space
+    Engine::pVoxelStorage->set_voxel(x, y, z, {10, 0});  // Grass
 }

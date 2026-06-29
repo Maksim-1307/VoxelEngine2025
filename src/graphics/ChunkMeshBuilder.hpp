@@ -44,6 +44,7 @@ public:
 private: 
 
     void CubeModel(int x, int y, int z);
+    void GrassModel(int x, int y, int z);
 
     std::array<bool, 6> opened_around(int x, int y, int z);
     int adjacent(int face);

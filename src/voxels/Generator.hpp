@@ -27,6 +27,7 @@ class Generator {
     Chunk* generate_at(int x, int z);
     void generate_ambient(int x, int z);
     void generate_tree(int x, int y, int z);
+    void generate_grass(int x, int y, int z);
 
     Chunk* perlin_noise_2d(int x, int y, int z);
     Chunk* perlin_noise_3d(int x, int y, int z);

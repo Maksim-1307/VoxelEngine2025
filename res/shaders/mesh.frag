@@ -13,5 +13,7 @@ void main()
     if (texColor.a == 0.0) {
         discard;
     }
-    outputColor = vec4(texColor.rgb *= min(vec3(1.0), lightColor.rgb), 1);
+    vec3 light = clamp(lightColor.rgb, 0.0, 1.0);
+    light = mix(light, pow(light, vec3(1.5)), 0.5);
+    outputColor = vec4(texColor.rgb *= light, 1);
 }

@@ -150,24 +150,30 @@ void ChunkMeshBuilder::GrassModel(int x, int y, int z)
     size_t UVy = std::get<1>(block.getUV(0));
     glm::vec2 uv = glm::vec2((float)UVx / ATLAS_SIZE, (float)UVy / ATLAS_SIZE);
 
+    // Pseudo-random offset from block X Y Z so grass isn't always centered
+    int wx = x + chunkX, wy = y + chunkY, wz = z + chunkZ;
+    uint32_t h = (uint32_t)(wx * 73856093) ^ (uint32_t)(wy * 19349663) ^ (uint32_t)(wz * 83492791);
+    float offX = ((h & 0xFF) / 255.0f - 0.5f) * 0.3f;
+    float offZ = (((h >> 8) & 0xFF) / 255.0f - 0.5f) * 0.3f;
+
     // delta = 0.5 - 0.5 * cos(45 degrees)
     const float d = 0.146f;
 
     _face = 6; // Grass model doesnt have faces. Use inner light calculation for all vertices
 
     // First sprite
-    vertex(d, 0.0f, d, uv.x, uv.y);
-    vertex(d, 1.0f, d, uv.x, uv.y + 1.0f / ATLAS_SIZE);
-    vertex(1.0f-d, 1.0f, 1.0f-d, uv.x + 1.0f / ATLAS_SIZE, uv.y + 1.0f / ATLAS_SIZE);
-    vertex(1.0f-d, 0.0f, 1.0f-d, uv.x + 1.0f / ATLAS_SIZE, uv.y);
+    vertex(d + offX, 0.0f, d + offZ, uv.x, uv.y);
+    vertex(d + offX, 1.0f, d + offZ, uv.x, uv.y + 1.0f / ATLAS_SIZE);
+    vertex(1.0f-d + offX, 1.0f, 1.0f-d + offZ, uv.x + 1.0f / ATLAS_SIZE, uv.y + 1.0f / ATLAS_SIZE);
+    vertex(1.0f-d + offX, 0.0f, 1.0f-d + offZ, uv.x + 1.0f / ATLAS_SIZE, uv.y);
 
     index(0, 1, 3, 1, 2, 3);
 
     // Second sprite
-    vertex(d, 0.0f, 1.0f-d, uv.x, uv.y);
-    vertex(d, 1.0f, 1.0f-d, uv.x, uv.y + 1.0f / ATLAS_SIZE);
-    vertex(1.0f-d, 1.0f, d, uv.x + 1.0f / ATLAS_SIZE, uv.y + 1.0f / ATLAS_SIZE);
-    vertex(1.0f-d, 0.0f, d, uv.x + 1.0f / ATLAS_SIZE, uv.y);
+    vertex(d + offX, 0.0f, 1.0f-d + offZ, uv.x, uv.y);
+    vertex(d + offX, 1.0f, 1.0f-d + offZ, uv.x, uv.y + 1.0f / ATLAS_SIZE);
+    vertex(1.0f-d + offX, 1.0f, d + offZ, uv.x + 1.0f / ATLAS_SIZE, uv.y + 1.0f / ATLAS_SIZE);
+    vertex(1.0f-d + offX, 0.0f, d + offZ, uv.x + 1.0f / ATLAS_SIZE, uv.y);
 
     index(0, 1, 3, 1, 2, 3);
 }

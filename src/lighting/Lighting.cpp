@@ -74,6 +74,58 @@ void Lighting::buildSkyLight(int cx, int cz) {
             }
         }
     }
+
+    // Seed cross-border propagation with adjacent chunks' border light
+    Chunk* neighbor;
+    // -X
+    neighbor = Engine::pChunkMap->get(cx-1, cz);
+    if (neighbor && neighbor->state >= LIGHTS_PRE_BUILT) {
+        int gx = (cx-1)*CHUNK_W + CHUNK_W-1;
+        for (int z = 0; z < CHUNK_W; z++) {
+            int gz = cz*CHUNK_W + z;
+            for (int y = 0; y < CHUNK_H; y++) {
+                light l = neighbor->lightmap.get(CHUNK_W-1, y, z);
+                if (l) solver->add(gx, y, gz, l);
+            }
+        }
+    }
+    // +X
+    neighbor = Engine::pChunkMap->get(cx+1, cz);
+    if (neighbor && neighbor->state >= LIGHTS_PRE_BUILT) {
+        int gx = (cx+1)*CHUNK_W;
+        for (int z = 0; z < CHUNK_W; z++) {
+            int gz = cz*CHUNK_W + z;
+            for (int y = 0; y < CHUNK_H; y++) {
+                light l = neighbor->lightmap.get(0, y, z);
+                if (l) solver->add(gx, y, gz, l);
+            }
+        }
+    }
+    // -Z
+    neighbor = Engine::pChunkMap->get(cx, cz-1);
+    if (neighbor && neighbor->state >= LIGHTS_PRE_BUILT) {
+        int gz = (cz-1)*CHUNK_W + CHUNK_W-1;
+        for (int x = 0; x < CHUNK_W; x++) {
+            int gx = cx*CHUNK_W + x;
+            for (int y = 0; y < CHUNK_H; y++) {
+                light l = neighbor->lightmap.get(x, y, CHUNK_W-1);
+                if (l) solver->add(gx, y, gz, l);
+            }
+        }
+    }
+    // +Z
+    neighbor = Engine::pChunkMap->get(cx, cz+1);
+    if (neighbor && neighbor->state >= LIGHTS_PRE_BUILT) {
+        int gz = (cz+1)*CHUNK_W;
+        for (int x = 0; x < CHUNK_W; x++) {
+            int gx = cx*CHUNK_W + x;
+            for (int y = 0; y < CHUNK_H; y++) {
+                light l = neighbor->lightmap.get(x, y, 0);
+                if (l) solver->add(gx, y, gz, l);
+            }
+        }
+    }
+
     solver->solve();
     chunk->state = LIGHTS_BUILT;
 }

@@ -90,7 +90,9 @@ void ChunksController::load_around(glm::ivec2 center) {
     }
     for (int p = 2; p <= distance; p++) {
         for (Chunk* chunk : Engine::pChunkMap->padding_chunks(p)) {
-            Engine::pLighting->prebuildSkyLight(chunk);
+            if (chunk->state < LIGHTS_PRE_BUILT) {
+                Engine::pLighting->prebuildSkyLight(chunk);
+            }
         }
     }
     for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance-1)) {

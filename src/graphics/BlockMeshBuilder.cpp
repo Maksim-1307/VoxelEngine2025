@@ -16,6 +16,8 @@ uptr<Mesh> BlockMeshBuilder::buildMesh(Block& block) {
         case BlockModel::SOLID: case BlockModel::FOLIAGE:
             CubeModel(block);
             break; 
+        case BlockModel::GRASS:
+            GrassModel(block);
         default:
             break;
     }
@@ -86,6 +88,34 @@ void BlockMeshBuilder::CubeModel(Block& block) {
             index(3, 1, 0, 3, 2, 1);
         }
     }
+}
+
+void BlockMeshBuilder::GrassModel(Block& block)
+{
+    size_t UVx = std::get<0>(block.getUV(0));
+    size_t UVy = std::get<1>(block.getUV(0));
+    glm::vec2 uv = glm::vec2((float)UVx / ATLAS_SIZE, (float)UVy / ATLAS_SIZE);
+
+    // delta = 0.5 - 0.5 * cos(45 degrees)
+    const float d = 0.146f;
+
+    // _face = 6; // Grass model doesnt have faces. Use inner light calculation for all vertices
+
+    // First sprite
+    vertex(d, 0.0f, d, uv.x, uv.y);
+    vertex(d, 1.0f, d, uv.x, uv.y + 1.0f / ATLAS_SIZE);
+    vertex(1.0f-d, 1.0f, 1.0f-d, uv.x + 1.0f / ATLAS_SIZE, uv.y + 1.0f / ATLAS_SIZE);
+    vertex(1.0f-d, 0.0f, 1.0f-d, uv.x + 1.0f / ATLAS_SIZE, uv.y);
+
+    index(0, 1, 3, 1, 2, 3);
+
+    // Second sprite
+    vertex(d, 0.0f, 1.0f-d, uv.x, uv.y);
+    vertex(d, 1.0f, 1.0f-d, uv.x, uv.y + 1.0f / ATLAS_SIZE);
+    vertex(1.0f-d, 1.0f, d, uv.x + 1.0f / ATLAS_SIZE, uv.y + 1.0f / ATLAS_SIZE);
+    vertex(1.0f-d, 0.0f, d, uv.x + 1.0f / ATLAS_SIZE, uv.y);
+
+    index(0, 1, 3, 1, 2, 3);
 }
 
 void BlockMeshBuilder::vertex(float x, float y, float z, float u, float v)

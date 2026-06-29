@@ -22,6 +22,8 @@ class BlockMeshBuilder {
     private:
 
     void CubeModel(Block& block);
+    void GrassModel(Block& block);
+    
     float pack_to_float(uint16_t a, uint16_t b){
         uint32_t combined = (static_cast<uint32_t>(b) << 16) | a;
         float result;

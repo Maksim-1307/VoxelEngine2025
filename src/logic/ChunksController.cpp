@@ -81,26 +81,16 @@ void ChunksController::load_around(glm::ivec2 center) {
     int size = Engine::pChunkMap->size;
     int distance = Settings::LOAD_DISTANCE;
 
-    for (Chunk* chunk : Engine::pChunkMap->padding_chunks(1)) {
-        if (chunk->state < STRUCTURES_GENERATED) {
-            Engine::pGenerator->generate_ambient(chunk->X, chunk->Z);
-        } 
-    }
-    for (Chunk* chunk : Engine::pChunkMap->padding_chunks(2)) {
-        if (chunk->state == STRUCTURES_GENERATED) {
-            Engine::pLighting->prebuildSkyLight(chunk);
-        } else {
-            Engine::pGenerator->generate_ambient(chunk->X, chunk->Z);
-            Engine::pLighting->prebuildSkyLight(chunk);
+    for (int p = 1; p <= distance; p++) {
+        for (Chunk* chunk : Engine::pChunkMap->padding_chunks(p)) {
+            if (chunk->state < STRUCTURES_GENERATED) {
+                Engine::pGenerator->generate_ambient(chunk->X, chunk->Z);
+            }
         }
     }
-
-    if (firstLoad) {
-        for (int padding = 3; padding <= distance; padding++) {
-            for (Chunk* chunk : Engine::pChunkMap->padding_chunks(padding)) {
-                if (chunk->state == TERRAIN_GENERATED) { 
-                    Engine::pGenerator->generate_ambient(chunk->X, chunk->Z);
-                }
+    for (int p = 2; p <= distance; p++) {
+        for (Chunk* chunk : Engine::pChunkMap->padding_chunks(p)) {
+            if (chunk->state < LIGHTS_PRE_BUILT) {
                 Engine::pLighting->prebuildSkyLight(chunk);
             }
         }

@@ -26,6 +26,8 @@
 #include "entities/Player.hpp"
 #include "physics/Physics.hpp"
 #include "src/time/Profiler.hpp"
+#include "src/graphics/ui/LoadingScreen.hpp"
+#include "src/graphics/ui/GameplayScreen.hpp"
 
 // class State;
 

@@ -35,17 +35,6 @@ Player* Engine::pPlayer = nullptr;
 void Engine::init()
 {
 
-    new Block("air", BlockModel::AIR,     {});
-    new Block("dirt", BlockModel::SOLID,  {{0, 1}});
-    new Block("stone", BlockModel::SOLID, {{1, 0}});
-    new Block("grass", BlockModel::SOLID, {{1, 1}, {0, 0}, {0, 1}});
-    new Block("oak_log", BlockModel::SOLID, {{2, 1}, {0, 2}, {2, 1}});
-    new Block("leaves", BlockModel::FOLIAGE, {{1, 2}});
-    new Block("red_lamp", BlockModel::SOLID, {{3, 2}}, true, {12, 0, 0});
-    new Block("green_lamp", BlockModel::SOLID, {{3, 1}}, true, {0, 12, 0});
-    new Block("blue_lamp", BlockModel::SOLID, {{3, 0}}, true, {0, 0, 12});
-    new Block("lamp", BlockModel::SOLID, {{4, 0}}, true, {12, 12, 10});
-
     // Graphics
     WindowArgs wargs;
     wargs.name = "VoxelEngine";
@@ -61,6 +50,25 @@ void Engine::init()
     Engine::pCamera = new Camera(*Engine::pWindow);
     Engine::pInputController = new InputController(*Engine::pCamera, *Engine::pWindow);
     Engine::pCanvas = new Canvas(*Engine::pWindow);
+
+    // remove
+    LoadingScreen* loadingScreen = new LoadingScreen();
+    loadingScreen->on_enter();
+    loadingScreen->draw();
+    //
+
+
+    // Blocks
+    new Block("air", BlockModel::AIR,     {});
+    new Block("dirt", BlockModel::SOLID,  {{0, 1}});
+    new Block("stone", BlockModel::SOLID, {{1, 0}});
+    new Block("grass", BlockModel::SOLID, {{1, 1}, {0, 0}, {0, 1}});
+    new Block("oak_log", BlockModel::SOLID, {{2, 1}, {0, 2}, {2, 1}});
+    new Block("leaves", BlockModel::FOLIAGE, {{1, 2}});
+    new Block("red_lamp", BlockModel::SOLID, {{3, 2}}, true, {12, 0, 0});
+    new Block("green_lamp", BlockModel::SOLID, {{3, 1}}, true, {0, 12, 0});
+    new Block("blue_lamp", BlockModel::SOLID, {{3, 0}}, true, {0, 0, 12});
+    new Block("lamp", BlockModel::SOLID, {{4, 0}}, true, {12, 12, 10});
     
     // Texts 
     std::string ss = "VoxelGame pre Alpha";
@@ -120,6 +128,14 @@ void Engine::init()
         Engine::pPlayer->move_right();
     });
 
+    // remove
+    loadingScreen->on_exit();
+    //
+
+    // remove
+    // GameplayScreen* gameplayScreen = new GameplayScreen();
+    // gameplayScreen->on_enter();
+    //
 }
 
 void Engine::game_loop()

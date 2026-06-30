@@ -130,6 +130,23 @@ void Lighting::buildSkyLight(int cx, int cz) {
     chunk->state = LIGHTS_BUILT;
 }
 
+void Lighting::onBlockSet(int x, int y, int z, uint8_t blockId) {
+    solver->remove(x, y, z);
+    solver->solve();
+
+    if (blockId != 0) {
+        Block& block = Block::getBlockByVoxelId(blockId);
+        if (block.emissive) {
+            light l = {0};
+            l.setR(block.emission[0]);
+            l.setG(block.emission[1]);
+            l.setB(block.emission[2]);
+            solver->add(x, y, z, l);
+            solver->solve();
+        }
+    }
+}
+
 void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
 
     Profiler p ("onChunkLoaded");

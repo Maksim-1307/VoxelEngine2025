@@ -26,12 +26,11 @@ void Mouse::update(float deltaTime) {
         if (pressTimeLeft == 0 || pressTimeLeft > Settings::BLOCK_BREAKING_DELAY) {
             RaycastResult result = Engine::pTerrain->raycast(camera->position, camera->front, 15.0f);
             if (result.hit) {
-                Engine::pVoxelStorage->set_voxel_soft(
-                    std::floor(result.position.x), 
-                    std::floor(result.position.y), 
-                    std::floor(result.position.z), 
-                    {0, 0}
-                );
+                int bx = std::floor(result.position.x);
+                int by = std::floor(result.position.y);
+                int bz = std::floor(result.position.z);
+                Engine::pVoxelStorage->set_voxel_soft(bx, by, bz, {0, 0});
+                Engine::pLighting->onBlockSet(bx, by, bz, 0);
             }
             pressTimeLeft = 0;
         }
@@ -43,12 +42,11 @@ void Mouse::update(float deltaTime) {
         if (pressTimeRight == 0 || pressTimeRight > Settings::BLOCK_PLACIND_DELAY) {
             RaycastResult result = Engine::pTerrain->raycast(camera->position, camera->front, 15.0f, false);
             if (result.hit) {
-                Engine::pVoxelStorage->set_voxel_soft(
-                    std::floor(result.position.x), 
-                    std::floor(result.position.y), 
-                    std::floor(result.position.z), 
-                    State::PLACING_VOXEL
-                );
+                int bx = std::floor(result.position.x);
+                int by = std::floor(result.position.y);
+                int bz = std::floor(result.position.z);
+                Engine::pVoxelStorage->set_voxel_soft(bx, by, bz, State::PLACING_VOXEL);
+                Engine::pLighting->onBlockSet(bx, by, bz, State::PLACING_VOXEL.id);
             }
             pressTimeRight = 0;
         }

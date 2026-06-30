@@ -59,6 +59,10 @@ public:
         else
             glfwSetInputMode(this->GLFWwindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
+    void set_clear_color(glm::vec3 color) {
+        this->clearColor = color;
+        glClearColor(clearColor.x, clearColor.y, clearColor.z, 1.0f);
+    }
 private:
     GLuint width;
     GLuint height;

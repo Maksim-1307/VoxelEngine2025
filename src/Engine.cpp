@@ -132,33 +132,37 @@ void Engine::init()
     // remove
     loadingScreen->on_exit();
     //
-
-    // remove
-    // GameplayScreen* gameplayScreen = new GameplayScreen();
-    // gameplayScreen->on_enter();
-    //
 }
 
 void Engine::game_loop()
 {
 
     FPSCounter* fpsCounter = new FPSCounter();
+    using Clock = std::chrono::steady_clock;
+    float elapsedTime = 0.0f;
 
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection = glm::mat4(1.0f);
 
     std::cout << "game loop started\n";
-    auto lastTime = high_resolution_clock::now();
+    auto lastTime = Clock::now();
     bool prevObstacle = true;
     std::string s = "";
 
     while (!Engine::pWindow->should_close())
     {
 
-        auto currentTime = high_resolution_clock::now();
-        float deltaTime = duration_cast<duration<float>>(currentTime - lastTime).count();
+        auto currentTime = Clock::now();
+        float deltaTime = duration_cast<duration<float>>(currentTime - lastTime).count(); // remake: use always double for delta time
+        elapsedTime += std::chrono::duration<float, std::milli>(currentTime - lastTime).count();
         lastTime = currentTime;
+        elapsedTime += deltaTime;
+
+        if (elapsedTime >= 50) { // 20 ticks per second
+            Engine::tick();
+            elapsedTime = 0;
+        }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -254,3 +258,7 @@ void Engine::game_loop()
     std::cout << "game loop interrupted";
 }
 
+void Engine::tick() {
+    Time::tick();
+    Sky::update();
+}

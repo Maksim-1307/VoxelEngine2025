@@ -28,6 +28,8 @@
 #include "src/time/Profiler.hpp"
 #include "src/graphics/ui/LoadingScreen.hpp"
 #include "src/graphics/ui/GameplayScreen.hpp"
+#include "src/time/Time.hpp"
+#include "src/graphics/Sky.hpp"
 
 // class State;
 
@@ -38,6 +40,8 @@ class Engine {
         Engine();
         void init();
         void game_loop();
+        void tick();
+        void frame();
 
         static Window* pWindow;
         static Shader* pSpriteShader;

@@ -12,4 +12,5 @@ public:
     static constexpr float BLOCK_BREAKING_DELAY = 0.3f;
     static constexpr float BLOCK_PLACIND_DELAY = 0.2f;
     static constexpr float PLAYER_SPEED = 5.0f;
+    static constexpr int DAY_LENGTH = 1200; // 1200 ticks == 1 minute
 };

@@ -97,7 +97,7 @@ void Engine::init()
     Engine::pStats = new Stats();
     Engine::pWorldLoadingIndicator = new WorldLoadingIndicator(Engine::pChunkMap->get_chunks());
     Engine::pBlockMeshBuilder = new BlockMeshBuilder();
-    Engine::pPlayer = new Player(glm::vec3(0, 30, 0), Engine::pCamera);
+    Engine::pPlayer = new Player(glm::vec3(0, 55, 0), Engine::pCamera);
 
     // Input Callbacks
     Engine::pInputController->onPress(GLFW_KEY_TAB, []() {

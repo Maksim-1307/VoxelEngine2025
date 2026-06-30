@@ -63,7 +63,7 @@ Chunk* Generator::terrain_with_caves(int x, int y, int z){
     for (int x = 0; x < CHUNK_W; x++){
         for (int z = 0; z < CHUNK_W; z++){
             float perlinTerrain = stb_perlin_noise3_seed((x + X) / SIZE_FACTOR, 0.0f, (z + Z) / SIZE_FACTOR, 0, 0, 0, this->seed);
-            int height = (int)(perlinTerrain * 10 + 15);
+            int height = (int)(perlinTerrain * 10 + 40);
             if (height >= CHUNK_H) height = CHUNK_H-1;
             int y = height;
 
@@ -134,7 +134,7 @@ Chunk* Generator::perlin_noise_2d(int x, int y, int z){
         for (int z = 0; z < CHUNK_W; z++){
             for (int y = 0; y < CHUNK_H; y++){
                 float perlin = stb_perlin_noise3_seed((x + X) / SIZE_FACTOR, 0.0f, (z + Z) / SIZE_FACTOR, 0, 0, 0, this->seed);
-                float height = perlin * 10 + 15;
+                float height = perlin * 10 + 40;
                 if (Y + y > height){
                     chunk->set_voxel(x, y, z, {0, 0});
                 } else {

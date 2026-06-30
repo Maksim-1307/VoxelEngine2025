@@ -185,6 +185,7 @@ void Engine::game_loop()
         Engine::pMeshShader->set_matrix4("view", view);
         Engine::pMeshShader->set_matrix4("projection", projection);
         Engine::pMeshShader->set_texture("theTexture", Engine::pTexture->getID());
+        Engine::pMeshShader->set_float("skyBrightness", 0.2f + 0.8f * Sky::get_sky_brightness());
 
         Engine::pChunksController->draw_chunks();
 

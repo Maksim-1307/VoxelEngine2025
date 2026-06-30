@@ -10,11 +10,10 @@ out vec4 lightColor;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform float skyBrightness;
 
 void main(void)
 {
-    // make uniform
-    float skyBrightness = 1.0f;
     vec3 skyColor = vec3(1, 1, 1);
 
     // unpacking float to two bytes

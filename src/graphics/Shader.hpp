@@ -29,6 +29,8 @@ public:
 
     bool set_texture(std::string uniformName, GLuint tectureID);
 
+    bool set_float(std::string uniformName, float value);
+
 private:
     GLuint createShader(const std::string &source, const GLenum shaderType);
 

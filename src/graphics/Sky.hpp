@@ -2,7 +2,6 @@
 
 #include <glm/glm.hpp>
 #include "src/time/Time.hpp"
-#include "src/time/Time.hpp"
 
 class Sky {
 public:

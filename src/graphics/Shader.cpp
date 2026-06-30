@@ -111,6 +111,21 @@ bool Shader::set_matrix4(std::string uniformName, glm::mat4 matrix)
     }
 }
 
+bool Shader::set_float(std::string uniformName, float value)
+{
+    GLuint uniformLoc = glGetUniformLocation(this->ID, uniformName.c_str());
+    if (uniformLoc == -1)
+    {
+        std::cerr << "WARNING: uniform named '" << uniformName << "' doesn't exist" << std::endl;
+        return false;
+    }
+    else
+    {
+        glUniform1f(uniformLoc, value);
+        return true;
+    }
+}
+
 bool Shader::set_texture(std::string uniformName, GLuint textureID)
 {
     GLuint uniformLoc = glGetUniformLocation(this->ID, uniformName.c_str());

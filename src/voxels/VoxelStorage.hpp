@@ -63,10 +63,13 @@ class VoxelStorage{
             chunksMap->get(chunkX, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
             chunksMap->get(chunkX, chunkZ)->state = MODIFIED;
 
-            if (blockX == 0) chunksMap->get(chunkX-1, chunkZ)->state = MODIFIED;
-            if (blockX == CHUNK_W-1) chunksMap->get(chunkX+1, chunkZ)->state = MODIFIED;
-            if (blockZ == 0) chunksMap->get(chunkX, chunkZ-1)->state = MODIFIED;
-            if (blockZ == CHUNK_W-1) chunksMap->get(chunkX, chunkZ+1)->state = MODIFIED;
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    if (dx == 0 && dz == 0) continue;
+                    if (chunksMap->is_inside(chunkX + dx, chunkZ + dz))
+                        chunksMap->get(chunkX + dx, chunkZ + dz)->state = MODIFIED;
+                }
+            }
             return true;
         };
 

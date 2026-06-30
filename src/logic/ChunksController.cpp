@@ -41,7 +41,8 @@ void ChunksController::handle_at(int x, int z) {
         // building or updating sky light if its needed
         if (Settings::HARD_LOADING || !chunk->renderer || chunk->state < VISIBLE) {
 
-            if (chunk->state == MODIFIED) Engine::pLighting->prebuildSkyLight(chunk);
+            if (chunk->state == MODIFIED && !Settings::RECURSIVE_LIGHTING)
+                Engine::pLighting->prebuildSkyLight(chunk);
 
             if (Settings::RECURSIVE_LIGHTING) {
                 Engine::pLighting->onChunkLoaded(chunk->X, chunk->Z, true);

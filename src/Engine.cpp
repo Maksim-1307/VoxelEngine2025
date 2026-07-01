@@ -71,6 +71,8 @@ void Engine::init()
     new Block("blue_lamp", BlockModel::SOLID, {{3, 0}}, true, {0, 0, 12});
     new Block("lamp", BlockModel::SOLID, {{4, 0}}, true, {12, 12, 10});
     new Block("tall_grass", BlockModel::GRASS, {{0, 3}});
+    new Block("dry_bush", BlockModel::GRASS, {{1, 3}});
+    new Block("sand", BlockModel::SOLID, {{2, 3}});
     
     // Texts 
     std::string ss = "VoxelGame pre Alpha";

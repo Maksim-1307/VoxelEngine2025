@@ -41,7 +41,7 @@ class Engine {
         void init();
         void game_loop();
         void tick(double deltaTime);
-        void frame(double deltaTime);
+        void frame(double deltaTime, double alpha);
 
         static Window* pWindow;
         static Shader* pSpriteShader;

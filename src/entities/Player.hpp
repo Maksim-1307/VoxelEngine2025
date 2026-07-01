@@ -16,6 +16,7 @@ public:
         this->hitbox = make_uptr<Hitbox>(position, glm::vec3(0.8f, 1.8f, 0.8f));
         this->hitbox->gravityFactor = 2.0f;
         this->hitbox->position = position;
+        this->prevPosition = position;
     };
     ~Player() {};
 
@@ -36,8 +37,6 @@ public:
     }
 
     void update() {
-        camera->position = hitbox->position + glm::vec3(0, 1.6f-0.9f, 0);
-
         glm::vec3 forward = camera->front;
         glm::vec3 right = camera->right;
         glm::vec3 direction = this->finalDirection();
@@ -60,6 +59,7 @@ public:
     // X+ - forward, Y+ - right
     std::vector<glm::vec2> movingDirections = {};
     glm::vec3 position;
+    glm::vec3 prevPosition;
     Camera* camera;
     uptr<Hitbox> hitbox;
 private:

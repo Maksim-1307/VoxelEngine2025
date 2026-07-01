@@ -160,11 +160,13 @@ void Engine::game_loop()
 
         accumulator += frameTime;
         while (accumulator >= TICK_RATE) {
+            Engine::pPlayer->prevPosition = Engine::pPlayer->hitbox->position;
             Engine::tick(TICK_RATE);
             accumulator -= TICK_RATE;
         }
 
-        Engine::frame(frameTime);
+        double alpha = accumulator / TICK_RATE;
+        Engine::frame(frameTime, alpha);
     }
     Profiler::print_results();
     std::cout << "game loop interrupted\n";
@@ -179,10 +181,17 @@ void Engine::tick(double deltaTime)
     Engine::pWorldLoadingIndicator->update(Engine::pChunkMap->get_chunks());
 }
 
-void Engine::frame(double deltaTime)
+void Engine::frame(double deltaTime, double alpha)
 {
     Engine::pFPSCounter->update(static_cast<float>(deltaTime));
     Engine::pWindow->set_mouse_lock(State::MOUSE_CONTROL);
+
+    glm::vec3 renderPos = glm::mix(
+        Engine::pPlayer->prevPosition,
+        Engine::pPlayer->hitbox->position,
+        static_cast<float>(alpha)
+    );
+    Engine::pCamera->position = renderPos + glm::vec3(0.0f, 1.6f - 0.9f, 0.0f);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

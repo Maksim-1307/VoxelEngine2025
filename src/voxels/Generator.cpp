@@ -122,20 +122,22 @@ Chunk* Generator::terrain_with_caves(int x, int y, int z){
             );
             float basinDepth = 1.0f - (basinNoise * 0.5f + 0.5f);
             basinDepth = basinDepth * basinDepth;
-            float lowFactor = 1.0f - std::clamp((height - 25.0f) / 10.0f, 0.0f, 1.0f);
+            float lowFactor = 1.0f - std::clamp((height - 55.0f) / 10.0f, 0.0f, 1.0f);
             height -= basinDepth * 8.0f * lowFactor;
+
+            height += 30.0f;
 
             int finalHeight = static_cast<int>(height);
             if (finalHeight >= CHUNK_H) finalHeight = CHUNK_H - 1;
             if (finalHeight < 0) finalHeight = 0;
 
             int dirtBlocks = 3;
-            if (finalHeight > 35) {
-                dirtBlocks = 3 - (finalHeight - 20) / 3;
+            if (finalHeight > 65) {
+                dirtBlocks = 3 - (finalHeight - 50) / 3;
                 if (dirtBlocks < 0) dirtBlocks = 0;
             }
 
-            if (finalHeight <= 15) {
+            if (finalHeight <= 45) {
                 for (int ly = finalHeight; ly >= finalHeight - dirtBlocks && ly >= 0; ly--) {
                     chunk->set_voxel(lx, ly, lz, {12, 0});
                 }
@@ -150,7 +152,7 @@ Chunk* Generator::terrain_with_caves(int x, int y, int z){
                 for (int ly = finalHeight - dirtBlocks - 1; ly >= 0; ly--) {
                     chunk->set_voxel(lx, ly, lz, {2, 0});
                 }
-            } else if (finalHeight <= 40) {
+            } else if (finalHeight <= 70) {
                 chunk->set_voxel(lx, finalHeight, lz, {3, 0});
                 for (int ly = finalHeight - 1; ly >= 0; ly--) {
                     chunk->set_voxel(lx, ly, lz, {2, 0});

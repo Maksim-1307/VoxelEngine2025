@@ -31,6 +31,7 @@ Lighting* Engine::pLighting = nullptr;
 WorldLoadingIndicator* Engine::pWorldLoadingIndicator = nullptr;
 BlockMeshBuilder* Engine::pBlockMeshBuilder = nullptr;
 Player* Engine::pPlayer = nullptr;
+FPSCounter* Engine::pFPSCounter = nullptr;
 
 void Engine::init()
 {
@@ -98,6 +99,7 @@ void Engine::init()
     Engine::pWorldLoadingIndicator = new WorldLoadingIndicator(Engine::pChunkMap->get_chunks());
     Engine::pBlockMeshBuilder = new BlockMeshBuilder();
     Engine::pPlayer = new Player(glm::vec3(0, 55, 0), Engine::pCamera);
+    Engine::pFPSCounter = new FPSCounter();
 
     // Input Callbacks
     Engine::pInputController->onPress(GLFW_KEY_TAB, []() {
@@ -136,130 +138,124 @@ void Engine::init()
 
 void Engine::game_loop()
 {
-
-    FPSCounter* fpsCounter = new FPSCounter();
     using Clock = std::chrono::steady_clock;
-    float elapsedTime = 0.0f;
+    using Seconds = std::chrono::duration<double>;
 
-    glm::mat4 model = glm::mat4(1.0f);
-    glm::mat4 view = glm::mat4(1.0f);
-    glm::mat4 projection = glm::mat4(1.0f);
+    constexpr double TICK_RATE = 1.0 / 20.0;
+    double accumulator = 0.0;
 
     std::cout << "game loop started\n";
     auto lastTime = Clock::now();
-    bool prevObstacle = true;
-    std::string s = "";
 
     while (!Engine::pWindow->should_close())
     {
-
         auto currentTime = Clock::now();
-        float deltaTime = duration_cast<duration<float>>(currentTime - lastTime).count(); // remake: use always double for delta time
-        elapsedTime += std::chrono::duration<float, std::milli>(currentTime - lastTime).count();
+        double frameTime = Seconds(currentTime - lastTime).count();
         lastTime = currentTime;
-        elapsedTime += deltaTime;
 
-        if (elapsedTime >= 50) { // 20 ticks per second
-            Engine::tick();
-            elapsedTime = 0;
-        }
+        if (frameTime > 0.1) frameTime = 0.1;
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // updates
-        fpsCounter->update(deltaTime);
-        Engine::pInputController->update(deltaTime);
-        Engine::pChunksController->update();
-        Engine::pWorldLoadingIndicator->update(Engine::pChunkMap->get_chunks());
-        Engine::pWindow->set_mouse_lock(State::MOUSE_CONTROL);
-        Physics::step(deltaTime);
+        Engine::pInputController->update(static_cast<float>(frameTime));
         Engine::pPlayer->update();
 
-        // drawing terrain
-        Engine::pMeshShader->use();
+        accumulator += frameTime;
+        while (accumulator >= TICK_RATE) {
+            Engine::tick(TICK_RATE);
+            accumulator -= TICK_RATE;
+        }
 
-        view = pCamera->getView();
-        projection = pCamera->getProjection();
-
-        Engine::pMeshShader->set_matrix4("model", model);
-        Engine::pMeshShader->set_matrix4("view", view);
-        Engine::pMeshShader->set_matrix4("projection", projection);
-        Engine::pMeshShader->set_texture("theTexture", Engine::pTexture->getID());
-        Engine::pMeshShader->set_float("skyBrightness", 0.2f + 0.8f * Sky::get_sky_brightness());
-
-        Engine::pChunksController->draw_chunks();
-
-        // drawing text
-        Engine::pTextShader->use();
-
-        projection = pCanvas->get_projection();
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 60.0f, 0.0f));
-
-        Engine::pTextShader->set_matrix4("projection", projection * glm::scale(transform, glm::vec3(1.0f, -1.0f, 1.0f)));
-        Engine::pTextShader->set_texture("theTexture", Engine::pText->get_font()->get_texture()->getID());
-        Engine::pText->draw();
-
-        transform = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 120.0f, 0.0f));
-        Engine::pTextShader->set_matrix4("projection", projection * glm::scale(transform, glm::vec3(1.0f, -1.0f, 1.0f)));
-
-        // updating stats 
-        glm::vec3 camPos = Engine::pCamera->position;
-        bool obstacle = Engine::pTerrain->is_obstacle_at(camPos.x, camPos.y, camPos.z);
-        Engine::pStats->set("Obstacle", obstacle ? "true" : "false");
-        prevObstacle = obstacle;
-        
-        // int rlight = Engine::pVoxelStorage->get_light(floor(camPos.x), floor(camPos.y), floor(camPos.z)).getR();
-        // int glight = Engine::pVoxelStorage->get_light(floor(camPos.x), floor(camPos.y), floor(camPos.z)).getG();
-        // int blight = Engine::pVoxelStorage->get_light(floor(camPos.x), floor(camPos.y), floor(camPos.z)).getB();
-        int skyLight = Engine::pVoxelStorage->get_light(floor(camPos.x), floor(camPos.y), floor(camPos.z)).getS();
-        Engine::pStats->set("Sky Light", std::to_string(skyLight));
-        // Engine::pStats->set("R Light", std::to_string(rlight));
-        // Engine::pStats->set("G Light", std::to_string(glight)); 
-        // Engine::pStats->set("B Light", std::to_string(blight));
-
-        Engine::pStats->set("X", std::to_string(camPos.x));
-        Engine::pStats->set("Y", std::to_string(camPos.y));
-        Engine::pStats->set("Z", std::to_string(camPos.z));
-        Engine::pStats->set("Chunks count", std::to_string(Chunk::chunks));
-
-        transform = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 250.0f, 0.0f));
-        Engine::pTextShader->set_matrix4("projection", projection * glm::scale(transform, glm::vec3(1.0f, -1.0f, 1.0f)));
-        Engine::pStats->draw();
-
-        // drawing world loading indicator
-        Engine::pSpriteShader->use();
-
-        int windowWidth = Engine::pWindow->get_width();
-        int windowHeight = Engine::pWindow->get_height();
-        float rightPosition = windowWidth - 82.0f; // 50px margin + 32px width
-        float topPosition = 80.0f; // 50px from top
-
-        transform = glm::translate(glm::mat4(1.0f), glm::vec3(rightPosition, topPosition, 0.0f));
-        transform = glm::scale(transform, glm::vec3(64.0f, 64.0f, 1.0f));
-
-        Engine::pSpriteShader->set_matrix4("projection", projection * transform);
-        Engine::pSpriteShader->set_texture("theTexture", Engine::pWorldLoadingIndicator->texture->getID());
-        Engine::pWorldLoadingIndicator->draw();
-
-        // drawing placing block indicator
-        topPosition = windowHeight - 90.0f; //50px from bottom
-        transform = glm::translate(glm::mat4(1.0f), glm::vec3(rightPosition, topPosition, 0.0f));
-        transform = glm::scale(transform, glm::vec3(128.0f, 128.0f, 1.0f));
-
-        Engine::pSpriteShader->set_matrix4("projection", projection * transform);
-        Engine::pSpriteShader->set_texture("theTexture", Engine::pWorldLoadingIndicator->texture->getID());
-        Block& placingBlock = Block::getBlockByVoxelId(State::PLACING_VOXEL.id);
-        Engine::pSpriteShader->set_texture("theTexture", placingBlock.getIcon().getTexture()->getID());
-        placingBlock.getIcon().draw();
-
-        glfwSwapBuffers(Engine::pWindow->get_glfw_window());
-        glfwPollEvents();
+        Engine::frame(frameTime);
     }
     Profiler::print_results();
-    std::cout << "game loop interrupted";
+    std::cout << "game loop interrupted\n";
 }
 
-void Engine::tick() {
+void Engine::tick(double deltaTime)
+{
     Time::tick();
     Sky::update();
+    Physics::step(static_cast<float>(deltaTime));
+    Engine::pChunksController->update();
+    Engine::pWorldLoadingIndicator->update(Engine::pChunkMap->get_chunks());
+}
+
+void Engine::frame(double deltaTime)
+{
+    Engine::pFPSCounter->update(static_cast<float>(deltaTime));
+    Engine::pWindow->set_mouse_lock(State::MOUSE_CONTROL);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // drawing terrain
+    Engine::pMeshShader->use();
+
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view = pCamera->getView();
+    glm::mat4 projection = pCamera->getProjection();
+
+    Engine::pMeshShader->set_matrix4("model", model);
+    Engine::pMeshShader->set_matrix4("view", view);
+    Engine::pMeshShader->set_matrix4("projection", projection);
+    Engine::pMeshShader->set_texture("theTexture", Engine::pTexture->getID());
+    Engine::pMeshShader->set_float("skyBrightness", 0.2f + 0.8f * Sky::get_sky_brightness());
+
+    Engine::pChunksController->draw_chunks();
+
+    // drawing text
+    Engine::pTextShader->use();
+
+    projection = pCanvas->get_projection();
+    glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 60.0f, 0.0f));
+
+    Engine::pTextShader->set_matrix4("projection", projection * glm::scale(transform, glm::vec3(1.0f, -1.0f, 1.0f)));
+    Engine::pTextShader->set_texture("theTexture", Engine::pText->get_font()->get_texture()->getID());
+    Engine::pText->draw();
+
+    transform = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 120.0f, 0.0f));
+    Engine::pTextShader->set_matrix4("projection", projection * glm::scale(transform, glm::vec3(1.0f, -1.0f, 1.0f)));
+
+    // updating stats
+    glm::vec3 camPos = Engine::pCamera->position;
+    bool obstacle = Engine::pTerrain->is_obstacle_at(camPos.x, camPos.y, camPos.z);
+    Engine::pStats->set("Obstacle", obstacle ? "true" : "false");
+
+    int skyLight = Engine::pVoxelStorage->get_light(floor(camPos.x), floor(camPos.y), floor(camPos.z)).getS();
+    Engine::pStats->set("Sky Light", std::to_string(skyLight));
+
+    Engine::pStats->set("X", std::to_string(camPos.x));
+    Engine::pStats->set("Y", std::to_string(camPos.y));
+    Engine::pStats->set("Z", std::to_string(camPos.z));
+    Engine::pStats->set("Chunks count", std::to_string(Chunk::chunks));
+
+    transform = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 250.0f, 0.0f));
+    Engine::pTextShader->set_matrix4("projection", projection * glm::scale(transform, glm::vec3(1.0f, -1.0f, 1.0f)));
+    Engine::pStats->draw();
+
+    // drawing world loading indicator
+    Engine::pSpriteShader->use();
+
+    int windowWidth = Engine::pWindow->get_width();
+    int windowHeight = Engine::pWindow->get_height();
+    float rightPosition = windowWidth - 82.0f;
+    float topPosition = 80.0f;
+
+    transform = glm::translate(glm::mat4(1.0f), glm::vec3(rightPosition, topPosition, 0.0f));
+    transform = glm::scale(transform, glm::vec3(64.0f, 64.0f, 1.0f));
+
+    Engine::pSpriteShader->set_matrix4("projection", projection * transform);
+    Engine::pSpriteShader->set_texture("theTexture", Engine::pWorldLoadingIndicator->texture->getID());
+    Engine::pWorldLoadingIndicator->draw();
+
+    // drawing placing block indicator
+    topPosition = windowHeight - 90.0f;
+    transform = glm::translate(glm::mat4(1.0f), glm::vec3(rightPosition, topPosition, 0.0f));
+    transform = glm::scale(transform, glm::vec3(128.0f, 128.0f, 1.0f));
+
+    Engine::pSpriteShader->set_matrix4("projection", projection * transform);
+    Block& placingBlock = Block::getBlockByVoxelId(State::PLACING_VOXEL.id);
+    Engine::pSpriteShader->set_texture("theTexture", placingBlock.getIcon().getTexture()->getID());
+    placingBlock.getIcon().draw();
+
+    glfwSwapBuffers(Engine::pWindow->get_glfw_window());
+    glfwPollEvents();
 }

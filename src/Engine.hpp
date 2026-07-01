@@ -40,8 +40,8 @@ class Engine {
         Engine();
         void init();
         void game_loop();
-        void tick();
-        void frame();
+        void tick(double deltaTime);
+        void frame(double deltaTime);
 
         static Window* pWindow;
         static Shader* pSpriteShader;
@@ -68,5 +68,6 @@ class Engine {
         static WorldLoadingIndicator* pWorldLoadingIndicator;
         static BlockMeshBuilder* pBlockMeshBuilder;
         static Player* pPlayer;
+        static FPSCounter* pFPSCounter;
         // static BlockIcon* pBlockIcon;
 };

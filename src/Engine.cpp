@@ -73,6 +73,7 @@ void Engine::init()
     new Block("tall_grass", BlockModel::GRASS, {{0, 3}});
     new Block("dry_bush", BlockModel::GRASS, {{1, 3}});
     new Block("sand", BlockModel::SOLID, {{2, 3}});
+    // new Block("water", BlockModel::SOLID, {{3, 3}});
 
     BlockUpdater::get_instance().register_block_behaviour(10, BlockBehaviour::grass);
     BlockUpdater::get_instance().register_block_behaviour(12, BlockBehaviour::sand);

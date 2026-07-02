@@ -138,6 +138,9 @@ Chunk* Generator::terrain_with_caves(int x, int y, int z){
             }
 
             if (finalHeight <= 45) {
+                for (int ly = 42; ly > finalHeight && ly >= 0; ly--) {
+                    // chunk->set_voxel(lx, ly, lz, {13, 0});
+                }
                 for (int ly = finalHeight; ly >= finalHeight - dirtBlocks && ly >= 0; ly--) {
                     chunk->set_voxel(lx, ly, lz, {12, 0});
                 }

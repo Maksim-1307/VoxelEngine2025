@@ -36,7 +36,7 @@ BlockBehaviour BlockBehaviour::sand (
             return;
         }
         Engine::pVoxelStorage->set_voxel_soft(context.x, y, context.z, {12, 0}, false);
-        Engine::pVoxelStorage->set_voxel_soft(context.x, context.y, context.z, {0, 0}, false);
+        Engine::pVoxelStorage->set_voxel_soft(context.x, context.y, context.z, {0, 0}, true);
     }
 );
 

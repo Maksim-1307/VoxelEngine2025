@@ -1,28 +1,57 @@
 #include "Physics.hpp"
 #include "src/Engine.hpp"
 
-#define E 0.01f
-
 void Physics::step(float deltaTime) {
     for (auto hitbox : Hitbox::hitboxes) {
-        // applying forces
         hitbox->velocity += gravity * hitbox->gravityFactor * deltaTime;
-        // calculating movement
         glm::vec3 movement = hitbox->velocity * deltaTime;
-        // then correcting the movement accorging to physical iteractions with terrain
         movement = resolveCollisions(*hitbox, movement);
         hitbox->position += movement;
+
+        // Push hitbox out of terrain if still colliding after movement
+        if (isColliding(hitbox->position, hitbox->halfSize)) {
+            const float pushStep = 0.05f;
+            for (int i = 0; i < 6; i++) {
+                glm::vec3 dir(0);
+                if (i < 2) dir.x = (i == 0 ? 1 : -1) * pushStep;
+                else if (i < 4) dir.y = (i == 2 ? 1 : -1) * pushStep;
+                else dir.z = (i == 4 ? 1 : -1) * pushStep;
+
+                glm::vec3 testPos = hitbox->position + dir;
+                if (!isColliding(testPos, hitbox->halfSize)) {
+                    hitbox->position = testPos;
+                    break;
+                }
+            }
+        }
     }
 }
 
 glm::vec3 Physics::resolveCollisions(Hitbox& hitbox, const glm::vec3& movement) {
     glm::vec3 result = movement;
 
-    // for ecah axis separately
     result.x = resolveAxis(hitbox, result, 0);
     result.z = resolveAxis(hitbox, result, 2);
     result.y = resolveAxis(hitbox, result, 1);
-    
+
+    // Binary search fallback for corner cases:
+    // per-axis checks allow X and Z individually, but their combination
+    // with Y pushes the hitbox corner into the terrain.
+    // Search along `result` to find the nearest non-colliding position.
+    if (isColliding(hitbox.position + result, hitbox.halfSize)) {
+        glm::vec3 safe(0);
+        glm::vec3 unsafe = result;
+        for (int i = 0; i < 6; i++) {
+            glm::vec3 mid = (safe + unsafe) * 0.5f;
+            if (isColliding(hitbox.position + mid, hitbox.halfSize)) {
+                unsafe = mid;
+            } else {
+                safe = mid;
+            }
+        }
+        result = safe;
+    }
+
     return result;
 }
 

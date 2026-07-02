@@ -41,7 +41,9 @@ void ChunksController::handle_at(int x, int z) {
         // building or updating sky light if its needed
         if (Settings::HARD_LOADING || !chunk->renderer || chunk->state < VISIBLE) {
 
-            if (chunk->state == MODIFIED)
+            // Fix: if we do prebuildSkyLight here, it causes edge case issues
+            // If we dont, sky light is not updated on block set
+            if (chunk->state == MODIFIED && !Settings::RECURSIVE_LIGHTING)
                 Engine::pLighting->prebuildSkyLight(chunk);
 
             if (Settings::RECURSIVE_LIGHTING) {

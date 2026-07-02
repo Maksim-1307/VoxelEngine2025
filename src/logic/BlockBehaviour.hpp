@@ -17,4 +17,5 @@ public:
     static BlockBehaviour grass;
     static BlockBehaviour leaves;
     static BlockBehaviour sand;
+    static BlockBehaviour dry_bush;
 };

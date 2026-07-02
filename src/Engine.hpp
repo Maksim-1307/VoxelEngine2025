@@ -30,6 +30,8 @@
 #include "src/graphics/ui/GameplayScreen.hpp"
 #include "src/time/Time.hpp"
 #include "src/graphics/Sky.hpp"
+#include "src/logic/BlockBehaviour.hpp"
+#include "src/logic/BlockUpdater.hpp"
 
 // class State;
 

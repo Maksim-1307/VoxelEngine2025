@@ -9,7 +9,7 @@ Block::Block(
     std::vector<std::tuple<size_t, size_t>> UVs,
     bool emissive, 
     std::array<uint8_t, 3> emission
-) : name(name), model(model), emissive(emissive), emission(emission)                                 
+) : name(name), model(model), emissive(emissive), emission(emission)                             
 {
     set_UVs(UVs);
     Block::add_block(this);

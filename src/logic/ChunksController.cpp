@@ -127,3 +127,7 @@ void ChunksController::draw_chunks() {
     //     }
     // }
 }
+
+std::vector<Chunk*> ChunksController::get_loaded_chunks() {
+    return Engine::pChunkMap->chunks_in_radius(Settings::LOAD_DISTANCE-1);
+}

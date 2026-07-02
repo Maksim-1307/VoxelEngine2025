@@ -20,6 +20,7 @@ class ChunksController {
         void update();
         void set_distance(int distance);
         void draw_chunks();
+        std::vector<Chunk*> get_loaded_chunks();
     private:
         void handle_at(int x, int z);
         void load_around(glm::ivec2 center);

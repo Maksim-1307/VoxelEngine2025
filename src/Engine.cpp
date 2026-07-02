@@ -75,9 +75,10 @@ void Engine::init()
     new Block("sand", BlockModel::SOLID, {{2, 3}});
     // new Block("water", BlockModel::SOLID, {{3, 3}});
 
-    BlockUpdater::get_instance().register_block_behaviour(10, BlockBehaviour::grass);
+    BlockUpdater::get_instance().register_block_behaviour(10, BlockBehaviour::tall_grass);
     BlockUpdater::get_instance().register_block_behaviour(12, BlockBehaviour::sand);
     BlockUpdater::get_instance().register_block_behaviour(11, BlockBehaviour::dry_bush);
+    BlockUpdater::get_instance().register_block_behaviour(3, BlockBehaviour::grass);
     
     // Texts 
     std::string ss = "VoxelGame pre Alpha";

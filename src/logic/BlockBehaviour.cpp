@@ -2,7 +2,7 @@
 #include "src/Engine.hpp"
 #include "src/voxels/Block.hpp"
 
-BlockBehaviour BlockBehaviour::grass {
+BlockBehaviour BlockBehaviour::tall_grass {
     .on_block_set = [](BlockBehaviourContext context) {
         if (context.y == 0) {
             Engine::pVoxelStorage->set_voxel_soft(context.x, context.y, context.z, {0, 0});
@@ -54,6 +54,19 @@ BlockBehaviour BlockBehaviour::sand {
         }
         Engine::pVoxelStorage->set_voxel_soft(context.x, y, context.z, {12, 0}, false);
         Engine::pVoxelStorage->set_voxel_soft(context.x, context.y, context.z, {0, 0}, true);
+    }
+};
+
+BlockBehaviour BlockBehaviour::grass {
+    .on_random_tick = [](BlockBehaviourContext context) {
+        if (context.y >= CHUNK_H-1) return;
+        voxel above = Engine::pVoxelStorage->get_voxel(context.x, context.y+1, context.z);
+        if (above.id == 0) return;
+        Block& aboveBlock = Block::getBlockByVoxelId(above.id);
+        // if above block is solid, turn grass into dirt
+        if (aboveBlock.getBlockModel() == BlockModel::SOLID) {
+            Engine::pVoxelStorage->set_voxel_soft(context.x, context.y, context.z, {1, 0}, false);
+        }
     }
 };
 

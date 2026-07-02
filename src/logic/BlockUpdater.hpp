@@ -22,4 +22,5 @@ public:
     }
 
     void on_block_set(int x, int y, int z);
+    void on_random_tick(int x, int y, int z);
 };

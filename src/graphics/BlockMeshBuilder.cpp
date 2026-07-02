@@ -31,7 +31,7 @@ void BlockMeshBuilder::CubeModel(Block& block) {
         size_t UVx = std::get<0>(block.getUV(face));
         size_t UVy = std::get<1>(block.getUV(face));
         glm::vec2 uv = glm::vec2((float)UVx / ATLAS_SIZE, (float)UVy / ATLAS_SIZE);
-        // _face = face;
+        _face = face;
         switch (face)
         {
         // X+
@@ -78,14 +78,14 @@ void BlockMeshBuilder::CubeModel(Block& block) {
             break;
         }
 
-        // direct and reverse order (when polygon must be rendered from other side)
-        if (face % 2 == 0)
+        switch (face)
         {
-            index(0, 1, 3, 1, 2, 3);
-        }
-        else
-        {
+        case 0: case 3: case 4:
             index(3, 1, 0, 3, 2, 1);
+            break;
+        case 1: case 2: case 5:
+            index(0, 1, 3, 1, 2, 3);
+            break;
         }
     }
 }
@@ -107,7 +107,7 @@ void BlockMeshBuilder::GrassModel(Block& block)
     vertex(1.0f-d, 1.0f, 1.0f-d, uv.x + 1.0f / ATLAS_SIZE, uv.y + 1.0f / ATLAS_SIZE);
     vertex(1.0f-d, 0.0f, 1.0f-d, uv.x + 1.0f / ATLAS_SIZE, uv.y);
 
-    index(0, 1, 3, 1, 2, 3);
+    index(3, 1, 0, 3, 2, 1);
 
     // Second sprite
     vertex(d, 0.0f, 1.0f-d, uv.x, uv.y);
@@ -115,7 +115,7 @@ void BlockMeshBuilder::GrassModel(Block& block)
     vertex(1.0f-d, 1.0f, d, uv.x + 1.0f / ATLAS_SIZE, uv.y + 1.0f / ATLAS_SIZE);
     vertex(1.0f-d, 0.0f, d, uv.x + 1.0f / ATLAS_SIZE, uv.y);
 
-    index(0, 1, 3, 1, 2, 3);
+    index(3, 1, 0, 3, 2, 1);
 }
 
 void BlockMeshBuilder::vertex(float x, float y, float z, float u, float v)

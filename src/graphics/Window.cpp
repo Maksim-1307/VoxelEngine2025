@@ -45,6 +45,8 @@ Window::Window(WindowArgs args)
 
     glClearColor(clearColor.x, clearColor.y, clearColor.z, 1.0f);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     glEnable(GL_BLEND);
 }
 

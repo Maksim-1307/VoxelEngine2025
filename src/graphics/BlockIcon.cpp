@@ -49,6 +49,8 @@ void BlockIcon::make_texture(int size) {
 
     // Rendering in texture
     glViewport(0, 0, size, size);
+    GLboolean wasCullEnabled = glIsEnabled(GL_CULL_FACE);
+    glDisable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -72,6 +74,7 @@ void BlockIcon::make_texture(int size) {
     glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
     glViewport(viewPortSize[0], viewPortSize[1], viewPortSize[2], viewPortSize[3]);
     if (!wasBlendEnabled) glDisable(GL_BLEND);
+    if (wasCullEnabled) glEnable(GL_CULL_FACE);
 }
 
 Texture* BlockIcon::getTexture() {

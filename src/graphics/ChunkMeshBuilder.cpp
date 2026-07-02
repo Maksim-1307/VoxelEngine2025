@@ -125,14 +125,14 @@ void ChunkMeshBuilder::CubeModel(int x, int y, int z)
                 break;
             }
 
-            // direct and reverse order (when polygon must be rendered from other side)
-            if (face % 2 == 0)
+            switch (face)
             {
-                index(0, 1, 3, 1, 2, 3);
-            }
-            else
-            {
+            case 0: case 3: case 4:
                 index(3, 1, 0, 3, 2, 1);
+                break;
+            case 1: case 2: case 5:
+                index(0, 1, 3, 1, 2, 3);
+                break;
             }
         }
     }
@@ -161,7 +161,7 @@ void ChunkMeshBuilder::GrassModel(int x, int y, int z)
 
     _face = 6; // Grass model doesnt have faces. Use inner light calculation for all vertices
 
-    // First sprite
+    // First sprite (front face)
     vertex(d + offX, 0.0f, d + offZ, uv.x, uv.y);
     vertex(d + offX, 1.0f, d + offZ, uv.x, uv.y + 1.0f / ATLAS_SIZE);
     vertex(1.0f-d + offX, 1.0f, 1.0f-d + offZ, uv.x + 1.0f / ATLAS_SIZE, uv.y + 1.0f / ATLAS_SIZE);
@@ -169,13 +169,29 @@ void ChunkMeshBuilder::GrassModel(int x, int y, int z)
 
     index(0, 1, 3, 1, 2, 3);
 
-    // Second sprite
+    // First sprite (back face)
+    vertex(d + offX, 0.0f, d + offZ, uv.x + 1.0f / ATLAS_SIZE, uv.y);
+    vertex(d + offX, 1.0f, d + offZ, uv.x + 1.0f / ATLAS_SIZE, uv.y + 1.0f / ATLAS_SIZE);
+    vertex(1.0f-d + offX, 1.0f, 1.0f-d + offZ, uv.x, uv.y + 1.0f / ATLAS_SIZE);
+    vertex(1.0f-d + offX, 0.0f, 1.0f-d + offZ, uv.x, uv.y);
+
+    index(3, 1, 0, 3, 2, 1);
+
+    // Second sprite (front face)
     vertex(d + offX, 0.0f, 1.0f-d + offZ, uv.x, uv.y);
     vertex(d + offX, 1.0f, 1.0f-d + offZ, uv.x, uv.y + 1.0f / ATLAS_SIZE);
     vertex(1.0f-d + offX, 1.0f, d + offZ, uv.x + 1.0f / ATLAS_SIZE, uv.y + 1.0f / ATLAS_SIZE);
     vertex(1.0f-d + offX, 0.0f, d + offZ, uv.x + 1.0f / ATLAS_SIZE, uv.y);
 
     index(0, 1, 3, 1, 2, 3);
+
+    // Second sprite (back face)
+    vertex(d + offX, 0.0f, 1.0f-d + offZ, uv.x + 1.0f / ATLAS_SIZE, uv.y);
+    vertex(d + offX, 1.0f, 1.0f-d + offZ, uv.x + 1.0f / ATLAS_SIZE, uv.y + 1.0f / ATLAS_SIZE);
+    vertex(1.0f-d + offX, 1.0f, d + offZ, uv.x, uv.y + 1.0f / ATLAS_SIZE);
+    vertex(1.0f-d + offX, 0.0f, d + offZ, uv.x, uv.y);
+
+    index(3, 1, 0, 3, 2, 1);
 }
 
 std::array<bool, 6> ChunkMeshBuilder::opened_around(int x, int y, int z)

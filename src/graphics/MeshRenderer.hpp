@@ -21,7 +21,7 @@ enum class MeshType { MESH3D, SPRITE2D, LINE3D };
 class MeshRenderer {
     public:
         MeshRenderer(sptr<Mesh> mesh, MeshType type) 
-            : pMesh(mesh)
+            : pMesh(mesh), meshType(type)
         {
             this->gen_buffers(type);
         };
@@ -40,4 +40,5 @@ class MeshRenderer {
         GLuint VAO;
         GLuint VBO;
         GLuint EBO;
+        MeshType meshType;
 };

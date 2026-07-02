@@ -73,11 +73,23 @@ void MeshRenderer::gen_buffers(MeshType type){
 
 void MeshRenderer::draw(){
 
+    GLboolean wasCullEnabled = glIsEnabled(GL_CULL_FACE);
+    if (meshType == MeshType::MESH3D) {
+        glEnable(GL_CULL_FACE);
+    } else {
+        glDisable(GL_CULL_FACE);
+    }
+
     glBindVertexArray(VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glDrawElements(GL_TRIANGLES, pMesh->indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
+    if (wasCullEnabled) {
+        glEnable(GL_CULL_FACE);
+    } else {
+        glDisable(GL_CULL_FACE);
+    }
 }
 
 void MeshRenderer::clear_data(){

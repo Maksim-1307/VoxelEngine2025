@@ -2,8 +2,8 @@
 #include "src/Engine.hpp"
 #include "src/voxels/Block.hpp"
 
-BlockBehaviour BlockBehaviour::grass (
-    [](BlockBehaviourContext context) {
+BlockBehaviour BlockBehaviour::grass {
+    .on_block_set = [](BlockBehaviourContext context) {
         if (context.y == 0) {
             Engine::pVoxelStorage->set_voxel_soft(context.x, context.y, context.z, {0, 0});
             return;
@@ -16,10 +16,10 @@ BlockBehaviour BlockBehaviour::grass (
             Engine::pVoxelStorage->set_voxel_soft(context.x, context.y, context.z, {0, 0});
         }
     }
-);
+};
 
-BlockBehaviour BlockBehaviour::dry_bush (
-    [](BlockBehaviourContext context) {
+BlockBehaviour BlockBehaviour::dry_bush {
+    .on_block_set = [](BlockBehaviourContext context) {
         if (context.y == 0) {
             Engine::pVoxelStorage->set_voxel_soft(context.x, context.y, context.z, {0, 0});
             return;
@@ -33,10 +33,10 @@ BlockBehaviour BlockBehaviour::dry_bush (
             Engine::pVoxelStorage->set_voxel_soft(context.x, context.y, context.z, {0, 0});
         }
     }
-);
+};
 
-BlockBehaviour BlockBehaviour::sand (
-    [](BlockBehaviourContext context) {
+BlockBehaviour BlockBehaviour::sand {
+    .on_block_set = [](BlockBehaviourContext context) {
         if (context.y <= 0) {
             return;
         }
@@ -55,6 +55,6 @@ BlockBehaviour BlockBehaviour::sand (
         Engine::pVoxelStorage->set_voxel_soft(context.x, y, context.z, {12, 0}, false);
         Engine::pVoxelStorage->set_voxel_soft(context.x, context.y, context.z, {0, 0}, true);
     }
-);
+};
 
 BlockBehaviour BlockBehaviour::leaves;

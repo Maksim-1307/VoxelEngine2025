@@ -9,8 +9,8 @@ struct BlockBehaviourContext {
 
 class BlockBehaviour {
 public:
-    BlockBehaviour() = default;
-    BlockBehaviour(std::function<void(BlockBehaviourContext)> on_block_set) : on_block_set(on_block_set) {};
+    // BlockBehaviour() = default;
+    // BlockBehaviour(std::function<void(BlockBehaviourContext)> on_block_set) : on_block_set(on_block_set) {};
 
     std::function<void(BlockBehaviourContext)> on_block_set;
 

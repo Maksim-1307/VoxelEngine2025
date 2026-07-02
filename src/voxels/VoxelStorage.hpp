@@ -50,7 +50,7 @@ class VoxelStorage{
             chunksMap->get(chunkX, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
         };
 
-        bool set_voxel_soft(int x, int y, int z, voxel vox);
+        bool set_voxel_soft(int x, int y, int z, voxel vox, bool triggerCallbacks = true);
 
         light get_light(int x, int y, int z) const {
 

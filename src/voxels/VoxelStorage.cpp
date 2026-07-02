@@ -2,7 +2,7 @@
 #include "src/Engine.hpp"
 #include "src/logic/BlockUpdater.hpp"
 
-bool VoxelStorage::set_voxel_soft(int x, int y, int z, voxel vox){
+bool VoxelStorage::set_voxel_soft(int x, int y, int z, voxel vox, bool triggerCallbacks){
 
     int chunkX = get_chunk_coord(x, CHUNK_W);
     int chunkY = get_chunk_coord(y, CHUNK_H);
@@ -18,14 +18,15 @@ bool VoxelStorage::set_voxel_soft(int x, int y, int z, voxel vox){
     chunksMap->get(chunkX, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
     chunksMap->get(chunkX, chunkZ)->state = MODIFIED;
 
-    // update neighbors and self
-    BlockUpdater::get_instance().on_block_set(x, y, z);
-    BlockUpdater::get_instance().on_block_set(x-1, y, z);
-    BlockUpdater::get_instance().on_block_set(x+1, y, z);
-    BlockUpdater::get_instance().on_block_set(x, y+1, z);
-    BlockUpdater::get_instance().on_block_set(x, y-1, z);
-    BlockUpdater::get_instance().on_block_set(x, y, z-1);
-    BlockUpdater::get_instance().on_block_set(x, y, z+1);
+    if (triggerCallbacks) {
+        BlockUpdater::get_instance().on_block_set(x, y, z);
+        BlockUpdater::get_instance().on_block_set(x-1, y, z);
+        BlockUpdater::get_instance().on_block_set(x+1, y, z);
+        BlockUpdater::get_instance().on_block_set(x, y+1, z);
+        BlockUpdater::get_instance().on_block_set(x, y-1, z);
+        BlockUpdater::get_instance().on_block_set(x, y, z-1);
+        BlockUpdater::get_instance().on_block_set(x, y, z+1);
+    }
 
     for (int dx = -1; dx <= 1; dx++) {
         for (int dz = -1; dz <= 1; dz++) {

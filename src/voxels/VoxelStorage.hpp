@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <functional>
 #include "src/logic/AreaMap2D.hpp"
 #include "src/voxels/Chunk.hpp"
 #include "src/logic/BlockUpdater.hpp"
@@ -18,7 +19,7 @@ class VoxelStorage{
             : chunksMap(chunksMap) 
         {};
 
-        voxel get_voxel(int x, int y, int z){
+        voxel get_voxel(int x, int y, int z) const {
 
             int chunkX = get_chunk_coord(x, CHUNK_W);
             int chunkY = 0; //get_chunk_coord(y, CHUNK_H);
@@ -31,7 +32,7 @@ class VoxelStorage{
             Chunk* ch = chunksMap->get(chunkX, chunkZ);
             if (ch == nullptr) {
                 // std::cout << "ERROR: Chunk out of bounds at " << chunkX << " " << chunkY << " " << chunkZ << "\n";
-                return {2, 0};
+                return {0, 0};
             }
 
             return ch->get_voxel(blockX, blockY, blockZ);
@@ -93,6 +94,22 @@ class VoxelStorage{
 
             chunksMap->get(chunkX, chunkZ)->lightmap.setS(blockX, blockY, blockZ, value);
 
+        };
+
+        bool find_in_radius(int x, int y, int z, int radius, std::function<bool(voxel)> condition) const {
+            for (int dx = -radius; dx <= radius; dx++) {
+                for (int dy = -radius; dy <= radius; dy++) {
+                    for (int dz = -radius; dz <= radius; dz++) {
+                        if (dx*dx + dy*dy + dz*dz <= radius*radius) {
+                            voxel v = get_voxel(x + dx, y + dy, z + dz);
+                            if (condition(v)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
         };
 
     private:

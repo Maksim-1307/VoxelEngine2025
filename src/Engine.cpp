@@ -79,6 +79,7 @@ void Engine::init()
     BlockUpdater::get_instance().register_block_behaviour(12, BlockBehaviour::sand);
     BlockUpdater::get_instance().register_block_behaviour(11, BlockBehaviour::dry_bush);
     BlockUpdater::get_instance().register_block_behaviour(3, BlockBehaviour::grass);
+    if (Settings::FALLING_LEAVES) BlockUpdater::get_instance().register_block_behaviour(5, BlockBehaviour::leaves);
     
     // Texts 
     std::string ss = "VoxelGame pre Alpha";

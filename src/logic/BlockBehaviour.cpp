@@ -70,4 +70,13 @@ BlockBehaviour BlockBehaviour::grass {
     }
 };
 
-BlockBehaviour BlockBehaviour::leaves;
+BlockBehaviour BlockBehaviour::leaves {
+    .on_random_tick = [](BlockBehaviourContext context) {
+        bool shouldFall = !Engine::pVoxelStorage->find_in_radius(context.x, context.y, context.z, 8, [](voxel v) {
+            return v.id == 4;
+        });
+        if (shouldFall) {
+            Engine::pVoxelStorage->set_voxel_soft(context.x, context.y, context.z, {0, 0}, false);
+        }
+    }
+};

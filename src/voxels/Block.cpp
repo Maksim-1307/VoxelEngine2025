@@ -89,12 +89,12 @@ const std::vector<AABB> Block::getAABBs(int x, int y, int z, IteractionType type
         case BlockModel::AIR:
             return {};
         case BlockModel::SOLID:
-            return {AABB(glm::vec3(1.0f))};
+            return {AABB(glm::vec3(1.0f), PhysicsMaterial::SOLID)};
         case BlockModel::FOLIAGE:
-            if (type == RAYCAST) {
+            if (type == RAYCAST) { // remove decoupling in future
                 return {AABB(glm::vec3(1.0f))};
             } else {
-                return {};
+                return {AABB(glm::vec3(1.0f), PhysicsMaterial::LEAVES)};
             }
         case BlockModel::GRASS:
             if (type == RAYCAST) {

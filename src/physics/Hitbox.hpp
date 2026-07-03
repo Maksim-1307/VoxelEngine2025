@@ -15,6 +15,7 @@ public:
     }
 
     bool isGrounded = false;
+    bool isFloating = false;
     float gravityFactor = 1.5f;
 
     glm::vec3 position;

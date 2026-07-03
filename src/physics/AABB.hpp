@@ -1,10 +1,12 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include "PhysicsMaterial.hpp"
 
 struct AABB {
     glm::vec3 a {0.0f};
     glm::vec3 b {1.0f, 1.0f, 1.0f};
+    PhysicsMaterial material = PhysicsMaterial::SOLID;
 
     AABB() = default;
 
@@ -12,6 +14,12 @@ struct AABB {
     }
 
     AABB(glm::vec3 a, glm::vec3 b) : a(a), b(b) {
+    }
+
+    AABB(glm::vec3 size, PhysicsMaterial material) : a(0.0f), b(size), material(material) {
+    }
+
+    AABB(glm::vec3 a, glm::vec3 b, PhysicsMaterial material) : a(a), b(b), material(material) {
     }
 
     inline glm::vec3 min() const {

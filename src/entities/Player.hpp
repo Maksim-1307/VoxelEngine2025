@@ -21,32 +21,46 @@ public:
     ~Player() {};
 
     void jump() {
-        if (this->hitbox->isGrounded) this->hitbox->velocity.y = 12.0f;
+        if (this->hitbox->isGrounded && !this->hitbox->isFloating) {
+            this->hitbox->velocity.y = 12.0f;
+        }
     }
     void move_forward() {
-        movingDirections.push_back(glm::vec2(1.0f, 0));
+        movingDirections.push_back(glm::vec3(1.0f, 0, 0));
     }
     void move_backward() {
-        movingDirections.push_back(glm::vec2(-1.0f, 0));
+        movingDirections.push_back(glm::vec3(-1.0f, 0, 0));
     }
     void move_right() {
-        movingDirections.push_back(glm::vec2(0, 1.0f));
+        movingDirections.push_back(glm::vec3(0, 0, 1.0f));
     }
     void move_left() {
-        movingDirections.push_back(glm::vec2(0, -1.0f));
+        movingDirections.push_back(glm::vec3(0, 0, -1.0f));
+    }
+    void move_up() {
+        if (this->hitbox->isFloating) movingDirections.push_back(glm::vec3(0, 1.0f, 0));
+    }
+    void move_down() {
+        if (this->hitbox->isFloating) movingDirections.push_back(glm::vec3(0, -1.0f, 0));
     }
 
     void update() {
         glm::vec3 forward = camera->front;
         glm::vec3 right = camera->right;
+        glm::vec3 up = camera->absoluteUp;
         glm::vec3 direction = this->finalDirection();
         
         if (glm::length(direction) > 0.001f) {
-            direction = forward * direction.x + right * direction.z;
-            direction.y = 0;
+            if (!this->hitbox->isFloating) {
+                direction.y = 0;
+            }
+            direction = forward * direction.x + up * direction.y + right * direction.z;
+            // direction.y = 0;
             direction = glm::normalize(direction);
             this->hitbox->velocity.x = direction.x * Settings::PLAYER_SPEED;
             this->hitbox->velocity.z = direction.z * Settings::PLAYER_SPEED;
+            if (this->hitbox->isFloating)
+                this->hitbox->velocity.y = direction.y * Settings::PLAYER_SPEED;
         } else {
             this->hitbox->velocity.x = 0.0f;
             this->hitbox->velocity.z = 0.0f;
@@ -57,7 +71,7 @@ public:
 
 // private:
     // X+ - forward, Y+ - right
-    std::vector<glm::vec2> movingDirections = {};
+    std::vector<glm::vec3> movingDirections = {};
     glm::vec3 position;
     glm::vec3 prevPosition;
     Camera* camera;
@@ -65,7 +79,7 @@ public:
 private:
     private:
     glm::vec3 finalDirection () {
-        glm::vec2 sum(0.0f);
+        glm::vec3 sum(0.0f);
         for (auto direction : movingDirections) {
             sum += direction;   
         }
@@ -74,6 +88,6 @@ private:
             return glm::vec3(0.0f); 
         }
         
-        return glm::normalize(glm::vec3(sum.x, 0.0f, sum.y));
+        return glm::normalize(sum);
     }
 };

@@ -3,7 +3,22 @@
 
 void Physics::step(float deltaTime) {
     for (auto hitbox : Hitbox::hitboxes) {
+
         hitbox->velocity += gravity * hitbox->gravityFactor * deltaTime;
+
+        // Slow down and stick to ground when inside leaves
+        if (isInsideLeaves(hitbox->position, hitbox->halfSize)) {
+            const float maxSpeed = 1.0f;
+            float speed = glm::length(hitbox->velocity);
+            if (speed > maxSpeed) {
+                hitbox->velocity = glm::normalize(hitbox->velocity) * maxSpeed;
+            }
+            // hitbox->isGrounded = true;
+            hitbox->isFloating = true;
+        } else {
+            hitbox->isFloating = false;
+        }
+
         glm::vec3 movement = hitbox->velocity * deltaTime;
         movement = resolveCollisions(*hitbox, movement);
         hitbox->position += movement;
@@ -88,9 +103,26 @@ bool Physics::isColliding(const glm::vec3& center, const glm::vec3& halfSize) {
     for (float x = min.x; x <= max.x; x += dX) {
         for (float y = min.y; y <= max.y; y += dY) {
             for (float z = min.z; z <= max.z; z += dZ) {
-                if (Engine::pTerrain->is_obstacle_at(x, y, z)) {
-                    return true;
-                }
+                if (Engine::pTerrain->get_material_at(x, y, z) == PhysicsMaterial::SOLID) return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool Physics::isInsideLeaves(const glm::vec3& center, const glm::vec3& halfSize) {
+    glm::vec3 min = center - halfSize;
+    glm::vec3 max = center + halfSize;
+
+    float dX = (max.x - min.x) / 10;
+    float dY = (max.y - min.y) / 10;
+    float dZ = (max.z - min.z) / 10;
+
+    for (float x = min.x; x <= max.x; x += dX) {
+        for (float y = min.y; y <= max.y; y += dY) {
+            for (float z = min.z; z <= max.z; z += dZ) {
+                if (Engine::pTerrain->get_material_at(x, y, z) == PhysicsMaterial::LEAVES) return true;
             }
         }
     }

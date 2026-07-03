@@ -127,6 +127,12 @@ void Engine::init()
     Engine::pInputController->onPress(GLFW_KEY_SPACE, []() { 
         Engine::pPlayer->jump();
     });
+    Engine::pInputController->whileHolding(GLFW_KEY_SPACE, []() { 
+        Engine::pPlayer->move_up();
+    });
+    Engine::pInputController->whileHolding(GLFW_KEY_LEFT_SHIFT, []() {
+        Engine::pPlayer->move_down();
+    });
     Engine::pInputController->whileHolding(GLFW_KEY_W, []() { 
         Engine::pPlayer->move_forward();
     });

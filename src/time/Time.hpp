@@ -14,5 +14,5 @@ public:
         return (float)(ticksTotal % Settings::DAY_LENGTH) / Settings::DAY_LENGTH;
     }
 private:
-    inline static long long ticksTotal = 0;
+    inline static long long ticksTotal = Settings::DAY_LENGTH / 4; // start at 6:00 AM
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include "PhysicsMaterial.hpp"
 
 class VoxelStorage;
 
@@ -20,6 +21,7 @@ public:
     }
     bool is_obstacle_at(float x, float y, float z);
     bool is_opaque_at(float x, float y, float z);
+    PhysicsMaterial get_material_at(float x, float y, float z);
     RaycastResult raycast(glm::vec3 origin, glm::vec3 direction, float maxDistance, bool inside = true);
 
 private:

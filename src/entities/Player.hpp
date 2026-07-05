@@ -51,10 +51,15 @@ public:
         glm::vec3 direction = this->finalDirection();
         
         if (glm::length(direction) > 0.001f) {
-            if (!this->hitbox->isFloating) {
-                direction.y = 0;
-            }
-            direction = forward * direction.x + up * direction.y + right * direction.z;
+            // if (this->hitbox->isFloating || true) {
+                glm::vec3 flatForward(forward.x, 0, forward.z);
+                if (glm::length(flatForward) > 0.001f)
+                    flatForward = glm::normalize(flatForward);
+                direction = flatForward * direction.x + up * direction.y + right * direction.z;
+            // } else {
+            //     direction.y = 0;
+            //     direction = forward * direction.x + right * direction.z;
+            // }
             // direction.y = 0;
             direction = glm::normalize(direction);
             this->hitbox->velocity.x = direction.x * Settings::PLAYER_SPEED;

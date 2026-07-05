@@ -73,13 +73,15 @@ void Engine::init()
     new Block("tall_grass", BlockModel::GRASS, {{0, 3}});
     new Block("dry_bush", BlockModel::GRASS, {{1, 3}});
     new Block("sand", BlockModel::SOLID, {{2, 3}});
-    // new Block("water", BlockModel::SOLID, {{3, 3}});
+    new Block("water", BlockModel::FOLIAGE, {{3, 3}});
 
     BlockUpdater::get_instance().register_block_behaviour(10, BlockBehaviour::tall_grass);
     BlockUpdater::get_instance().register_block_behaviour(12, BlockBehaviour::sand);
     BlockUpdater::get_instance().register_block_behaviour(11, BlockBehaviour::dry_bush);
     BlockUpdater::get_instance().register_block_behaviour(3, BlockBehaviour::grass);
+    BlockUpdater::get_instance().register_block_behaviour(1, BlockBehaviour::dirt);
     if (Settings::FALLING_LEAVES) BlockUpdater::get_instance().register_block_behaviour(5, BlockBehaviour::leaves);
+    
     
     // Texts 
     std::string ss = "VoxelGame pre Alpha";

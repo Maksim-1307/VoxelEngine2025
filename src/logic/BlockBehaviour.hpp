@@ -20,4 +20,5 @@ public:
     static BlockBehaviour sand;
     static BlockBehaviour dry_bush;
     static BlockBehaviour tall_grass;
+    static BlockBehaviour dirt;
 };

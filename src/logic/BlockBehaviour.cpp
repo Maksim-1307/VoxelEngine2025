@@ -1,6 +1,7 @@
 #include "BlockBehaviour.hpp"
 #include "src/Engine.hpp"
 #include "src/voxels/Block.hpp"
+#include "src/graphics/Sky.hpp"
 
 BlockBehaviour BlockBehaviour::tall_grass {
     .on_block_set = [](BlockBehaviourContext context) {
@@ -72,11 +73,30 @@ BlockBehaviour BlockBehaviour::grass {
 
 BlockBehaviour BlockBehaviour::leaves {
     .on_random_tick = [](BlockBehaviourContext context) {
-        bool shouldFall = !Engine::pVoxelStorage->find_in_radius(context.x, context.y, context.z, 8, [](voxel v) {
+        bool shouldFall = !Engine::pVoxelStorage->find_in_radius(context.x, context.y, context.z, 4, [](voxel v) {
             return v.id == 4;
         });
         if (shouldFall) {
             Engine::pVoxelStorage->set_voxel_soft(context.x, context.y, context.z, {0, 0}, false);
         }
+    }
+};
+
+BlockBehaviour BlockBehaviour::dirt {
+    .on_random_tick = [](BlockBehaviourContext context) {
+        // turn dirt into grass if there is empty above and there is grass nearby
+        if (context.y > CHUNK_H-1) return;
+        voxel above = Engine::pVoxelStorage->get_voxel(context.x, context.y+1, context.z);
+        if (above.id != 0) return;
+
+        light lightAbove = Engine::pVoxelStorage->get_light(context.x, context.y+1, context.z);
+        if ((float)lightAbove.getS() * Sky::get_sky_brightness() < 10.0f) return;
+
+        bool hasGrassNearby = Engine::pVoxelStorage->find_in_radius(context.x, context.y, context.z, 1, [](voxel v) {
+            return v.id == 3;
+        });
+        if (!hasGrassNearby) return;
+
+        Engine::pVoxelStorage->set_voxel_soft(context.x, context.y, context.z, {3, 0}, false);
     }
 };

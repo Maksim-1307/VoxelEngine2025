@@ -8,7 +8,7 @@ void Physics::step(float deltaTime) {
 
         // Slow down and stick to ground when inside leaves
         if (isInsideLeaves(hitbox->position, hitbox->halfSize)) {
-            const float maxSpeed = 1.0f;
+            const float maxSpeed = 2.0f;
             float speed = glm::length(hitbox->velocity);
             if (speed > maxSpeed) {
                 hitbox->velocity = glm::normalize(hitbox->velocity) * maxSpeed;

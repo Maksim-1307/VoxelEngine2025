@@ -6,6 +6,7 @@ layout(location = 2) in float aPackedData;
 
 out vec2 texCoord;
 out vec4 lightColor;
+out vec3 v_Position;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -37,7 +38,11 @@ void main(void)
     float faceFactor = 0.5;
     float darkeing = faceDarkeing[face] * faceFactor;
 
+    // vertex position for fragment shader
+    vec4 viewPos = view * model * vec4(aPosition, 1.0);
+
     lightColor = vec4(mix(totalLight, vec3(0), darkeing), 1);
     texCoord = aTexCoord;
-    gl_Position = projection * view * model  * vec4(aPosition, 1.0);
+    gl_Position = projection * view * model * vec4(aPosition, 1.0);
+    v_Position = viewPos.xyz;
 }

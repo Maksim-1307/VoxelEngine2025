@@ -79,7 +79,7 @@ void Engine::init()
     BlockUpdater::get_instance().register_block_behaviour(12, BlockBehaviour::sand);
     BlockUpdater::get_instance().register_block_behaviour(11, BlockBehaviour::dry_bush);
     BlockUpdater::get_instance().register_block_behaviour(3, BlockBehaviour::grass);
-    BlockUpdater::get_instance().register_block_behaviour(1, BlockBehaviour::dirt);
+    if (Settings::FALLING_LEAVES) BlockUpdater::get_instance().register_block_behaviour(1, BlockBehaviour::dirt);
     if (Settings::FALLING_LEAVES) BlockUpdater::get_instance().register_block_behaviour(5, BlockBehaviour::leaves);
     
     
@@ -224,6 +224,10 @@ void Engine::frame(double deltaTime, double alpha)
     Engine::pMeshShader->set_matrix4("projection", projection);
     Engine::pMeshShader->set_texture("theTexture", Engine::pTexture->getID());
     Engine::pMeshShader->set_float("skyBrightness", 0.2f + 0.8f * Sky::get_sky_brightness());
+    Engine::pMeshShader->set_vector3("fogColor", Sky::get_color());
+    Engine::pMeshShader->set_float("fogStart", Settings::LOAD_DISTANCE * CHUNK_W * 0.666f);
+    Engine::pMeshShader->set_float("fogDistance", Settings::LOAD_DISTANCE * CHUNK_W);
+    Engine::pMeshShader->set_float("fogDensity", 3.0f);
 
     Engine::pChunksController->draw_chunks();
 

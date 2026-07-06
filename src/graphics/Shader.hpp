@@ -27,6 +27,8 @@ public:
 
     bool set_matrix4(std::string uniformName, glm::mat4 matrix);
 
+    bool set_vector3(std::string uniformName, glm::vec3 vector);
+
     bool set_texture(std::string uniformName, GLuint tectureID);
 
     bool set_float(std::string uniformName, float value);

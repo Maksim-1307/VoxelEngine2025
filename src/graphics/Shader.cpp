@@ -111,6 +111,16 @@ bool Shader::set_matrix4(std::string uniformName, glm::mat4 matrix)
     }
 }
 
+bool Shader::set_vector3(std::string uniformName, glm::vec3 vector) {
+    GLuint uniformLoc = glGetUniformLocation(this->ID, uniformName.c_str());
+    if (uniformLoc == -1) {
+        std::cerr << "WARNING: uniform named '" << uniformName << "' doesn't exist" << std::endl;
+        return false;
+    }
+    glUniform3fv(uniformLoc, 1, glm::value_ptr(vector));
+    return true;
+}
+
 bool Shader::set_float(std::string uniformName, float value)
 {
     GLuint uniformLoc = glGetUniformLocation(this->ID, uniformName.c_str());

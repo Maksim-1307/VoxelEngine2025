@@ -3,8 +3,6 @@
 
 #include "Engine.hpp"
 
-// #include "logic/State.hpp"
-
 using namespace std::chrono;
 
 Engine::Engine() {}
@@ -196,6 +194,7 @@ void Engine::tick(double deltaTime)
     Physics::step(static_cast<float>(deltaTime));
     Engine::pChunksController->update();
     Engine::pWorldLoadingIndicator->update(Engine::pChunkMap->get_chunks());
+    ChunksUpdater::get_instance().update();
 }
 
 void Engine::frame(double deltaTime, double alpha)
@@ -225,7 +224,7 @@ void Engine::frame(double deltaTime, double alpha)
     Engine::pMeshShader->set_texture("theTexture", Engine::pTexture->getID());
     Engine::pMeshShader->set_float("skyBrightness", 0.2f + 0.8f * Sky::get_sky_brightness());
     Engine::pMeshShader->set_vector3("fogColor", Sky::get_color());
-    Engine::pMeshShader->set_float("fogStart", Settings::LOAD_DISTANCE * CHUNK_W * 0.666f);
+    Engine::pMeshShader->set_float("fogStart", Settings::LOAD_DISTANCE * CHUNK_W * 0.6f);
     Engine::pMeshShader->set_float("fogDistance", Settings::LOAD_DISTANCE * CHUNK_W);
     Engine::pMeshShader->set_float("fogDensity", 3.0f);
 

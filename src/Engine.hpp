@@ -32,6 +32,7 @@
 #include "src/graphics/Sky.hpp"
 #include "src/logic/BlockBehaviour.hpp"
 #include "src/logic/BlockUpdater.hpp"
+#include "src/logic/ChunksUpdater.hpp"
 
 // class State;
 

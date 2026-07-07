@@ -1,6 +1,7 @@
 #include "ChunksController.hpp"
 #include "src/Engine.hpp"
 #include "src/logic/Settings.hpp"
+#include "ChunksUpdater.hpp"
 
 void ChunksController::update() {
     int X = std::floor((float)this->camera->position.x / CHUNK_W);
@@ -26,15 +27,6 @@ void ChunksController::handle_at(int x, int z) {
 
     Chunk* chunk = Engine::pChunkMap->get(x, z);
     if (!chunk) return;
-    // try {
-    //     // Engine::pLighting->prebuildSkyLight(chunk);
-    //     Engine::pLighting->buildSkyLight(x, z);
-    // } catch (...) {
-    //     std::cerr << "Failed to build light of chunk " << "\n";
-    // }
-    // if (chunk->state < STRUCTURES_GENERATED) {
-    //     Engine::pGenerator->generate_ambient(x, z);
-    // } 
     
     try {
 
@@ -61,16 +53,6 @@ void ChunksController::handle_at(int x, int z) {
                 glm::vec3(chunk->X * CHUNK_W, 0, chunk->Z * CHUNK_W)
             );
             
-        } else {
-            // std::shared_ptr<Mesh> mesh = Engine::pChunkMeshBuilder->buildMesh(*chunk);
-            // if (!mesh) return;
-            
-            // if (chunk->renderer) delete(chunk->renderer);
-            // chunk->renderer = new MeshRenderer(mesh, MeshType::MESH3D);
-            chunk->renderer->transform = glm::translate(
-                glm::mat4(1.0f),
-                glm::vec3(chunk->X * CHUNK_W, 0, chunk->Z * CHUNK_W)
-            );
         }
         chunk->state = VISIBLE;
     } catch (...) {
@@ -111,21 +93,11 @@ void ChunksController::draw_chunks() {
     int distance = Settings::LOAD_DISTANCE;
     for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance-1)) {
         if (chunk->state < VISIBLE) 
-            handle_at(chunk->X, chunk->Z);
-        if (!chunk || !chunk->renderer || chunk->state < VISIBLE) continue;
+            ChunksUpdater::get_instance().queue_chunk({chunk->X, chunk->Z});
+        // if (!chunk || !chunk->renderer || chunk->state < VISIBLE) continue;
         Engine::pMeshShader->set_matrix4("model", chunk->renderer->transform);
-        chunk->renderer->draw();
+        if (chunk->renderer) chunk->renderer->draw();
     }
-    
-    // for (int x = center.x - distance; x <= center.x + distance; x++) {
-    //     for (int z = center.y - distance; z <= center.y + distance; z++) { // fix
-    //         Chunk* chunk = Engine::pChunkMap->get(x, z);
-    //         if (!chunk || !chunk->renderer || chunk->state < VISIBLE) continue;
-            
-    //         Engine::pMeshShader->set_matrix4("model", chunk->renderer->transform);
-    //         chunk->renderer->draw();
-    //     }
-    // }
 }
 
 std::vector<Chunk*> ChunksController::get_loaded_chunks() {

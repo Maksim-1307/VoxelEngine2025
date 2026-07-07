@@ -75,6 +75,12 @@ public:
     static int chunks;
     ChunkState state;
 
+    // for multithreading
+    // chunk has been modified while processing. needs to be reprocessed
+    bool isDirty = false; 
+    // chunk will be processed. do not queue it again
+    bool isQueued = false;
+
 private:
     Array3D<voxel> voxels = Array3D<voxel>(CHUNK_W, CHUNK_H, CHUNK_W);
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <mutex>
 
 #include "src/logic/pointers.hpp"
 #include "src/logic/Array3D.hpp"
@@ -56,6 +57,7 @@ public:
     };
 
     uptr<MeshRenderer> renderer;
+    sptr<Mesh> pendingMesh;
 
     int X, Y, Z;
     Lightmap lightmap = Lightmap(CHUNK_W, CHUNK_H, CHUNK_W);
@@ -74,6 +76,7 @@ public:
     
     static int chunks;
     ChunkState state;
+    std::mutex mtx;
 
     // for multithreading
     // chunk has been modified while processing. needs to be reprocessed

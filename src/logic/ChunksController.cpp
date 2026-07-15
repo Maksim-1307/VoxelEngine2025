@@ -30,6 +30,9 @@ void ChunksController::handle_at(int x, int z) {
     
     try {
 
+        ChunksUpdater::get_instance().queue_chunk({x, z});
+        return;
+
         // building or updating sky light if its needed
         if (Settings::HARD_LOADING || !chunk->renderer || chunk->state < VISIBLE) {
 
@@ -92,11 +95,23 @@ void ChunksController::draw_chunks() {
     // glm::ivec2 center = this->camPos;
     int distance = Settings::LOAD_DISTANCE;
     for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance-1)) {
-        if (chunk->state < VISIBLE) 
+        // std::lock_guard lock(chunk->mtx);
+
+        if (chunk->pendingMesh) {
+            chunk->renderer = make_uptr<MeshRenderer>(std::move(chunk->pendingMesh), MeshType::MESH3D);
+            chunk->renderer->transform = glm::translate(
+                glm::mat4(1.0f),
+                glm::vec3(chunk->X * CHUNK_W, 0, chunk->Z * CHUNK_W)
+            );
+            chunk->state = VISIBLE;
+        }
+
+        if (chunk->state < VISIBLE) {
             ChunksUpdater::get_instance().queue_chunk({chunk->X, chunk->Z});
-        // if (!chunk || !chunk->renderer || chunk->state < VISIBLE) continue;
+            continue;
+        }
         Engine::pMeshShader->set_matrix4("model", chunk->renderer->transform);
-        if (chunk->renderer) chunk->renderer->draw();
+        chunk->renderer->draw();
     }
 }
 

@@ -14,4 +14,5 @@ public:
     static constexpr float PLAYER_SPEED = 5.0f;
     static constexpr int DAY_LENGTH = 1200 * 5; // 1200 * 5 ticks == 5 minutes
     static constexpr bool FALLING_LEAVES = true; // not well optimized
+    static constexpr bool BLOCKS_BEHAVIOR = true; // enables/disables blocks updates
 };

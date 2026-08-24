@@ -120,6 +120,8 @@ void LightSolver::solve(){
 
             if (!chunk) continue;
 
+            std::lock_guard<std::mutex> chunkLock(chunk->mtx);
+
             int lx = x & 15;
             int lz = z & 15;
 

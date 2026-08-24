@@ -56,31 +56,35 @@ void WorldLoadingIndicator::update(Array2D<Chunk*>* chunks) {
             ChunkState state = chunk->state;
             
             switch (state) {
-                case VISIBLE:
+                case VISIBLE: // White
                     textureData.push_back(255); textureData.push_back(255); textureData.push_back(255);
                     break;
-                case LIGHTS_BUILT:
+                case LIGHTS_BUILT: // Turquoise
                     textureData.push_back(152); textureData.push_back(221); textureData.push_back(255);
                     break;
-                case CHUNK_LOADED:
+                case CHUNK_LOADED: // Light blue
                     textureData.push_back(59); textureData.push_back(190); textureData.push_back(255);
                     break;
-                case LIGHTS_PRE_BUILT:
+                case LIGHTS_PRE_BUILT: // Dark blue
                     textureData.push_back(0); textureData.push_back(86); textureData.push_back(130);
                     break;
-                case MODIFIED:
+                case MODIFIED: // Green
                     textureData.push_back(0); textureData.push_back(255); textureData.push_back(255);
                     break;
-                case STRUCTURES_GENERATED:
+                case STRUCTURES_GENERATED: // Light green
                     textureData.push_back(24); textureData.push_back(234); textureData.push_back(24);
                     break;
-                case TERRAIN_GENERATED:
+                case TERRAIN_GENERATED: // Dark green
                     textureData.push_back(6); textureData.push_back(64); textureData.push_back(46);
                     break;
-                case INITIALIZED:
+                case MESH_BUILT: // Orange
+                    textureData.push_back(238); textureData.push_back(191); textureData.push_back(1);
+                    break;
+                case INITIALIZED: // Black
                     textureData.push_back(0); textureData.push_back(0); textureData.push_back(0);
                     break;
-                default:
+                default: // Black
+                    std::cout << "Unknown chunk state: " << static_cast<int>(state) << "\n";
                     textureData.push_back(0); textureData.push_back(0); textureData.push_back(0);
                     break;
             }

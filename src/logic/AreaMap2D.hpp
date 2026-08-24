@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mutex>
 #include "Array2D.hpp"
 #include "Iterator.hpp"
 #include <functional>
@@ -30,6 +31,7 @@ public:
     }
 
     T* get(int x, int z) {
+        std::lock_guard lock(mtx);
         int mx = x - offsetX + size/2;  
         int mz = z - offsetZ + size/2;
         
@@ -39,8 +41,9 @@ public:
         return firstBuffer->get(mx, mz);
     }
 
-    // unsafe! 
+    // unsafe!
     T** get_volume(){
+        std::lock_guard lock(mtx);
         return this->firstBuffer->get_data();
     }
 
@@ -49,6 +52,7 @@ public:
     }
 
     void fill() {
+        std::lock_guard lock(mtx);
         for (int x = 0; x < size; x++) {
             for (int z = 0; z < size; z++) {
                 int wx = x - size/2 + offsetX;
@@ -61,12 +65,12 @@ public:
     }
 
     void translate(int dx, int dz) {
+        std::lock_guard lock(mtx);
 
         if (dx == 0 && dz == 0) return;
 
         std::vector<T*> to_delete;
 
-        // Clear second buffer
         for (int i = 0; i < size*size; i++) {
             secondBuffer->get_data()[i] = nullptr;
         }
@@ -102,24 +106,28 @@ public:
     }
 
     bool is_inside(int x, int z) {
+        std::lock_guard lock(mtx);
         int mx = x - offsetX + size/2;
         int mz = z - offsetZ + size/2;
         return in_bounds(mx, mz);
     }
     
     std::vector<T*> padding_chunks(int level){
+        std::lock_guard lock(mtx);
         return Iterator<T*>::padding(this->firstBuffer, level);
     }
     std::vector<T*> chunks_in_radius(int radius) {
+        std::lock_guard lock(mtx);
         return Iterator<T*>::in_radius(this->firstBuffer, radius);
     }
 
-    Array2D<T*>* get_chunks() const {
+    Array2D<T*>* get_chunks() {
+        std::lock_guard lock(mtx);
         return this->firstBuffer;
     }
 
-    // timely 
     int size;
+    std::mutex mtx;
 
 // private:
     Array2D<T*>* firstBuffer;

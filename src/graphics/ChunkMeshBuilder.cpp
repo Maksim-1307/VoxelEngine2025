@@ -6,17 +6,6 @@ sptr<Mesh> ChunkMeshBuilder::buildMesh(Chunk &chunk)
 
     Profiler t("buildMesh");
 
-    // if (chunk.state < LIGHTS_PRE_BUILT) {
-    //     // std::cout << "WARNING: buildMesh called on a chunk with state less than LIGHTS_BUILT. The state: " <<
-    //     //     (int)chunk.state;
-    //     return nullptr;
-    // }
-    // if (chunk.state > LIGHTS_BUILT) {
-    //     // std::cout << "WARNING: buildMesh called on an already handled chunk. The state: " <<
-    //     //     (int)chunk.state;
-    //     return nullptr;
-    // }
-
     vertices.clear();
     indices.clear();
     vertices.reserve(5000);
@@ -27,12 +16,30 @@ sptr<Mesh> ChunkMeshBuilder::buildMesh(Chunk &chunk)
     int Y = this->chunk->Y;
     int Z = this->chunk->Z;
 
-    // chaching
-    this->currD = Engine::pChunkMap->get(X, Z)->get_raw_data();
-    this->nxD = Engine::pChunkMap->get(X-1, Z)->get_raw_data();
-    this->pxD = Engine::pChunkMap->get(X+1, Z)->get_raw_data();
-    this->nzD = Engine::pChunkMap->get(X, Z-1)->get_raw_data();
-    this->pzD = Engine::pChunkMap->get(X, Z+1)->get_raw_data();
+    Chunk* nxChunk = Engine::pChunkMap->get(X-1, Z);
+    Chunk* pxChunk = Engine::pChunkMap->get(X+1, Z);
+    Chunk* nzChunk = Engine::pChunkMap->get(X, Z-1);
+    Chunk* pzChunk = Engine::pChunkMap->get(X, Z+1);
+
+    if (!nxChunk || !pxChunk || !nzChunk || !pzChunk) {
+        throw std::runtime_error(
+            "ChunkMeshBuilder::buildMesh: failed to build mesh for chunk at " + 
+            std::to_string(X) + ", " + std::to_string(Z) + 
+            " because neighbour chunk is not generated yet\n"
+        );
+    }
+
+    // std::scoped_lock lock(
+    //     nxChunk->mtx, pxChunk->mtx,
+    //     nzChunk->mtx, pzChunk->mtx
+    // );
+
+    // caching
+    this->currD = chunk.get_raw_data();
+    this->nxD = nxChunk->get_raw_data();
+    this->pxD = pxChunk->get_raw_data();
+    this->nzD = nzChunk->get_raw_data();
+    this->pzD = pzChunk->get_raw_data();
 
     indexOffset = 0;
 

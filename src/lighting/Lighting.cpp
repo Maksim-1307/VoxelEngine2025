@@ -4,6 +4,7 @@
 #include <queue>
 
 std::queue<Chunk*> Lighting::preBuildQueue;
+std::mutex Lighting::lightingMtx;
 
 Lighting::Lighting(AreaMap2D<Chunk>& chunks) 
   : chunks(chunks) {
@@ -56,6 +57,8 @@ void Lighting::prebuildSkyLight(Chunk* chunk){
 void Lighting::buildSkyLight(int cx, int cz) {
 
     Profiler p("buildSkyLight");
+
+    std::lock_guard<std::mutex> lock(lightingMtx);
 
     Chunk* chunk = Engine::pChunkMap->get(cx, cz);
     if (chunk == nullptr) {
@@ -131,6 +134,9 @@ void Lighting::buildSkyLight(int cx, int cz) {
 }
 
 void Lighting::onBlockSet(int x, int y, int z, uint8_t blockId) {
+
+    std::lock_guard<std::mutex> lock(lightingMtx);
+
     solver->remove(x, y, z);
     solver->solve();
 
@@ -150,6 +156,8 @@ void Lighting::onBlockSet(int x, int y, int z, uint8_t blockId) {
 void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
 
     Profiler p ("onChunkLoaded");
+
+    std::lock_guard<std::mutex> lock(lightingMtx);
 
     Chunk* chunk = Engine::pChunkMap->get(cx, cz);
     if (chunk == nullptr) {

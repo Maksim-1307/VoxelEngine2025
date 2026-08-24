@@ -16,7 +16,7 @@ class ThreadPool {
 
     ThreadPool() {
 
-        size_t num_threads = std::max(1u, std::thread::hardware_concurrency() - 1);
+        size_t num_threads = 3;//std::max(1u, std::thread::hardware_concurrency() - 1);
 
         for (size_t i = 0; i < num_threads; ++i) {
             workers.emplace_back([this] {

@@ -5,19 +5,18 @@
 
 void ChunksController::update() {
     int X = std::floor((float)this->camera->position.x / CHUNK_W);
-    int Z = std::floor((float)this->camera->position.z / CHUNK_W); // fix
+    int Z = std::floor((float)this->camera->position.z / CHUNK_W);
 
     glm::ivec2 currentPos(X, Z);
     glm::ivec2 delta = currentPos - this->camPos;
 
-    if (delta.x != 0 || delta.y != 0) { // fix
+    if (delta.x != 0 || delta.y != 0) {
         
-        Engine::pChunkMap->translate(delta.x, delta.y); // fix 
-
+        Engine::pChunkMap->translate(delta.x, delta.y);
         this->camPos = currentPos;
         load_around(camPos);
         
-        std::cout << "Moved to: " << camPos.x << ", " << camPos.y << "\n"; // fix 
+        std::cout << "Moved to: " << camPos.x << ", " << camPos.y << "\n";
     }
 }
 
@@ -83,7 +82,7 @@ void ChunksController::load_around(glm::ivec2 center) {
             }
         }
     }
-    for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance-1)) {
+    for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance-2)) {
         if (chunk->state >= STRUCTURES_GENERATED || true) {
             handle_at(chunk->X, chunk->Z);
         } 
@@ -95,7 +94,6 @@ void ChunksController::draw_chunks() {
     // glm::ivec2 center = this->camPos;
     int distance = Settings::LOAD_DISTANCE;
     for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance-1)) {
-        // std::lock_guard lock(chunk->mtx);
 
         if (chunk->pendingMesh) {
             chunk->renderer = make_uptr<MeshRenderer>(std::move(chunk->pendingMesh), MeshType::MESH3D);
@@ -106,12 +104,16 @@ void ChunksController::draw_chunks() {
             chunk->state = VISIBLE;
         }
 
-        if (chunk->state < VISIBLE) {
+        if (chunk->state < MESH_BUILT) {
             ChunksUpdater::get_instance().queue_chunk({chunk->X, chunk->Z});
-            continue;
+            // if (chunk->state != MODIFIED) continue;
         }
-        Engine::pMeshShader->set_matrix4("model", chunk->renderer->transform);
-        chunk->renderer->draw();
+        if (chunk->state == MESH_BUILT) continue;
+
+        if (chunk->renderer) {
+            Engine::pMeshShader->set_matrix4("model", chunk->renderer->transform);
+            chunk->renderer->draw();
+        }
     }
 }
 

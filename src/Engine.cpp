@@ -73,12 +73,14 @@ void Engine::init()
     new Block("sand", BlockModel::SOLID, {{2, 3}});
     new Block("water", BlockModel::FOLIAGE, {{3, 3}});
 
-    BlockUpdater::get_instance().register_block_behaviour(10, BlockBehaviour::tall_grass);
-    BlockUpdater::get_instance().register_block_behaviour(12, BlockBehaviour::sand);
-    BlockUpdater::get_instance().register_block_behaviour(11, BlockBehaviour::dry_bush);
-    BlockUpdater::get_instance().register_block_behaviour(3, BlockBehaviour::grass);
-    if (Settings::FALLING_LEAVES) BlockUpdater::get_instance().register_block_behaviour(1, BlockBehaviour::dirt);
-    if (Settings::FALLING_LEAVES) BlockUpdater::get_instance().register_block_behaviour(5, BlockBehaviour::leaves);
+    if (Settings::BLOCKS_BEHAVIOR) {
+        BlockUpdater::get_instance().register_block_behaviour(10, BlockBehaviour::tall_grass);
+        BlockUpdater::get_instance().register_block_behaviour(12, BlockBehaviour::sand);
+        BlockUpdater::get_instance().register_block_behaviour(11, BlockBehaviour::dry_bush);
+        BlockUpdater::get_instance().register_block_behaviour(3, BlockBehaviour::grass);
+        if (Settings::FALLING_LEAVES) BlockUpdater::get_instance().register_block_behaviour(1, BlockBehaviour::dirt);
+        if (Settings::FALLING_LEAVES) BlockUpdater::get_instance().register_block_behaviour(5, BlockBehaviour::leaves);
+    }
     
     
     // Texts 
@@ -94,6 +96,7 @@ void Engine::init()
     // Lighting
     Engine::pLighting = new Lighting(*Engine::pChunkMap);
     
+    // Set up
     std::function<Chunk *(int, int)> gen_func = [](int x, int z) -> Chunk* 
     { 
         return Engine::pGenerator->generate_at(x, z);

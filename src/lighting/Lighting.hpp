@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+#include <memory>
 #include "LightSolver.hpp"
 #include "Lightmap.hpp"
 #include "src/voxels/Chunk.hpp"
@@ -24,6 +26,7 @@ public:
     void syncBorders(Chunk* main, int nX, int nZ, int side);
 
     static void prebuildSkyLight(Chunk* chunk);
+    static std::mutex lightingMtx;
 private:
     static std::queue<Chunk*> preBuildQueue;
 };

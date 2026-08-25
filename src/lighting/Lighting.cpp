@@ -31,9 +31,10 @@ void Lighting::clear(){
 
 
 void Lighting::prebuildSkyLight(Chunk* chunk){
+    
+    if (!chunk) return;
 
     Profiler t("prebuildSkyLight");
-
     chunk->lightmap.clear();
 
     int cx = chunk->X;
@@ -188,7 +189,7 @@ void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
                     int gx = x + cx * CHUNK_W;
                     int gz = z + cz * CHUNK_W;
                     light l = chunk->lightmap.get(x, y, z);
-                    if (l){
+                    if (l.emitting()) {
                         solver->add(gx, y, gz, l);
                     }
                 }
@@ -200,7 +201,7 @@ void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
                     int gx = x + cx * CHUNK_W;
                     int gz = z + cz * CHUNK_W;
                     light l = chunk->lightmap.get(x, y, z);
-                    if (l){
+                    if (l.emitting()) {
                         solver->add(gx, y, gz, l);
                     }
                 }

@@ -6,7 +6,7 @@
 #include "ChunkPos.hpp"
 
 // update low priority chunks every BATCH_INTERVAL ticks
-constexpr int BATCH_INTERVAL = 100;
+constexpr int BATCH_INTERVAL = 3;
 
 class ChunksUpdater {
 public:
@@ -29,9 +29,7 @@ public:
         
     }
 
-    void queue_chunk(ChunkPos chunkPos) {
-        chunksToUpdate.insert(chunkPos);
-    }
+    void queue_chunk(ChunkPos chunkPos);
 
     // update modified chunk
     void update_immediately(ChunkPos chunkPos);

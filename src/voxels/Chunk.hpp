@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <mutex>
+#include <atomic>
 
 #include "src/logic/pointers.hpp"
 #include "src/logic/Array3D.hpp"
@@ -35,12 +36,13 @@ enum ChunkState {
     // padding 1
     STRUCTURES_GENERATED = 2, 
     MODIFIED = 3,
-    LIGHTS_PRE_BUILT = 4,
-    CHUNK_LOADED = 5,
-    LIGHTS_BUILT = 6,
-    MESH_BUILT = 7,
+    MODIFIED_IMMEDIATELY = 4,
+    LIGHTS_PRE_BUILT = 5,
+    CHUNK_LOADED = 6,
+    LIGHTS_BUILT = 7,
+    MESH_BUILT = 8,
     // shown
-    VISIBLE = 8
+    VISIBLE = 9
 };
 
 class Chunk{
@@ -75,14 +77,14 @@ public:
     }
     
     static int chunks;
-    ChunkState state;
+    std::atomic<ChunkState> state;
     std::mutex mtx;
 
     // for multithreading
     // chunk has been modified while processing. needs to be reprocessed
     bool isDirty = false; 
     // chunk will be processed. do not queue it again
-    bool isQueued = false;
+    std::atomic<bool> isQueued = false;
 
 private:
     Array3D<voxel> voxels = Array3D<voxel>(CHUNK_W, CHUNK_H, CHUNK_W);

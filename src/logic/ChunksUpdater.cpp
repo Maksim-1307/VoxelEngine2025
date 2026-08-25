@@ -2,6 +2,12 @@
 #include "src/Engine.hpp"
 #include "src/logic/ThreadPool.hpp"
 
+void ChunksUpdater::queue_chunk(ChunkPos chunkPos) {
+    Chunk* chunk = Engine::pChunkMap->get(chunkPos.first(), chunkPos.second());
+    chunk->isQueued = true;
+    chunksToUpdate.insert(chunkPos);
+}
+
 void ChunksUpdater::update_immediately(ChunkPos chunkPos) {
 
     ThreadPool::get_instance().enqueue([chunkPos]() {
@@ -12,6 +18,7 @@ void ChunksUpdater::update_immediately(ChunkPos chunkPos) {
         int z = chunkPos.second();
         Chunk* chunk = Engine::pChunkMap->get(x, z);
         if (!chunk) return;
+        chunk->isQueued = true;
 
         // Lock briefly to check state
         std::unique_lock chunkLock(chunk->mtx);
@@ -23,7 +30,7 @@ void ChunksUpdater::update_immediately(ChunkPos chunkPos) {
         try {
 
             {
-                std::lock_guard sharedLock(sharedMtx);
+                // std::lock_guard sharedLock(sharedMtx);
                 Engine::pLighting->prebuildSkyLight(chunk);
                 
                 if (Settings::RECURSIVE_LIGHTING) {
@@ -34,7 +41,7 @@ void ChunksUpdater::update_immediately(ChunkPos chunkPos) {
 
             sptr<Mesh> mesh;
             {
-                std::lock_guard sharedLock(sharedMtx);
+                // std::lock_guard sharedLock(sharedMtx);
                 mesh = Engine::pChunkMeshBuilder->buildMesh(*chunk);
             }
             if (!mesh) return;
@@ -43,6 +50,7 @@ void ChunksUpdater::update_immediately(ChunkPos chunkPos) {
             chunk->pendingMesh = std::move(mesh);
             chunk->state = MESH_BUILT;
             chunk->isDirty = false;
+            chunk->isQueued = false;
             chunkLock.unlock();
 
         } catch (...) {

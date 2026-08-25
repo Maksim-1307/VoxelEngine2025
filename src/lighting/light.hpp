@@ -33,4 +33,8 @@ struct light {
     operator bool() const {
         return value != 0;
     }
+    // At least one channel greater than one
+    bool emitting() const {
+        return (value & 0xEEEE) != 0;
+    }
 };

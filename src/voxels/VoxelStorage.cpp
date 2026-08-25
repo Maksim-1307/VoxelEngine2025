@@ -2,7 +2,12 @@
 #include "src/Engine.hpp"
 #include "src/logic/BlockUpdater.hpp"
 
-bool VoxelStorage::set_voxel_soft(int x, int y, int z, voxel vox, bool triggerCallbacks){
+bool VoxelStorage::set_voxel_soft(
+    int x, int y, int z, 
+    voxel vox, 
+    bool triggerCallbacks, 
+    bool immediately
+) {
 
     int chunkX = get_chunk_coord(x, CHUNK_W);
     int chunkY = get_chunk_coord(y, CHUNK_H);

@@ -27,9 +27,12 @@ void LightSolver::add(int x, int y, int z, light emission){
     if (chunk == nullptr)
         return;
 
-    uint16_t curVal = chunk->lightmap.map.get(ix, y, iz).value;
+    light l = chunk->lightmap.get(ix, y, iz);
     uint16_t emVal = emission.value;
-    if (emVal == 0) return;
+    if (!l.emitting() && emVal == 0) return;
+
+    uint16_t curVal = chunk->lightmap.map.get(ix, y, iz).value;
+
 
     uint16_t newVal = curVal;
     bool canPush = false;

@@ -12,6 +12,7 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform float skyBrightness;
+uniform vec3 sunVector;
 
 void main(void)
 {
@@ -34,9 +35,18 @@ void main(void)
 
     vec3 totalLight =  skyColor * skyBrightness * s + vec3(r, g, b);
 
-    float faceDarkeing[6] = float[](0.2f, 0.7f, 0.0f, 0.8f, 0.3f, 0.5f);
-    float faceFactor = 0.5;
-    float darkeing = faceDarkeing[face] * faceFactor;
+    // float faceDarkeing[6] = float[](0.2f, 0.7f, 0.0f, 0.8f, 0.3f, 0.5f);
+    vec3 faceNormals[6] = vec3[](
+        vec3(1, 0, 0),
+        vec3(-1, 0, 0),
+        vec3(0, 1, 0),
+        vec3(0, -1, 0),
+        vec3(0, 0, 1),
+        vec3(0, 0, -1)
+    );
+    float faceFactor = 0.3;
+    float product = dot(faceNormals[face], sunVector) * 0.5 + 0.5;
+    float darkeing = product * faceFactor;
 
     // vertex position for fragment shader
     vec4 viewPos = view * model * vec4(aPosition, 1.0);

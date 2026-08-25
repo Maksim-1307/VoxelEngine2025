@@ -230,6 +230,7 @@ void Engine::frame(double deltaTime, double alpha)
     Engine::pMeshShader->set_float("fogStart", Settings::LOAD_DISTANCE * CHUNK_W * 0.6f);
     Engine::pMeshShader->set_float("fogDistance", Settings::LOAD_DISTANCE * CHUNK_W);
     Engine::pMeshShader->set_float("fogDensity", 3.0f);
+    Engine::pMeshShader->set_vector3("sunVector", Sky::get_sun_vector());
 
     Engine::pChunksController->draw_chunks();
 

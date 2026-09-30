@@ -286,7 +286,12 @@ void Generator::generate_grass(int x, int y, int z) {
     if (y <= 0 || y >= CHUNK_H) return;
     voxel bottomVoxel = Engine::pVoxelStorage->get_voxel(x, y-1, z);
     voxel currentVoxel = Engine::pVoxelStorage->get_voxel(x, y, z);
-    if (bottomVoxel.id != 3 && bottomVoxel.id != 1) return; // Only grass on grass or dirt
     if (currentVoxel.id != 0) return; // Grass can only be placed on empty space
-    Engine::pVoxelStorage->set_voxel(x, y, z, {10, 0});  // Grass
+    // Place grass on grass block or dirt
+    // Place dry bush on sand or stone
+    if (bottomVoxel.id == 3 || bottomVoxel.id == 1) {
+        Engine::pVoxelStorage->set_voxel(x, y, z, {10, 0});
+    } else if (bottomVoxel.id == 2 || bottomVoxel.id == 12) {
+        if (random(x, z, seed) > 0.99) Engine::pVoxelStorage->set_voxel(x, y, z, {11, 0});
+    }
 }

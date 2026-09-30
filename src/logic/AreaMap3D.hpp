@@ -20,7 +20,6 @@ public:
     }
 
     ~AreaMap3D() {
-        // Сначала удаляем все объекты
         for (int i = 0; i < size*size*size; i++) {
             delete firstBuffer->get_data()[i];
             delete secondBuffer->get_data()[i];

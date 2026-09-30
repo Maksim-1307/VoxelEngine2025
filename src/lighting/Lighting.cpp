@@ -164,6 +164,8 @@ void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
     if (chunk == nullptr) {
         return;
     }
+    // std::lock_guard<std::mutex> lock(chunk->mtx);
+
     for (uint y = 0; y < CHUNK_H; y++){
         for (uint z = 0; z < CHUNK_W; z++){
             for (uint x = 0; x < CHUNK_W; x++){

@@ -18,7 +18,6 @@ Canvas *Engine::pCanvas = nullptr;
 Texture *Engine::pTexture = nullptr;
 Text *Engine::pText = nullptr;
 Text *Engine::pFpsText = nullptr;
-ChunkMeshBuilder *Engine::pChunkMeshBuilder = nullptr;
 AreaMap2D<Chunk>* Engine::pChunkMap = nullptr;
 Generator *Engine::pGenerator = nullptr;
 VoxelStorage* Engine::pVoxelStorage = nullptr;
@@ -44,7 +43,6 @@ void Engine::init()
     Engine::pTextShader = new Shader("res/shaders/sprite.vert", "res/shaders/text.frag");
     Engine::pMeshShader = new Shader("res/shaders/mesh.vert", "res/shaders/mesh.frag");
 
-    Engine::pChunkMeshBuilder = new ChunkMeshBuilder();
     Engine::pTexture = new Texture("res/textures/atlas.png", true);
     Engine::pCamera = new Camera(*Engine::pWindow);
     Engine::pInputController = new InputController(*Engine::pCamera, *Engine::pWindow);

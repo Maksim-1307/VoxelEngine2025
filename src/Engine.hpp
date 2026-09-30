@@ -50,7 +50,6 @@ class Engine {
         static Shader* pSpriteShader;
         static Shader *pTextShader;
         static Shader* pMeshShader;
-        static Mesh* pSprite;
         static MeshRenderer* pRenderer;
         static MeshRenderer *pSpriteRenderer;
         static Camera* pCamera;
@@ -60,7 +59,6 @@ class Engine {
         static Text* pText;
         static Text* pFpsText;
         static Chunk* pChunk;
-        static ChunkMeshBuilder *pChunkMeshBuilder;
         static AreaMap2D<Chunk>* pChunkMap;
         static Generator* pGenerator;
         static VoxelStorage* pVoxelStorage;

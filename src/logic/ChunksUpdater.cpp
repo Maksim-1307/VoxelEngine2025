@@ -1,5 +1,6 @@
 #include "ChunksUpdater.hpp"
 #include "src/Engine.hpp"
+#include "src/graphics/ChunkMeshBuilder.hpp"
 #include "src/logic/ThreadPool.hpp"
 
 void ChunksUpdater::queue_chunk(ChunkPos chunkPos) {
@@ -42,7 +43,8 @@ void ChunksUpdater::update_immediately(ChunkPos chunkPos) {
             sptr<Mesh> mesh;
             {
                 // std::lock_guard sharedLock(sharedMtx);
-                mesh = Engine::pChunkMeshBuilder->buildMesh(*chunk);
+                ChunkMeshBuilder builder;
+                mesh = builder.buildMesh(*chunk);
             }
             if (!mesh) return;
 

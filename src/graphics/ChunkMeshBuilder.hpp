@@ -52,7 +52,7 @@ private:
     void vertex(float x, float y, float z, float u, float v);
     void index(uint a, uint b, uint c, uint d, uint e, uint f);
     uint16_t calculate_light();
-    inline voxel get_voxel_fast(int x, int y, int z); // uses chached chunks
+    inline voxel get_voxel_fast(int x, int y, int z); // uses cached chunks
     inline light get_light_fast(int x, int y, int z);
     inline bool is_in_bounds(int x, int y, int z);
 

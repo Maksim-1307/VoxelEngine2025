@@ -33,6 +33,7 @@
 #include "src/logic/BlockBehaviour.hpp"
 #include "src/logic/BlockUpdater.hpp"
 #include "src/logic/ChunksUpdater.hpp"
+#include "src/graphics/FocusOutline.hpp"
 
 // class State;
 
@@ -50,6 +51,7 @@ class Engine {
         static Shader* pSpriteShader;
         static Shader *pTextShader;
         static Shader* pMeshShader;
+        static Shader* pLineShader;
         static MeshRenderer* pRenderer;
         static MeshRenderer *pSpriteRenderer;
         static Camera* pCamera;

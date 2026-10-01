@@ -66,7 +66,46 @@ void MeshRenderer::gen_buffers(MeshType type){
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             break;
         case MeshType::LINE3D:
-            std::cerr << "ERROR! Type LINE3D is not supported yet.";
+            /* layout: float pos X, float pos Y, float pos Z,
+                float R, float G, float B, float A 
+            */
+            stride = 7 * sizeof(GLfloat); // 28 bytes
+
+            glGenBuffers(1, &VBO);
+            glBindBuffer(GL_ARRAY_BUFFER, VBO);
+            glBufferData(
+                GL_ARRAY_BUFFER,
+                pMesh->vertices.size() * sizeof(GLfloat),
+                pMesh->vertices.data(), GL_STATIC_DRAW
+            );
+
+            glGenVertexArrays(1, &VAO);
+            glBindVertexArray(VAO);
+
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid *)0);
+
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(
+                1, 4, GL_FLOAT, GL_FALSE, stride,
+                (GLvoid *)(3 * sizeof(GLfloat))
+            );
+
+            glBindVertexArray(0);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+            if (!pMesh->indices.empty()) {
+                glGenBuffers(1, &EBO);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+                glBufferData(
+                    GL_ELEMENT_ARRAY_BUFFER,
+                    pMesh->indices.size() * sizeof(GLuint),
+                    pMesh->indices.data(), GL_STATIC_DRAW
+                );
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            } else {
+                EBO = 0; // drawing using glDrawArrays(GL_LINES, ...)
+            }
             break;
     }
 }
@@ -81,8 +120,24 @@ void MeshRenderer::draw(){
     }
 
     glBindVertexArray(VAO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glDrawElements(GL_TRIANGLES, pMesh->indices.size(), GL_UNSIGNED_INT, 0);
+
+    if (meshType == MeshType::LINE3D) {
+        glLineWidth(1.0);
+        if (EBO != 0) {
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+            glDrawElements(GL_LINES,
+                static_cast<GLsizei>(pMesh->indices.size()),
+                GL_UNSIGNED_INT, 0);
+        } else {
+            GLsizei vertexCount =
+                static_cast<GLsizei>(pMesh->vertices.size() / 7);
+            glDrawArrays(GL_LINES, 0, vertexCount);
+        }
+    } else {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glDrawElements(GL_TRIANGLES, pMesh->indices.size(), GL_UNSIGNED_INT, 0);
+    }
+    
     glBindVertexArray(0);
 
     if (wasCullEnabled) {

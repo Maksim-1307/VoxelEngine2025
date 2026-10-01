@@ -11,6 +11,7 @@ Window *Engine::pWindow = nullptr;
 Shader *Engine::pSpriteShader = nullptr;
 Shader *Engine::pTextShader = nullptr;
 Shader *Engine::pMeshShader = nullptr;
+Shader *Engine::pLineShader = nullptr;
 MeshRenderer *Engine::pSpriteRenderer = nullptr;
 Camera *Engine::pCamera = nullptr;
 InputController *Engine::pInputController = nullptr;
@@ -42,6 +43,7 @@ void Engine::init()
     Engine::pSpriteShader = new Shader("res/shaders/sprite.vert", "res/shaders/sprite.frag");
     Engine::pTextShader = new Shader("res/shaders/sprite.vert", "res/shaders/text.frag");
     Engine::pMeshShader = new Shader("res/shaders/mesh.vert", "res/shaders/mesh.frag");
+    Engine::pLineShader = new Shader("res/shaders/line.vert", "res/shaders/line.frag");
 
     Engine::pTexture = new Texture("res/textures/atlas.png", true);
     Engine::pCamera = new Camera(*Engine::pWindow);
@@ -196,6 +198,7 @@ void Engine::tick(double deltaTime)
     Engine::pChunksController->update();
     Engine::pWorldLoadingIndicator->update(Engine::pChunkMap->get_chunks());
     ChunksUpdater::get_instance().update();
+    FocusOutline::instance().update();
 }
 
 void Engine::frame(double deltaTime, double alpha)
@@ -231,6 +234,15 @@ void Engine::frame(double deltaTime, double alpha)
     Engine::pMeshShader->set_vector3("sunVector", Sky::get_sun_vector());
 
     Engine::pChunksController->draw_chunks();
+
+    // drawing focus outline
+    Engine::pLineShader->use();
+
+    Engine::pLineShader->set_matrix4("model", model);
+    Engine::pLineShader->set_matrix4("view", view);
+    Engine::pLineShader->set_matrix4("projection", projection);
+
+    FocusOutline::instance().draw();
 
     // drawing text
     Engine::pTextShader->use();

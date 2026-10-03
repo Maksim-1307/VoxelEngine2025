@@ -115,21 +115,17 @@ public:
     }
     
     std::vector<T*> padding_chunks(int level){
-        // std::lock_guard lock(mtx);
         return Iterator<T*>::padding(this->firstBuffer, level);
     }
     std::vector<T*> chunks_in_radius(int radius) {
-        // std::lock_guard lock(mtx);
         return Iterator<T*>::in_radius(this->firstBuffer, radius);
     }
 
     Array2D<T*>* get_chunks() {
-        // std::shared_lock lock(mtx);
         return this->firstBuffer;
     }
 
     int size;
-    // mutable std::shared_mutex mtx;
 
 // private:
     Array2D<T*>* firstBuffer;

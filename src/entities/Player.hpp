@@ -13,7 +13,7 @@ public:
         this->position = position;
         this->camera = camera;
         this->camera->position = position + glm::vec3(0, 1.6f-0.9f, 0);
-        this->hitbox = make_uptr<Hitbox>(position, glm::vec3(0.8f, 1.8f, 0.8f));
+        this->hitbox = make_uptr<Hitbox>(position, glm::vec3(0.6f, 1.8f, 0.6f));
         this->hitbox->gravityFactor = 2.0f;
         this->hitbox->position = position;
         this->prevPosition = position;

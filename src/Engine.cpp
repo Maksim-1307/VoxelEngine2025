@@ -16,7 +16,7 @@ MeshRenderer *Engine::pSpriteRenderer = nullptr;
 Camera *Engine::pCamera = nullptr;
 InputController *Engine::pInputController = nullptr;
 Canvas *Engine::pCanvas = nullptr;
-Texture *Engine::pTexture = nullptr;
+Texture *Engine::pTerrainTexture = nullptr;
 Text *Engine::pText = nullptr;
 Text *Engine::pFpsText = nullptr;
 AreaMap2D<Chunk>* Engine::pChunkMap = nullptr;
@@ -45,7 +45,7 @@ void Engine::init()
     Engine::pMeshShader = new Shader("res/shaders/mesh.vert", "res/shaders/mesh.frag");
     Engine::pLineShader = new Shader("res/shaders/line.vert", "res/shaders/line.frag");
 
-    Engine::pTexture = new Texture("res/textures/atlas.png", true);
+    Engine::pTerrainTexture = new Texture("res/textures/atlas.png", true);
     Engine::pCamera = new Camera(*Engine::pWindow);
     Engine::pInputController = new InputController(*Engine::pCamera, *Engine::pWindow);
     Engine::pCanvas = new Canvas(*Engine::pWindow);
@@ -225,7 +225,7 @@ void Engine::frame(double deltaTime, double alpha)
     Engine::pMeshShader->set_matrix4("model", model);
     Engine::pMeshShader->set_matrix4("view", view);
     Engine::pMeshShader->set_matrix4("projection", projection);
-    Engine::pMeshShader->set_texture("theTexture", Engine::pTexture->getID());
+    Engine::pMeshShader->set_texture("theTexture", Engine::pTerrainTexture->getID());
     Engine::pMeshShader->set_float("skyBrightness", 0.2f + 0.8f * Sky::get_sky_brightness());
     Engine::pMeshShader->set_vector3("fogColor", Sky::get_color());
     Engine::pMeshShader->set_float("fogStart", Settings::LOAD_DISTANCE * CHUNK_W * 0.6f);
@@ -246,7 +246,6 @@ void Engine::frame(double deltaTime, double alpha)
 
     // drawing text
     Engine::pTextShader->use();
-
     projection = pCanvas->get_projection();
     glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 60.0f, 0.0f));
 
@@ -273,6 +272,20 @@ void Engine::frame(double deltaTime, double alpha)
     transform = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 250.0f, 0.0f));
     Engine::pTextShader->set_matrix4("projection", projection * glm::scale(transform, glm::vec3(1.0f, -1.0f, 1.0f)));
     Engine::pStats->draw();
+
+    // drawing crosshair
+    {
+        int windowWidth = Engine::pWindow->get_width();
+        int windowHeight = Engine::pWindow->get_height();
+        float rightPosition = windowWidth;
+        float topPosition = windowHeight;
+        transform = glm::translate(glm::mat4(1.0f), glm::vec3(rightPosition / 2, topPosition / 2, 0.0f));
+        transform = glm::scale(transform, glm::vec3(64.0f, 64.0f, 1.0f));
+        Engine::pTextShader->use();
+        Engine::pTextShader->set_matrix4("projection", projection * transform);
+        Engine::pTextShader->set_texture("theTexture", Crosshair::get_instance().texture->getID());
+        Crosshair::get_instance().draw();
+    }
 
     // drawing world loading indicator
     Engine::pSpriteShader->use();

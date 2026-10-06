@@ -20,7 +20,13 @@ void ChunksController::update() {
     }
 
     for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(Settings::LOAD_DISTANCE-2)) {
-        if (chunk->state == MODIFIED && !chunk->isQueued) {
+        // Re-queue modified chunks and prepared chunks whose worker task
+        // never finished (e.g. it exited early), so they can't get stuck
+        // before VISIBLE. MESH_BUILT chunks are left for draw_chunks.
+        if (!chunk->isQueued &&
+            (chunk->state == MODIFIED ||
+             chunk->state == LIGHTS_PRE_BUILT ||
+             chunk->state == LIGHTS_BUILT)) {
             ChunksUpdater::get_instance().queue_chunk({chunk->X, chunk->Z});
         }
     }
@@ -39,8 +45,6 @@ void ChunksController::handle_at(int x, int z) {
             ChunksUpdater::get_instance().queue_chunk({x, z});
             chunk->isQueued = true;
         }
-        return;
-        chunk->state = VISIBLE;
     } catch (...) {
         std::cerr << "Failed to build mesh for chunk at " 
                   << x << ", " << z << "\n";
@@ -64,6 +68,17 @@ void ChunksController::load_around(glm::ivec2 center) {
             if (chunk->state < LIGHTS_PRE_BUILT) {
                 Engine::pLighting->prebuildSkyLight(chunk);
             }
+        }
+    }
+    // padding() only returns ring perimeters, so the exact center chunk is
+    // never prepared above. Handle it explicitly, otherwise its worker task
+    // exits early on the state guard and it never becomes VISIBLE.
+    if (Chunk* centerChunk = Engine::pChunkMap->get(center.x, center.y)) {
+        if (centerChunk->state < STRUCTURES_GENERATED) {
+            Engine::pGenerator->generate_ambient(centerChunk->X, centerChunk->Z);
+        }
+        if (centerChunk->state < LIGHTS_PRE_BUILT) {
+            Engine::pLighting->prebuildSkyLight(centerChunk);
         }
     }
     for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance-2)) {

@@ -5,6 +5,7 @@
 
 void ChunksUpdater::queue_chunk(ChunkPos chunkPos) {
     Chunk* chunk = Engine::pChunkMap->get(chunkPos.first(), chunkPos.second());
+    if (!chunk) return;
     chunk->isQueued = true;
     chunksToUpdate.insert(chunkPos);
 }
@@ -24,6 +25,10 @@ void ChunksUpdater::update_immediately(ChunkPos chunkPos) {
         // Lock briefly to check state
         std::unique_lock chunkLock(chunk->mtx);
         if (chunk->state < MODIFIED) {
+            // Chunk is not prepared yet (terrain/structures are built
+            // synchronously in load_around). Release it so it can be
+            // queued again once prepared instead of getting stuck.
+            chunk->isQueued = false;
             return;
         }
         chunkLock.unlock();
@@ -46,7 +51,10 @@ void ChunksUpdater::update_immediately(ChunkPos chunkPos) {
                 ChunkMeshBuilder builder;
                 mesh = builder.buildMesh(*chunk);
             }
-            if (!mesh) return;
+            if (!mesh) {
+                chunk->isQueued = false;
+                return;
+            }
 
             chunkLock.lock();
             chunk->pendingMesh = std::move(mesh);
@@ -58,6 +66,9 @@ void ChunksUpdater::update_immediately(ChunkPos chunkPos) {
         } catch (...) {
             std::cerr << "ERROR: Failed to update chunk at " 
                     << x << ", " << z << "\n";
+            if (chunk) {
+                chunk->isQueued = false;
+            }
         }
     });
 }

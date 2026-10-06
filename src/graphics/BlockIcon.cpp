@@ -12,6 +12,8 @@ BlockIcon::BlockIcon(int blockId, int size) {
 }
 
 void BlockIcon::draw() {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     renderer->draw();
 }
 
@@ -51,8 +53,8 @@ void BlockIcon::make_texture(int size) {
     glViewport(0, 0, size, size);
     GLboolean wasCullEnabled = glIsEnabled(GL_CULL_FACE);
     glDisable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // glEnable(GL_BLEND);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -63,7 +65,7 @@ void BlockIcon::make_texture(int size) {
     Engine::pMeshShader->set_matrix4("view", view);
     Engine::pMeshShader->set_matrix4("projection", projection);
     
-    Engine::pMeshShader->set_texture("theTexture", Engine::pTexture->getID());
+    Engine::pMeshShader->set_texture("theTexture", Engine::pTerrainTexture->getID());
     uptr<Mesh> mesh = Engine::pBlockMeshBuilder->buildMesh(Block::getBlockByVoxelId(blockId));
     uptr<MeshRenderer> blockRenderer = make_uptr<MeshRenderer>(std::move(mesh), MeshType::MESH3D);
 

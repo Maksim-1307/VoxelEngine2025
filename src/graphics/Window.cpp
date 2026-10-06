@@ -33,7 +33,14 @@ Window::Window(WindowArgs args)
 
     glfwMakeContextCurrent(GLFWwindow);
     glfwSetWindowSizeCallback(GLFWwindow, windowSizeCallback);
-    glfwSwapInterval(0);
+
+    /* V-Sync: 
+    0 disable 
+    1 enable
+    2 and more: (monitor frequency / n) fps limit 
+    negative: adaptive vsync
+    */
+    glfwSwapInterval(1);
 
     glewExperimental = GL_TRUE;
     GLenum gl_err = glewInit();

@@ -34,6 +34,7 @@
 #include "src/logic/BlockUpdater.hpp"
 #include "src/logic/ChunksUpdater.hpp"
 #include "src/graphics/FocusOutline.hpp"
+#include "src/graphics/Crosshair.hpp"
 
 // class State;
 
@@ -57,7 +58,7 @@ class Engine {
         static Camera* pCamera;
         static InputController *pInputController;
         static Canvas* pCanvas;
-        static Texture* pTexture;
+        static Texture* pTerrainTexture;
         static Text* pText;
         static Text* pFpsText;
         static Chunk* pChunk;
@@ -72,5 +73,4 @@ class Engine {
         static BlockMeshBuilder* pBlockMeshBuilder;
         static Player* pPlayer;
         static FPSCounter* pFPSCounter;
-        // static BlockIcon* pBlockIcon;
 };

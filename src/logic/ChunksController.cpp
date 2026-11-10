@@ -2,8 +2,11 @@
 #include "src/Engine.hpp"
 #include "src/logic/Settings.hpp"
 #include "ChunksUpdater.hpp"
+#include "src/logic/ThreadPool.hpp"
 
 void ChunksController::update() {
+
+    // Moving world's center while player's moving
     int X = std::floor((float)this->camera->position.x / CHUNK_W);
     int Z = std::floor((float)this->camera->position.z / CHUNK_W);
 
@@ -19,36 +22,95 @@ void ChunksController::update() {
         std::cout << "Moved to: " << camPos.x << ", " << camPos.y << "\n";
     }
 
-    for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(Settings::LOAD_DISTANCE-2)) {
-        // Re-queue modified chunks and prepared chunks whose worker task
-        // never finished (e.g. it exited early), so they can't get stuck
-        // before VISIBLE. MESH_BUILT chunks are left for draw_chunks.
-        if (!chunk->isQueued &&
-            (chunk->state == MODIFIED ||
-             chunk->state == LIGHTS_PRE_BUILT ||
-             chunk->state == LIGHTS_BUILT)) {
-            ChunksUpdater::get_instance().queue_chunk({chunk->X, chunk->Z});
-        }
+    // for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(Settings::LOAD_DISTANCE-2)) {
+    //     // Re-queue modified chunks and prepared chunks whose worker task
+    //     // never finished (e.g. it exited early), so they can't get stuck
+    //     // before VISIBLE. MESH_BUILT chunks are left for draw_chunks.
+    //     if (!chunk->isQueued &&
+    //         (chunk->state == MODIFIED ||
+    //          chunk->state == LIGHTS_PRE_BUILT ||
+    //          chunk->state == LIGHTS_BUILT)) {
+    //         ChunksUpdater::get_instance().queue_chunk({chunk->X, chunk->Z});
+    //     }
+    // }
+
+    // Chunks updating logic
+
+    // Updating chunks updating phase
+    switch (updatingPhase) {
+        case ChunksUpdatePhase::WAIT_FOR_LIGHTING:
+        case ChunksUpdatePhase::WAIT_FOR_MESH:
+            // If all chunks already processed - moving to the next phase
+            if (processingChunksCount == 0) {
+                updatingPhase = next_phase(updatingPhase);
+                std::cout << "Next phase: " << (int)updatingPhase << std::endl;
+            } else if (processingChunksCount < 0) {
+                std::cout << "ERROR: negative value of processingChunksCount" << std::endl;
+            } else {
+                std::cout << processingChunksCount << std::endl;
+            }
+            break;
+        case ChunksUpdatePhase::UPDATE_LIGHTING:
+        case ChunksUpdatePhase::UPDATE_MESH:
+            break;
+        default:
+            std::cout << "ERROR: unknown chunk update phase in ChunksController::update(). Numeric value : " << (int)updatingPhase << std::endl;
+            break;
     }
+
+    int distance = Settings::LOAD_DISTANCE;
+
+    // First phase (Lighting)
+    if (updatingPhase == ChunksUpdatePhase::UPDATE_LIGHTING) {
+        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance-2)) {
+            if (chunk->state < LIGHTS_BUILT) {
+                processingChunksCount += 1;
+                ChunkPos chunkPos = {chunk->X, chunk->Z};
+                ThreadPool::get_instance().enqueue([chunkPos, this, &processingChunksCount = processingChunksCount]() {
+                    ChunksUpdater::get_instance().update_light(chunkPos);
+                    // Decrement counter once the chunk is processed
+                    processingChunksCount.fetch_sub(1, std::memory_order_relaxed);
+                });
+            }
+        }
+        updatingPhase = ChunksUpdatePhase::WAIT_FOR_LIGHTING;
+    }
+
+    // Second phase (Mesh building)
+    if (updatingPhase == ChunksUpdatePhase::UPDATE_MESH) {
+        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance-2)) {
+            if (chunk->state < MESH_BUILT && chunk->state >= LIGHTS_BUILT) {
+                processingChunksCount += 1;
+                ChunkPos chunkPos = {chunk->X, chunk->Z};
+                ThreadPool::get_instance().enqueue([chunkPos, this, &processingChunksCount = processingChunksCount]() {
+                    ChunksUpdater::get_instance().update_mesh(chunkPos);
+                    // Decrement counter once the chunk is processed
+                    processingChunksCount.fetch_sub(1, std::memory_order_relaxed);
+                });
+            }
+        }
+        updatingPhase = ChunksUpdatePhase::WAIT_FOR_MESH;
+    }
+
 }
 
 void ChunksController::handle_at(int x, int z) {
 
     Profiler t("handle_at");
 
-    Chunk* chunk = Engine::pChunkMap->get(x, z);
-    if (!chunk) return;
+    // Chunk* chunk = Engine::pChunkMap->get(x, z);
+    // if (!chunk) return;
     
-    try {
+    // try {
 
-        if (!chunk->isQueued) {
-            ChunksUpdater::get_instance().queue_chunk({x, z});
-            chunk->isQueued = true;
-        }
-    } catch (...) {
-        std::cerr << "Failed to build mesh for chunk at " 
-                  << x << ", " << z << "\n";
-    }
+    //     if (!chunk->isQueued) {
+    //         ChunksUpdater::get_instance().queue_chunk({x, z});
+    //         chunk->isQueued = true;
+    //     }
+    // } catch (...) {
+    //     std::cerr << "Failed to build mesh for chunk at " 
+    //               << x << ", " << z << "\n";
+    // }
 }
 
 void ChunksController::load_around(glm::ivec2 center) {
@@ -83,7 +145,7 @@ void ChunksController::load_around(glm::ivec2 center) {
     }
     for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance-2)) {
         if (chunk->state < VISIBLE) {
-            handle_at(chunk->X, chunk->Z);
+            // handle_at(chunk->X, chunk->Z);
         } 
     }
     firstLoad = false;

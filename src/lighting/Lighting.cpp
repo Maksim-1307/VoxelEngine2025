@@ -212,3 +212,9 @@ void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
     }
     solver->solve();
 }
+
+void Lighting::solve() {
+    // std::cout << "Solving lighting...\n";
+    // std::lock_guard<std::mutex> lock(lightingMtx);
+    // solver->solve();
+}

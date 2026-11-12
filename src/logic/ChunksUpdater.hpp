@@ -19,9 +19,12 @@ public:
     void update() {
         batchCounter++;
         if (batchCounter >= BATCH_INTERVAL) {
+            solve_all_light();
             std::cout << "Updating " << chunksToUpdate.size() << " chunks\n";
             for (ChunkPos chunkPos : chunksToUpdate) {
-                update_immediately(chunkPos);
+                update_light(chunkPos);
+                update_mesh(chunkPos);
+                // update_immediately(chunkPos);
             }
             chunksToUpdate.clear();
             batchCounter = 0;
@@ -31,8 +34,15 @@ public:
 
     void queue_chunk(ChunkPos chunkPos);
 
+    void update_light(ChunkPos chunkPos);
+
+    void update_mesh(ChunkPos chunkPos);
+
     // update modified chunk
     void update_immediately(ChunkPos chunkPos);
+
+    // build recursive lighting for all chunks in the queue
+    void solve_all_light();
 
 private:
     ChunksUpdater() {}

@@ -24,6 +24,7 @@ public:
     void onChunkLoaded(int cx, int cz, bool expand);
     void onBlockSet(int x, int y, int z, uint8_t id);
     void syncBorders(Chunk* main, int nX, int nZ, int side);
+    void solve();
 
     static void prebuildSkyLight(Chunk* chunk);
     static std::mutex lightingMtx;

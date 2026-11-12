@@ -103,6 +103,8 @@ void LightSolver::solve(){
            -1, 0, 0
     };
 
+    // std::cout << "Queue size: " << addqueue.size() << " to add, " << remqueue.size() << " to remove\n";
+
     while (!remqueue.empty()){
         const lightentry entry = remqueue.front();
         remqueue.pop();

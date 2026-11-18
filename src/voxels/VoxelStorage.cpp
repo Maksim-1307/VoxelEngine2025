@@ -33,12 +33,12 @@ bool VoxelStorage::set_voxel_soft(
         BlockUpdater::get_instance().on_block_set(x, y, z+1);
     }
 
-    for (int dx = -1; dx <= 1; dx++) {
-        for (int dz = -1; dz <= 1; dz++) {
-            if (dx == 0 && dz == 0) continue;
-            if (chunksMap->is_inside(chunkX + dx, chunkZ + dz))
-                chunksMap->get(chunkX + dx, chunkZ + dz)->state = MODIFIED;
-        }
-    }
+    // for (int dx = -1; dx <= 1; dx++) {
+    //     for (int dz = -1; dz <= 1; dz++) {
+    //         if (dx == 0 && dz == 0) continue;
+    //         if (chunksMap->is_inside(chunkX + dx, chunkZ + dz))
+    //             chunksMap->get(chunkX + dx, chunkZ + dz)->state = MODIFIED;
+    //     }
+    // }
     return true;
 };

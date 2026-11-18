@@ -44,7 +44,7 @@ void main(void)
         vec3(0, 0, 1),
         vec3(0, 0, -1)
     );
-    float faceFactor = 0.3;
+    float faceFactor = 0.43;
     float product = dot(faceNormals[face], sunVector) * 0.5 + 0.5;
     float darkeing = product * faceFactor;
 

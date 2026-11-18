@@ -31,7 +31,7 @@ void LightSolver::add(int x, int y, int z, light emission){
     uint16_t emVal = emission.value;
     if (!l.emitting() && emVal == 0) return;
 
-    uint16_t curVal = chunk->lightmap.map.get(ix, y, iz).value;
+    uint16_t curVal = chunk->lightmap.get(ix, y, iz).value;
 
 
     uint16_t newVal = curVal;
@@ -68,7 +68,7 @@ void LightSolver::add(int x, int y, int z, light emission){
 
     if (!canPush) return;
 
-    chunk->lightmap.map.set(ix, y, iz, {newVal});
+    chunk->lightmap.set(ix, y, iz, {newVal});
     addqueue.push({x, y, z, {newVal}});
 }
 
@@ -85,12 +85,12 @@ void LightSolver::remove(int x, int y, int z) {
     if (chunk == nullptr)
         return;
 
-    light current = chunk->lightmap.map.get(ix, y, iz);
+    light current = chunk->lightmap.get(ix, y, iz);
     if (current.value == 0)
         return;
 
     remqueue.push({x, y, z, current});
-    chunk->lightmap.map.set(ix, y, iz, {0});
+    chunk->lightmap.set(ix, y, iz, {0});
 }
 
 void LightSolver::solve(){
@@ -130,7 +130,7 @@ void LightSolver::solve(){
             int lx = x & 15;
             int lz = z & 15;
 
-            uint16_t cur = chunk->lightmap.map.get(lx, y, lz).value;
+            uint16_t cur = chunk->lightmap.get(lx, y, lz).value;
             if (cur == 0) continue;
 
             bool cascade = false;
@@ -167,7 +167,7 @@ void LightSolver::solve(){
                 if (ev2 > 0 && cv2 != 0 && cv2 == ev2 - 1) newVal &= 0xFF0F;
                 if (ev3 > 0 && cv3 != 0 && cv3 == ev3 - 1) newVal &= 0xFFF0;
 
-                chunk->lightmap.map.set(lx, y, lz, {newVal});
+                chunk->lightmap.set(lx, y, lz, {newVal});
 
                 uint16_t remVal = 0;
                 if (ev0 > 0 && cv0 != 0 && cv0 == ev0 - 1) remVal |= (cv0 << 12);
@@ -206,7 +206,7 @@ void LightSolver::solve(){
             int lx = x & 15;
             int lz = z & 15;
 
-            uint16_t cur = chunk->lightmap.map.get(lx, y, lz).value;
+            uint16_t cur = chunk->lightmap.get(lx, y, lz).value;
             if (cur == ev) continue;
 
             voxel v = chunk->get_voxel(lx, y, lz);
@@ -253,7 +253,7 @@ void LightSolver::solve(){
             }
 
             if (changed) {
-                chunk->lightmap.map.set(lx, y, lz, {newVal});
+                chunk->lightmap.set(lx, y, lz, {newVal});
                 addqueue.push({x, y, z, {newVal}});
             }
         }

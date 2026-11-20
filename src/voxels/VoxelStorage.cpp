@@ -17,11 +17,12 @@ bool VoxelStorage::set_voxel_soft(
     int blockY = get_block_coord(y, CHUNK_H);
     int blockZ = get_block_coord(z, CHUNK_W);
 
-    if (blockZ < 0 || blockZ >= CHUNK_H || !chunksMap->is_inside(chunkX, chunkZ))
+    if (blockY < 0 || blockY >= CHUNK_H || !chunksMap->is_inside(chunkX, chunkZ))
         return false;
 
     chunksMap->get(chunkX, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
     chunksMap->get(chunkX, chunkZ)->state = MODIFIED;
+    chunksMap->get(chunkX, chunkZ)->update_caused_by_neighbor = false;
 
     if (triggerCallbacks) {
         BlockUpdater::get_instance().on_block_set(x, y, z);
@@ -32,6 +33,11 @@ bool VoxelStorage::set_voxel_soft(
         BlockUpdater::get_instance().on_block_set(x, y, z-1);
         BlockUpdater::get_instance().on_block_set(x, y, z+1);
     }
+
+    if (blockX == 0)         chunksMap->get(chunkX-1, chunkZ)->state = MODIFIED;
+    if (blockX == CHUNK_W-1) chunksMap->get(chunkX+1, chunkZ)->state = MODIFIED;
+    if (blockZ == 0)         chunksMap->get(chunkX, chunkZ-1)->state = MODIFIED;
+    if (blockZ == CHUNK_W-1) chunksMap->get(chunkX, chunkZ+1)->state = MODIFIED;
 
     // for (int dx = -1; dx <= 1; dx++) {
     //     for (int dz = -1; dz <= 1; dz++) {

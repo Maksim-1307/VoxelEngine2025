@@ -67,13 +67,21 @@ void Lighting::buildSkyLight(int cx, int cz) {
         return;
     }
 
+    bool update_neighbors = !chunk->update_caused_by_neighbor;
+
+    std::array<Chunk*, 8> neighboring_chunks;
+    neighboring_chunks[0] = Engine::pChunkMap->get(cx+1, cz);
+    neighboring_chunks[1] = Engine::pChunkMap->get(cx-1, cz);
+    neighboring_chunks[2] = Engine::pChunkMap->get(cx, cz+1);
+    neighboring_chunks[3] = Engine::pChunkMap->get(cx, cz-1);
+    neighboring_chunks[4] = Engine::pChunkMap->get(cx+1, cz+1);
+    neighboring_chunks[5] = Engine::pChunkMap->get(cx+1, cz-1);
+    neighboring_chunks[6] = Engine::pChunkMap->get(cx-1, cz+1);
+    neighboring_chunks[7] = Engine::pChunkMap->get(cx-1, cz-1);
+
     // Compare edge hash before / after building light,
     // to update neighbors' light only if needed
-    std::array<uint64_t, 4> edge_hash_before;
-    edge_hash_before[0] = chunk->lightmap.getHashOfPositiveXEdge(); // X+
-    edge_hash_before[1] = chunk->lightmap.getHashOfNegativeXEdge(); // X-
-    edge_hash_before[2] = chunk->lightmap.getHashOfPositiveZEdge(); // Z+
-    edge_hash_before[4] = chunk->lightmap.getHashOfNegativeZEdge(); // Z-
+    std::array<uint64_t, 4> edge_hash_before = chunk->lightmap.getCommitedHashes();
 
     // Building light of the current chunk
     for (int x = 0; x < CHUNK_W; x ++) {
@@ -88,41 +96,12 @@ void Lighting::buildSkyLight(int cx, int cz) {
             }
         }
     }
-    solver->solve();
-    chunk->state = LIGHTS_BUILT;
-
-    // Edge hash after
-    std::array<uint64_t, 4> edge_hash_after;
-    edge_hash_after[0] = chunk->lightmap.getHashOfPositiveXEdge(); // X+
-    edge_hash_after[1] = chunk->lightmap.getHashOfNegativeXEdge(); // X-
-    edge_hash_after[2] = chunk->lightmap.getHashOfPositiveZEdge(); // Z+
-    edge_hash_after[4] = chunk->lightmap.getHashOfNegativeZEdge(); // Z-
-
-    std::array<bool, 8> need_update;
-    need_update[0] = edge_hash_before[0] != edge_hash_after[0]; // X+
-    need_update[1] = edge_hash_before[1] != edge_hash_after[1]; // X-
-    need_update[2] = edge_hash_before[2] != edge_hash_after[2]; // Z+
-    need_update[3] = edge_hash_before[3] != edge_hash_after[3]; // Z-
-
-    need_update[4] = false;
-    need_update[5] = false;
-    need_update[6] = false;
-    need_update[7] = false;
-
-    // need_update = {false, false, false, false, false, false, false, false};
-    // need_update = {true, true, true, true, true, true, true, true};
-
-    // bool changed = std::any_of(need_update.begin(), need_update.end(), [](bool b) { return b; });
-    // if (changed) {
-    //     need_update = {true, true, true, true, true, true, true, true};
-    // }
-
 
     // Seed cross-border propagation with adjacent chunks' border light
     Chunk* neighbor;
     // -X
     neighbor = Engine::pChunkMap->get(cx-1, cz);
-    if (neighbor && neighbor->state >= LIGHTS_PRE_BUILT && need_update[1]) {
+    if (neighbor && neighbor->state >= LIGHTS_PRE_BUILT) {
         int gx = (cx-1)*CHUNK_W + CHUNK_W-1;
         for (int z = 0; z < CHUNK_W; z++) {
             int gz = cz*CHUNK_W + z;
@@ -132,12 +111,11 @@ void Lighting::buildSkyLight(int cx, int cz) {
             }
         }
         solver->solve();
-        if (neighbor->state > LIGHTS_BUILT) neighbor->state = LIGHTS_BUILT;
     }
     
     // +X
     neighbor = Engine::pChunkMap->get(cx+1, cz);
-    if (neighbor && neighbor->state >= LIGHTS_PRE_BUILT && need_update[0]) {
+    if (neighbor && neighbor->state >= LIGHTS_PRE_BUILT) {
         int gx = (cx+1)*CHUNK_W;
         for (int z = 0; z < CHUNK_W; z++) {
             int gz = cz*CHUNK_W + z;
@@ -147,12 +125,11 @@ void Lighting::buildSkyLight(int cx, int cz) {
             }
         }
         solver->solve();
-        if (neighbor->state > LIGHTS_BUILT) neighbor->state = LIGHTS_BUILT;
     }
     
     // -Z
     neighbor = Engine::pChunkMap->get(cx, cz-1);
-    if (neighbor && neighbor->state >= LIGHTS_PRE_BUILT && need_update[3]) {
+    if (neighbor && neighbor->state >= LIGHTS_PRE_BUILT) {
         int gz = (cz-1)*CHUNK_W + CHUNK_W-1;
         for (int x = 0; x < CHUNK_W; x++) {
             int gx = cx*CHUNK_W + x;
@@ -162,12 +139,11 @@ void Lighting::buildSkyLight(int cx, int cz) {
             }
         }
         solver->solve();
-        if (neighbor->state > LIGHTS_BUILT) neighbor->state = LIGHTS_BUILT;
     }
     
     // +Z
     neighbor = Engine::pChunkMap->get(cx, cz+1);
-    if (neighbor && neighbor->state >= LIGHTS_PRE_BUILT && need_update[2]) {
+    if (neighbor && neighbor->state >= LIGHTS_PRE_BUILT) {
         int gz = (cz+1)*CHUNK_W;
         for (int x = 0; x < CHUNK_W; x++) {
             int gx = cx*CHUNK_W + x;
@@ -177,9 +153,43 @@ void Lighting::buildSkyLight(int cx, int cz) {
             }
         }
         solver->solve();
-        if (neighbor->state > LIGHTS_BUILT) neighbor->state = LIGHTS_BUILT;
     }
-    
+
+    solver->solve();
+    chunk->state = LIGHTS_BUILT;
+    chunk->update_caused_by_neighbor = false;
+
+    // Edge hash after
+    std::array<uint64_t, 4> edge_hash_after;
+    edge_hash_after[0] = chunk->lightmap.getHashOfPositiveXEdge(); // X+
+    edge_hash_after[1] = chunk->lightmap.getHashOfNegativeXEdge(); // X-
+    edge_hash_after[2] = chunk->lightmap.getHashOfPositiveZEdge(); // Z+
+    edge_hash_after[3] = chunk->lightmap.getHashOfNegativeZEdge(); // Z-
+
+    // Update if needed
+    std::array<bool, 8> need_update;
+    need_update[0] = edge_hash_before[0] != edge_hash_after[0]; // X+
+    need_update[1] = edge_hash_before[1] != edge_hash_after[1]; // X-
+    need_update[2] = edge_hash_before[2] != edge_hash_after[2]; // Z+
+    need_update[3] = edge_hash_before[3] != edge_hash_after[3]; // Z-
+
+    need_update[4] = need_update[0] || need_update[2]; // X+ Z+
+    need_update[5] = need_update[0] || need_update[3]; // X+ Z-
+    need_update[6] = need_update[1] || need_update[2]; // X- Z+
+    need_update[7] = need_update[1] || need_update[3]; // X- Z-
+
+    if (update_neighbors) {
+        for (int i = 0; i < 8; i++) {
+            if (need_update[i] || true) {
+                Chunk* neighbor = neighboring_chunks[i];
+                // std::lock_guard<std::mutex> neighborLock(neighbor->mtx); // makes very slow, deadlock probably
+                if (neighbor->state > LIGHTS_BUILT) {
+                    neighbor->state = LIGHTS_BUILT;
+                }
+                neighbor->update_caused_by_neighbor = true;
+            }
+        }
+    }
 }
 
 void Lighting::onBlockSet(int x, int y, int z, uint8_t blockId) {

@@ -18,11 +18,14 @@ class Lightmap {
     Array2D<light> pos_z_cache;
     Array2D<light> neg_z_cache;
 
+    // Edge hashes from the last completed light build.
+    std::array<uint64_t, 4> commited_hashes{};
+
     void setEdgeCache(int x, int y, int z, light val) {
         if (x == 0) neg_x_cache.set(z, y, val);
-        if (x == X) pos_x_cache.set(z, y, val);
+        if (x == X-1) pos_x_cache.set(z, y, val);
         if (z == 0) neg_z_cache.set(x, y, val);
-        if (z == Z) pos_z_cache.set(x, y, val);
+        if (z == Z-1) pos_z_cache.set(x, y, val);
     }
 
     uint64_t getHashOf(Array2D<light>& edge) {
@@ -42,9 +45,9 @@ public:
     {};
 
     ~Lightmap(){};
-    
 
     void clear(){
+        commitEdgeHashes();
         map.clear({0});
         pos_x_cache.clear({0});
         neg_x_cache.clear({0});
@@ -52,12 +55,24 @@ public:
         neg_z_cache.clear({0});
     }
 
+    // Saves the current edge hashes as the last completed build.
+    void commitEdgeHashes() {
+        commited_hashes = {
+            getHashOfPositiveXEdge(),
+            getHashOfNegativeXEdge(),
+            getHashOfPositiveZEdge(),
+            getHashOfNegativeZEdge()
+        };
+    }
+
+    std::array<uint64_t, 4> getCommitedHashes() const {
+        return commited_hashes;
+    }
+
     // Don't call map.set directly, use this wrapper because it updates edge cache
     inline void set(int x, int y, int z, light val){
-        bool onEdge = (x == 0) | (x == X) |
-              (y == 0) | (y == Y) |
-              (z == 0) | (z == Z);
-        if (onEdge) setEdgeCache(x, y, z, val);
+        if (x == 0 || x == X-1 || z == 0 || z == Z-1)
+            setEdgeCache(x, y, z, val);
         map.set(x, y, z, val);
     }
     void set(int x, int y, int z, int channel, uint8_t val) {

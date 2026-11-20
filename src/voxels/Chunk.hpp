@@ -58,25 +58,22 @@ public:
         Chunk::chunks -= 1;
     };
 
-    uptr<MeshRenderer> renderer;
-    sptr<Mesh> pendingMesh;
-
-    int X, Y, Z;
-    Lightmap lightmap = Lightmap(CHUNK_W, CHUNK_H, CHUNK_W);
-
-    void set_voxel(size_t x, size_t y, size_t z, const voxel voxel)
-    {
+    void set_voxel(size_t x, size_t y, size_t z, const voxel voxel) {
         voxels.set(x, y, z, voxel);
     }
-    const voxel get_voxel(size_t x, size_t y, size_t z) const
-    {
+    const voxel get_voxel(size_t x, size_t y, size_t z) const {
         return voxels.get(x, y, z);
     }
     voxel* get_raw_data() const {
         return voxels.get_data();
     }
-    
+
     static int chunks;
+
+    uptr<MeshRenderer> renderer;
+    sptr<Mesh> pendingMesh;
+    int X, Y, Z;
+    Lightmap lightmap = Lightmap(CHUNK_W, CHUNK_H, CHUNK_W);
     std::atomic<ChunkState> state;
     std::mutex mtx;
 
@@ -85,6 +82,7 @@ public:
     bool isDirty = false; 
     // chunk will be processed. do not queue it again
     std::atomic<bool> isQueued = false;
+    std::atomic<bool> update_caused_by_neighbor = false;
 
 private:
     Array3D<voxel> voxels = Array3D<voxel>(CHUNK_W, CHUNK_H, CHUNK_W);

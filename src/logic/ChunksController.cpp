@@ -43,7 +43,7 @@ void ChunksController::update() {
             // If all chunks already processed - moving to the next phase
             if (processingChunksCount == 0) {
                 updatingPhase = next_phase(updatingPhase);
-                std::cout << "Next phase: " << (int)updatingPhase << std::endl;
+                // std::cout << "Next phase: " << (int)updatingPhase << std::endl;
             } else if (processingChunksCount < 0) {
                 std::cout << "ERROR: negative value of processingChunksCount" << std::endl;
             } else {

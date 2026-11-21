@@ -23,10 +23,16 @@ void main()
     vec3 terrainColor = texColor.rgb *= light;
 
     float distance = length(v_Position);
-    float t = (distance - fogStart) / (fogDistance - fogStart);
-    t = clamp(t, 0.0, 1.0);
-    float fogFactor = exp(-fogDensity * t);
+    // // Exponential fog
+    // float t = (distance - fogStart) / (fogDistance - fogStart);
+    // t = clamp(t, 0.0, 1.0);
+    // float fogFactor = exp(-fogDensity * t);
+    // fogFactor = clamp(fogFactor, 0.0, 1.0);
+
+    // Linear fog
+    float fogFactor = distance / fogDistance;
     fogFactor = clamp(fogFactor, 0.0, 1.0);
+    fogFactor = 1.0 - fogFactor * fogFactor;
 
     outputColor = vec4(mix(fogColor, terrainColor, fogFactor), texColor.a);
 }

@@ -12,6 +12,14 @@ enum ChunksUpdatePhase {
     WAIT_FOR_MESH
 };
 
+enum ChunkUpdateOperation {
+    TERRAIN_GENERATION,
+    STRUCTURES_GENERATION,
+    LIGHTS_PRE_BUILDING,
+    LIGHTS_BUILDING,
+    MESH_BUILDING
+};
+
 class ChunksController {
     public:
         ChunksController(AreaMap2D<Chunk> *chunkMap, Camera *camera) : chunkMap(chunkMap), camera(camera) {
@@ -24,7 +32,6 @@ class ChunksController {
         void draw_chunks();
         std::vector<Chunk*> get_loaded_chunks();
     private:
-        void handle_at(int x, int z);
         void load_around(glm::ivec2 center);
         bool firstLoad = true;
 
@@ -50,5 +57,7 @@ class ChunksController {
                     return ChunksUpdatePhase::UPDATE_LIGHTING;
             }
         }
+
+        bool canPerformFor(ChunkPos pos, ChunkUpdateOperation operation);
 };
 

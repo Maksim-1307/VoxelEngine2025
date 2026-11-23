@@ -13,7 +13,7 @@ void ChunksController::update() {
     glm::ivec2 currentPos(X, Z);
     glm::ivec2 delta = currentPos - this->camPos;
 
-    if (delta.x != 0 || delta.y != 0) {
+    if (delta.x != 0 || delta.y != 0 || firstLoad) {
         
         Engine::pChunkMap->translate(delta.x, delta.y);
         this->camPos = currentPos;
@@ -22,19 +22,7 @@ void ChunksController::update() {
         std::cout << "Moved to: " << camPos.x << ", " << camPos.y << "\n";
     }
 
-    // for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(Settings::LOAD_DISTANCE-2)) {
-    //     // Re-queue modified chunks and prepared chunks whose worker task
-    //     // never finished (e.g. it exited early), so they can't get stuck
-    //     // before VISIBLE. MESH_BUILT chunks are left for draw_chunks.
-    //     if (!chunk->isQueued &&
-    //         (chunk->state == MODIFIED ||
-    //          chunk->state == LIGHTS_PRE_BUILT ||
-    //          chunk->state == LIGHTS_BUILT)) {
-    //         ChunksUpdater::get_instance().queue_chunk({chunk->X, chunk->Z});
-    //     }
-    // }
-
-    // Chunks updating logic
+    //=== Chunks updating logic ===
 
     // Updating chunks updating phase
     switch (updatingPhase) {
@@ -66,6 +54,7 @@ void ChunksController::update() {
             if (chunk->state < LIGHTS_BUILT) {
                 processingChunksCount += 1;
                 ChunkPos chunkPos = {chunk->X, chunk->Z};
+                if (!canPerformFor(chunkPos, LIGHTS_PRE_BUILDING)) continue;
                 ThreadPool::get_instance().enqueue([chunkPos, this, &processingChunksCount = processingChunksCount]() {
                     ChunksUpdater::get_instance().update_light(chunkPos);
                     // Decrement counter once the chunk is processed
@@ -82,6 +71,7 @@ void ChunksController::update() {
             if (chunk->state < MESH_BUILT && chunk->state >= LIGHTS_BUILT) {
                 processingChunksCount += 1;
                 ChunkPos chunkPos = {chunk->X, chunk->Z};
+                if (!canPerformFor(chunkPos, MESH_BUILDING)) continue;
                 ThreadPool::get_instance().enqueue([chunkPos, this, &processingChunksCount = processingChunksCount]() {
                     ChunksUpdater::get_instance().update_mesh(chunkPos);
                     // Decrement counter once the chunk is processed
@@ -92,25 +82,6 @@ void ChunksController::update() {
         updatingPhase = ChunksUpdatePhase::WAIT_FOR_MESH;
     }
 
-}
-
-void ChunksController::handle_at(int x, int z) {
-
-    Profiler t("handle_at");
-
-    // Chunk* chunk = Engine::pChunkMap->get(x, z);
-    // if (!chunk) return;
-    
-    // try {
-
-    //     if (!chunk->isQueued) {
-    //         ChunksUpdater::get_instance().queue_chunk({x, z});
-    //         chunk->isQueued = true;
-    //     }
-    // } catch (...) {
-    //     std::cerr << "Failed to build mesh for chunk at " 
-    //               << x << ", " << z << "\n";
-    // }
 }
 
 void ChunksController::load_around(glm::ivec2 center) {
@@ -145,7 +116,6 @@ void ChunksController::load_around(glm::ivec2 center) {
     }
     for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance-2)) {
         if (chunk->state < VISIBLE) {
-            // handle_at(chunk->X, chunk->Z);
         } 
     }
     firstLoad = false;
@@ -176,4 +146,76 @@ void ChunksController::draw_chunks() {
 
 std::vector<Chunk*> ChunksController::get_loaded_chunks() {
     return Engine::pChunkMap->chunks_in_radius(Settings::LOAD_DISTANCE-1);
+}
+
+// Can some update operation be performed on chunk considering its neighbors states
+// Ensures correctness for operation
+bool ChunksController::canPerformFor(ChunkPos pos, ChunkUpdateOperation operation) {
+    int x = pos.x;
+    int z = pos.z;
+    Chunk* chunk = Engine::pChunkMap->get(x, z);
+    if (!chunk) return false;
+    if (operation == TERRAIN_GENERATION && chunk->state == INITIALIZED) return true;
+    if (operation == MESH_BUILDING && chunk->state == LIGHTS_BUILT) return true;
+    ChunkState min_neighbors_state = VISIBLE;
+    std::array<Chunk*, 8> neighbors;
+    int i = 0;
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dz = -1; dz <= 1; dz++) {
+            if (dx == 0 && dz == 0) continue;
+            Chunk* n = Engine::pChunkMap->get(x + dx, z + dz);
+            if (!n) return false;
+            neighbors[i++] = n;
+            if (n->state < min_neighbors_state) min_neighbors_state = n->state;
+        }
+    }
+    switch (operation) {
+        case TERRAIN_GENERATION:
+            // Don't generate chunk unless it's empty 
+            return chunk->state == INITIALIZED;
+        case STRUCTURES_GENERATION:
+            // Don't generate structures if at least one neighbor or itself is not terrain generated yet 
+            return (chunk->state >= TERRAIN_GENERATED) && (min_neighbors_state >= TERRAIN_GENERATED);
+        case LIGHTS_PRE_BUILDING:
+            // Don't pre-build light if at least one neighbor or itself is not structures generated yet
+            // if (chunk->state >= STRUCTURES_GENERATED) {
+            //     std::cout << "a == true\n";
+            // } else {
+            //     std::cout << "a == false\n";
+            // }
+            // if (min_neighbors_state >= STRUCTURES_GENERATED) {
+            //     std::cout << "b == true\n";
+            //     std::cout << (int)min_neighbors_state << "\n";
+            // } else {
+            //     std::cout << "b == false\n";
+            //     std::cout << (int)(chunk->state) << "\n";
+            // }
+            // if ((chunk->state >= STRUCTURES_GENERATED) && (min_neighbors_state >= STRUCTURES_GENERATED)) {
+            //     std::cout << "a && b == true\n";
+            // } else {
+            //     std::cout << "a && b == false\n";
+            // }
+            // std::cout << "\n\n";
+            return (chunk->state >= STRUCTURES_GENERATED) && (min_neighbors_state >= STRUCTURES_GENERATED);
+        case LIGHTS_BUILDING:
+            // Don't build light without pre-building for neighbors end itself
+            return (chunk->state >= LIGHTS_PRE_BUILT) && (min_neighbors_state >= LIGHTS_PRE_BUILT);
+        case MESH_BUILDING:
+            return (chunk->state >= LIGHTS_BUILT) && (min_neighbors_state >= LIGHTS_BUILT);
+        default:
+            std::cout << "ERROR: unknown chunk update operation in ChunksController::canPerformFor(). Numeric value : " << (int)updatingPhase << std::endl;
+            return false;
+    }
+    return false;
+    /*
+    
+    x TERRAIN_GENERATION, // if current is INITIALIZED
+    - STRUCTURES_GENERATION, // if current is TERRAIN_GENERATED and neighbors at are least TERRAIN_GENERATED
+    - LIGHTS_PRE_BUILDING, // if current and neighbors are at least STRUCTURES_GENERATED
+    - LIGHTS_BUILDING, // if current and neighbors are at least LIGHTS_PRE_BUILT or MODIFIED 
+    - MESH_BUILDING // current at least LIGHTS BUILT 
+    
+    */
+
+
 }

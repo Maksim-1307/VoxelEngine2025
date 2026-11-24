@@ -181,8 +181,7 @@ void Generator::terrain_with_caves(int x, int y, int z){
             }
         }
     }
-    // chunk->state = TERRAIN_GENERATED;
-    chunk->state = STRUCTURES_GENERATED; // for test to skip trees generation
+    chunk->state = TERRAIN_GENERATED;
 }
 
 void Generator::perlin_noise_3d(int x, int y, int z){

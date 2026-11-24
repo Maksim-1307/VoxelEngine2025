@@ -8,12 +8,14 @@
 enum ChunksUpdatePhase {
     GENERATE_TERRAIN = 0,
     WAIT_FOR_TERRAIN = 1,
-    UPDATE_PRE_LIGHTING = 2,
-    WAIT_FOR_PRE_LIGHTING = 3,
-    UPDATE_LIGHTING = 4,
-    WAIT_FOR_LIGHTING = 5,
-    UPDATE_MESH = 6,
-    WAIT_FOR_MESH = 7
+    GENERATE_AMBIENT = 2,
+    WAIT_FOR_AMBIENT = 3,
+    UPDATE_PRE_LIGHTING = 4,
+    WAIT_FOR_PRE_LIGHTING = 5,
+    UPDATE_LIGHTING = 6,
+    WAIT_FOR_LIGHTING = 7,
+    UPDATE_MESH = 8,
+    WAIT_FOR_MESH = 9
 };
 
 enum ChunkUpdateOperation {
@@ -51,6 +53,10 @@ class ChunksController {
                 case ChunksUpdatePhase::GENERATE_TERRAIN:
                     return ChunksUpdatePhase::WAIT_FOR_TERRAIN;
                 case ChunksUpdatePhase::WAIT_FOR_TERRAIN:
+                    return ChunksUpdatePhase::GENERATE_AMBIENT;
+                case ChunksUpdatePhase::GENERATE_AMBIENT:
+                    return ChunksUpdatePhase::WAIT_FOR_AMBIENT;
+                case ChunksUpdatePhase::WAIT_FOR_AMBIENT:
                     return ChunksUpdatePhase::UPDATE_PRE_LIGHTING;
                 case ChunksUpdatePhase::UPDATE_PRE_LIGHTING:
                     return ChunksUpdatePhase::WAIT_FOR_PRE_LIGHTING;

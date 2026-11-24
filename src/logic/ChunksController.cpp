@@ -27,6 +27,7 @@ void ChunksController::update() {
     // Updating chunks updating phase
     switch (updatingPhase) {
         case ChunksUpdatePhase::WAIT_FOR_TERRAIN:
+        case ChunksUpdatePhase::WAIT_FOR_AMBIENT:
         case ChunksUpdatePhase::WAIT_FOR_PRE_LIGHTING:
         case ChunksUpdatePhase::WAIT_FOR_LIGHTING:
         case ChunksUpdatePhase::WAIT_FOR_MESH:
@@ -41,6 +42,7 @@ void ChunksController::update() {
             }
             break;
         case ChunksUpdatePhase::GENERATE_TERRAIN:
+        case ChunksUpdatePhase::GENERATE_AMBIENT:
         case ChunksUpdatePhase::UPDATE_PRE_LIGHTING:
         case ChunksUpdatePhase::UPDATE_LIGHTING:
         case ChunksUpdatePhase::UPDATE_MESH:
@@ -54,7 +56,7 @@ void ChunksController::update() {
 
     // Zero phase (generation)
     if (updatingPhase == ChunksUpdatePhase::GENERATE_TERRAIN) {
-        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance)) { // Implement iterator for all chunks
+        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance+2)) { // Implement iterator for all chunks
             if (chunk->state < TERRAIN_GENERATED) {
                 ChunkPos chunkPos = {chunk->X, chunk->Z};
                 if (!canPerformFor(chunkPos, TERRAIN_GENERATION)) continue;
@@ -69,9 +71,26 @@ void ChunksController::update() {
         updatingPhase = ChunksUpdatePhase::WAIT_FOR_TERRAIN;
     }
 
+    // Ambient generation phase
+    if (updatingPhase == ChunksUpdatePhase::GENERATE_AMBIENT) {
+        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance+2)) { // Implement iterator for all chunks
+            if (chunk->state < STRUCTURES_GENERATED) {
+                ChunkPos chunkPos = {chunk->X, chunk->Z};
+                if (!canPerformFor(chunkPos, STRUCTURES_GENERATION)) continue;
+                processingChunksCount += 1;
+                ThreadPool::get_instance().enqueue([chunkPos, this, &processingChunksCount = processingChunksCount]() {
+                    ChunksUpdater::get_instance().generate_ambient(chunkPos);
+                    // Decrement counter once the chunk is processed
+                    processingChunksCount.fetch_sub(1, std::memory_order_relaxed);
+                });
+            }
+        }
+        updatingPhase = ChunksUpdatePhase::WAIT_FOR_AMBIENT;
+    }
+
     // First phase (Pre-Lighting)
     if (updatingPhase == ChunksUpdatePhase::UPDATE_PRE_LIGHTING) {
-        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance)) {
+        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance+2)) {
             if (chunk->state < LIGHTS_PRE_BUILT) {
                 ChunkPos chunkPos = {chunk->X, chunk->Z};
                 if (!canPerformFor(chunkPos, LIGHTS_PRE_BUILDING)) continue;
@@ -86,9 +105,9 @@ void ChunksController::update() {
         updatingPhase = ChunksUpdatePhase::WAIT_FOR_PRE_LIGHTING;
     }
 
-    // First phase (Lighting)
+    // Second phase (Lighting)
     if (updatingPhase == ChunksUpdatePhase::UPDATE_LIGHTING) {
-        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance)) {
+        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance+2)) {
             if (chunk->state < LIGHTS_BUILT) {
                 ChunkPos chunkPos = {chunk->X, chunk->Z};
                 if (!canPerformFor(chunkPos, LIGHTS_BUILDING)) continue;
@@ -103,9 +122,9 @@ void ChunksController::update() {
         updatingPhase = ChunksUpdatePhase::WAIT_FOR_LIGHTING;
     }
 
-    // Second phase (Mesh building)
+    // Last phase (Mesh building)
     if (updatingPhase == ChunksUpdatePhase::UPDATE_MESH) {
-        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance)) {
+        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance+2)) {
             if (chunk->state < MESH_BUILT && chunk->state >= LIGHTS_BUILT) {
                 ChunkPos chunkPos = {chunk->X, chunk->Z};
                 if (!canPerformFor(chunkPos, MESH_BUILDING)) continue;

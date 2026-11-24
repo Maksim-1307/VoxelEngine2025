@@ -3,6 +3,8 @@
 #include "src/graphics/ChunkMeshBuilder.hpp"
 #include "src/logic/ThreadPool.hpp"
 
+std::mutex ChunksUpdater::trees_mutex;
+
 void ChunksUpdater::update_pre_light(ChunkPos chunkPos) {
     int x = chunkPos.first();
     int z = chunkPos.second();
@@ -94,5 +96,6 @@ void ChunksUpdater::generate_terrain(ChunkPos chunkPos) {
 }
 
 void ChunksUpdater::generate_ambient(ChunkPos chunkPos) {
+    std::lock_guard lock(trees_mutex);
     Engine::pGenerator->generate_ambient(chunkPos.x, chunkPos.z);
 }

@@ -27,6 +27,8 @@ private:
     ChunksUpdater() {}
     ~ChunksUpdater() {}
 
+    static std::mutex trees_mutex; // temporary
+
     int batchCounter = 0;
     std::unordered_set<ChunkPos> chunksToUpdate;
 };

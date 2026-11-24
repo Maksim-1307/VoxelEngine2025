@@ -24,14 +24,14 @@ class Generator {
         }
     };
 
-    Chunk* generate_at(int x, int z);
+    void generate_at(int x, int z);
     void generate_ambient(int x, int z);
     void generate_tree(int x, int y, int z);
     void generate_grass(int x, int y, int z);
 
-    Chunk* perlin_noise_2d(int x, int y, int z);
-    Chunk* perlin_noise_3d(int x, int y, int z);
-    Chunk* terrain_with_caves(int x, int y, int z);
+    void perlin_noise_2d(int x, int y, int z);
+    void perlin_noise_3d(int x, int y, int z);
+    void terrain_with_caves(int x, int y, int z);
     
     private:
         uint32_t crc32(const char *str)

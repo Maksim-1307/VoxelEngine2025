@@ -11,12 +11,12 @@ void ChunksUpdater::update_light(ChunkPos chunkPos) {
     chunk->isQueued = true;
 
     // Lock briefly to check state
-    std::unique_lock chunkLock(chunk->mtx);
-    if (chunk->state < MODIFIED) {
-        chunk->isQueued = false;
-        return;
-    }
-    chunkLock.unlock();
+    // std::unique_lock chunkLock(chunk->mtx);
+    // if (chunk->state < MODIFIED) {
+    //     chunk->isQueued = false;
+    //     return;
+    // }
+    // chunkLock.unlock();
 
     try {
         std::lock_guard lock(chunk->mtx);
@@ -39,12 +39,12 @@ void ChunksUpdater::update_mesh(ChunkPos chunkPos) {
     Chunk* chunk = Engine::pChunkMap->get(x, z);
     if (!chunk) return;
     chunk->isQueued = true;
-    std::unique_lock chunkLock(chunk->mtx);
-    if (chunk->state < MODIFIED) {
-        chunk->isQueued = false;
-        return;
-    }
-    chunkLock.unlock();
+    // std::unique_lock chunkLock(chunk->mtx);
+    // if (chunk->state < MODIFIED) {
+    //     chunk->isQueued = false;
+    //     return;
+    // }
+    // chunkLock.unlock();
     try {
         std::lock_guard lock(chunk->mtx);
         sptr<Mesh> mesh;
@@ -61,4 +61,12 @@ void ChunksUpdater::update_mesh(ChunkPos chunkPos) {
         std::cerr << "ERROR: Failed to update mesh for chunk at " 
                 << chunkPos.first() << ", " << chunkPos.second() << "\n";
     }
+}
+
+void ChunksUpdater::generate_terrain(ChunkPos chunkPos) {
+    Engine::pGenerator->generate_at(chunkPos.x, chunkPos.z);
+}
+
+void ChunksUpdater::generate_ambient(ChunkPos chunkPos) {
+    Engine::pGenerator->generate_ambient(chunkPos.x, chunkPos.z);
 }

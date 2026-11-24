@@ -99,7 +99,11 @@ void Engine::init()
     // Set up
     std::function<Chunk *(int, int)> gen_func = [](int x, int z) -> Chunk* 
     { 
-        return Engine::pGenerator->generate_at(x, z);
+        Chunk* chunk = new Chunk();
+        chunk->X = x;
+        chunk->Y = 0;
+        chunk->Z = z;
+        return chunk;
     };
     Engine::pChunkMap->set_out_callback(gen_func);
     

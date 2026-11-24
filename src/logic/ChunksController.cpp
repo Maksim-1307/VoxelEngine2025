@@ -22,10 +22,11 @@ void ChunksController::update() {
         std::cout << "Moved to: " << camPos.x << ", " << camPos.y << "\n";
     }
 
-    //=== Chunks updating logic ===
+    // === Chunks updating logic ===
 
     // Updating chunks updating phase
     switch (updatingPhase) {
+        case ChunksUpdatePhase::WAIT_FOR_TERRAIN:
         case ChunksUpdatePhase::WAIT_FOR_LIGHTING:
         case ChunksUpdatePhase::WAIT_FOR_MESH:
             // If all chunks already processed - moving to the next phase
@@ -35,9 +36,10 @@ void ChunksController::update() {
             } else if (processingChunksCount < 0) {
                 std::cout << "ERROR: negative value of processingChunksCount" << std::endl;
             } else {
-                std::cout << processingChunksCount << std::endl;
+                // std::cout << "count: " << processingChunksCount << std::endl;
             }
             break;
+        case ChunksUpdatePhase::GENERATE_TERRAIN:
         case ChunksUpdatePhase::UPDATE_LIGHTING:
         case ChunksUpdatePhase::UPDATE_MESH:
             break;
@@ -48,13 +50,30 @@ void ChunksController::update() {
 
     int distance = Settings::LOAD_DISTANCE;
 
+    // Zero phase (generation)
+    if (updatingPhase == ChunksUpdatePhase::GENERATE_TERRAIN) {
+        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance)) { // Implement iterator for all chunks
+            if (chunk->state < TERRAIN_GENERATED) {
+                ChunkPos chunkPos = {chunk->X, chunk->Z};
+                if (!canPerformFor(chunkPos, TERRAIN_GENERATION)) continue;
+                processingChunksCount += 1;
+                ThreadPool::get_instance().enqueue([chunkPos, this, &processingChunksCount = processingChunksCount]() {
+                    ChunksUpdater::get_instance().generate_terrain(chunkPos);
+                    // Decrement counter once the chunk is processed
+                    processingChunksCount.fetch_sub(1, std::memory_order_relaxed);
+                });
+            }
+        }
+        updatingPhase = ChunksUpdatePhase::WAIT_FOR_TERRAIN;
+    }
+
     // First phase (Lighting)
     if (updatingPhase == ChunksUpdatePhase::UPDATE_LIGHTING) {
-        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance-2)) {
+        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance)) {
             if (chunk->state < LIGHTS_BUILT) {
-                processingChunksCount += 1;
                 ChunkPos chunkPos = {chunk->X, chunk->Z};
                 if (!canPerformFor(chunkPos, LIGHTS_PRE_BUILDING)) continue;
+                processingChunksCount += 1;
                 ThreadPool::get_instance().enqueue([chunkPos, this, &processingChunksCount = processingChunksCount]() {
                     ChunksUpdater::get_instance().update_light(chunkPos);
                     // Decrement counter once the chunk is processed
@@ -67,11 +86,11 @@ void ChunksController::update() {
 
     // Second phase (Mesh building)
     if (updatingPhase == ChunksUpdatePhase::UPDATE_MESH) {
-        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance-2)) {
+        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance)) {
             if (chunk->state < MESH_BUILT && chunk->state >= LIGHTS_BUILT) {
-                processingChunksCount += 1;
                 ChunkPos chunkPos = {chunk->X, chunk->Z};
                 if (!canPerformFor(chunkPos, MESH_BUILDING)) continue;
+                processingChunksCount += 1;
                 ThreadPool::get_instance().enqueue([chunkPos, this, &processingChunksCount = processingChunksCount]() {
                     ChunksUpdater::get_instance().update_mesh(chunkPos);
                     // Decrement counter once the chunk is processed
@@ -85,6 +104,8 @@ void ChunksController::update() {
 }
 
 void ChunksController::load_around(glm::ivec2 center) {
+    firstLoad = false;
+    return;
 
     int size = Engine::pChunkMap->size;
     int distance = Settings::LOAD_DISTANCE;

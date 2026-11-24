@@ -6,10 +6,12 @@
 #include "src/graphics/Camera.hpp"
 
 enum ChunksUpdatePhase {
-    UPDATE_LIGHTING,
-    WAIT_FOR_LIGHTING,
-    UPDATE_MESH,
-    WAIT_FOR_MESH
+    GENERATE_TERRAIN = 0,
+    WAIT_FOR_TERRAIN = 1,
+    UPDATE_LIGHTING = 2,
+    WAIT_FOR_LIGHTING = 3,
+    UPDATE_MESH = 4,
+    WAIT_FOR_MESH = 5
 };
 
 enum ChunkUpdateOperation {
@@ -36,7 +38,7 @@ class ChunksController {
         bool firstLoad = true;
 
         std::queue<Chunk*> handleQueue;
-        ChunksUpdatePhase updatingPhase = ChunksUpdatePhase::UPDATE_LIGHTING;
+        ChunksUpdatePhase updatingPhase = ChunksUpdatePhase::GENERATE_TERRAIN;
         std::atomic<int> processingChunksCount{0};
         AreaMap2D<Chunk> *chunkMap;
         Camera* camera;
@@ -44,6 +46,10 @@ class ChunksController {
         
         inline ChunksUpdatePhase next_phase (ChunksUpdatePhase phase) const {
             switch (phase) {
+                case ChunksUpdatePhase::GENERATE_TERRAIN:
+                    return ChunksUpdatePhase::WAIT_FOR_TERRAIN;
+                case ChunksUpdatePhase::WAIT_FOR_TERRAIN:
+                    return ChunksUpdatePhase::UPDATE_LIGHTING;
                 case ChunksUpdatePhase::UPDATE_LIGHTING:
                     return ChunksUpdatePhase::WAIT_FOR_LIGHTING;
                 case ChunksUpdatePhase::WAIT_FOR_LIGHTING:
@@ -51,10 +57,10 @@ class ChunksController {
                 case ChunksUpdatePhase::UPDATE_MESH:
                     return ChunksUpdatePhase::WAIT_FOR_MESH;
                 case ChunksUpdatePhase::WAIT_FOR_MESH:
-                    return ChunksUpdatePhase::UPDATE_LIGHTING;
+                    return ChunksUpdatePhase::GENERATE_TERRAIN;
                 default:
                     std::cout << "ERROR: unknown chunk update phase in ChunksController::update(). Numeric value : " << (int)updatingPhase << std::endl;
-                    return ChunksUpdatePhase::UPDATE_LIGHTING;
+                    return ChunksUpdatePhase::GENERATE_TERRAIN;
             }
         }
 

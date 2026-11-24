@@ -9,7 +9,7 @@
 
 #define SIZE_FACTOR 15.0f
 
-Chunk *Generator::generate_at(int x, int z)
+void Generator::generate_at(int x, int z)
 {
     Profiler t("generate_at");
     return terrain_with_caves(x, 0, z);
@@ -50,12 +50,12 @@ void Generator::generate_ambient(int x, int z) {
     chunk->state = STRUCTURES_GENERATED;
 }
 
-Chunk* Generator::terrain_with_caves(int x, int y, int z){
+void Generator::terrain_with_caves(int x, int y, int z){
     int X = x * CHUNK_W;
     int Y = y;
     int Z = z * CHUNK_W;
 
-    Chunk *chunk = new Chunk();
+    Chunk* chunk = Engine::pChunkMap->get(x, z);
     chunk->X = x;
     chunk->Y = y;
     chunk->Z = z;
@@ -181,17 +181,17 @@ Chunk* Generator::terrain_with_caves(int x, int y, int z){
             }
         }
     }
-    chunk->state = TERRAIN_GENERATED;
-    return chunk;
+    // chunk->state = TERRAIN_GENERATED;
+    chunk->state = STRUCTURES_GENERATED; // for test to skip trees generation
 }
 
-Chunk* Generator::perlin_noise_3d(int x, int y, int z){
+void Generator::perlin_noise_3d(int x, int y, int z){
     // global coords
     int X = x * CHUNK_W;
     int Y = y;
     int Z = z * CHUNK_W;
 
-    Chunk *chunk = new Chunk();
+    Chunk* chunk = Engine::pChunkMap->get(x, z);
     chunk->X = x;
     chunk->Y = y;
     chunk->Z = z;
@@ -210,16 +210,15 @@ Chunk* Generator::perlin_noise_3d(int x, int y, int z){
     // chunk->modified = true;
     // chunk->lightmap.mask.clear(true);
     chunk->state = TERRAIN_GENERATED;
-    return chunk;
 }
 
-Chunk* Generator::perlin_noise_2d(int x, int y, int z){
+void Generator::perlin_noise_2d(int x, int y, int z){
     // global coords
     int X = x * CHUNK_W;
     int Y = y * CHUNK_H;
     int Z = z * CHUNK_W;
 
-    Chunk *chunk = new Chunk();
+    Chunk* chunk = Engine::pChunkMap->get(x, z);
     chunk->X = x;
     chunk->Y = y;
     chunk->Z = z;
@@ -237,9 +236,7 @@ Chunk* Generator::perlin_noise_2d(int x, int y, int z){
         }
     }
     // chunk->modified = true;
-    // chunk->lightmap.mask.clear(true);
     chunk->state = TERRAIN_GENERATED;
-    return chunk;
 }
 
 

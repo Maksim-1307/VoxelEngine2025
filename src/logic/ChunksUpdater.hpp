@@ -18,8 +18,9 @@ public:
     void update() {}
 
     void update_light(ChunkPos chunkPos);
-
     void update_mesh(ChunkPos chunkPos);
+    void generate_terrain(ChunkPos chunkPos);
+    void generate_ambient(ChunkPos chunkPos);
 
 private:
     ChunksUpdater() {}

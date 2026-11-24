@@ -3,14 +3,14 @@
 #include "src/graphics/ChunkMeshBuilder.hpp"
 #include "src/logic/ThreadPool.hpp"
 
-void ChunksUpdater::update_light(ChunkPos chunkPos) {
+void ChunksUpdater::update_pre_light(ChunkPos chunkPos) {
     int x = chunkPos.first();
     int z = chunkPos.second();
     Chunk* chunk = Engine::pChunkMap->get(x, z);
     if (!chunk) return;
     chunk->isQueued = true;
 
-    // Lock briefly to check state
+    // // Lock briefly to check state
     // std::unique_lock chunkLock(chunk->mtx);
     // if (chunk->state < MODIFIED) {
     //     chunk->isQueued = false;
@@ -21,6 +21,32 @@ void ChunksUpdater::update_light(ChunkPos chunkPos) {
     try {
         std::lock_guard lock(chunk->mtx);
         Engine::pLighting->prebuildSkyLight(chunk);
+        
+        chunk->state = LIGHTS_PRE_BUILT;
+    } catch (...) {
+        std::cerr << "ERROR: Failed to update pre-lighting for chunk at " 
+                << chunkPos.first() << ", " << chunkPos.second() << "\n";
+    }
+}
+
+void ChunksUpdater::update_light(ChunkPos chunkPos) {
+    int x = chunkPos.first();
+    int z = chunkPos.second();
+    Chunk* chunk = Engine::pChunkMap->get(x, z);
+    if (!chunk) return;
+    chunk->isQueued = true;
+
+    // // Lock briefly to check state
+    // std::unique_lock chunkLock(chunk->mtx);
+    // if (chunk->state < MODIFIED) {
+    //     chunk->isQueued = false;
+    //     return;
+    // }
+    // chunkLock.unlock();
+
+    try {
+        std::lock_guard lock(chunk->mtx);
+        // Engine::pLighting->prebuildSkyLight(chunk);
         
         if (Settings::RECURSIVE_LIGHTING) {
             Engine::pLighting->onChunkLoaded(chunk->X, chunk->Z, true);
@@ -39,12 +65,12 @@ void ChunksUpdater::update_mesh(ChunkPos chunkPos) {
     Chunk* chunk = Engine::pChunkMap->get(x, z);
     if (!chunk) return;
     chunk->isQueued = true;
-    // std::unique_lock chunkLock(chunk->mtx);
-    // if (chunk->state < MODIFIED) {
-    //     chunk->isQueued = false;
-    //     return;
-    // }
-    // chunkLock.unlock();
+    std::unique_lock chunkLock(chunk->mtx);
+    if (chunk->state < MODIFIED) {
+        chunk->isQueued = false;
+        return;
+    }
+    chunkLock.unlock();
     try {
         std::lock_guard lock(chunk->mtx);
         sptr<Mesh> mesh;

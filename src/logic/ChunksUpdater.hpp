@@ -17,6 +17,7 @@ public:
 
     void update() {}
 
+    void update_pre_light(ChunkPos chunkPos);
     void update_light(ChunkPos chunkPos);
     void update_mesh(ChunkPos chunkPos);
     void generate_terrain(ChunkPos chunkPos);

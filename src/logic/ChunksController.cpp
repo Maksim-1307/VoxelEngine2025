@@ -27,6 +27,7 @@ void ChunksController::update() {
     // Updating chunks updating phase
     switch (updatingPhase) {
         case ChunksUpdatePhase::WAIT_FOR_TERRAIN:
+        case ChunksUpdatePhase::WAIT_FOR_PRE_LIGHTING:
         case ChunksUpdatePhase::WAIT_FOR_LIGHTING:
         case ChunksUpdatePhase::WAIT_FOR_MESH:
             // If all chunks already processed - moving to the next phase
@@ -40,6 +41,7 @@ void ChunksController::update() {
             }
             break;
         case ChunksUpdatePhase::GENERATE_TERRAIN:
+        case ChunksUpdatePhase::UPDATE_PRE_LIGHTING:
         case ChunksUpdatePhase::UPDATE_LIGHTING:
         case ChunksUpdatePhase::UPDATE_MESH:
             break;
@@ -67,12 +69,29 @@ void ChunksController::update() {
         updatingPhase = ChunksUpdatePhase::WAIT_FOR_TERRAIN;
     }
 
+    // First phase (Pre-Lighting)
+    if (updatingPhase == ChunksUpdatePhase::UPDATE_PRE_LIGHTING) {
+        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance)) {
+            if (chunk->state < LIGHTS_PRE_BUILT) {
+                ChunkPos chunkPos = {chunk->X, chunk->Z};
+                if (!canPerformFor(chunkPos, LIGHTS_PRE_BUILDING)) continue;
+                processingChunksCount += 1;
+                ThreadPool::get_instance().enqueue([chunkPos, this, &processingChunksCount = processingChunksCount]() {
+                    ChunksUpdater::get_instance().update_pre_light(chunkPos);
+                    // Decrement counter once the chunk is processed
+                    processingChunksCount.fetch_sub(1, std::memory_order_relaxed);
+                });
+            }
+        }
+        updatingPhase = ChunksUpdatePhase::WAIT_FOR_PRE_LIGHTING;
+    }
+
     // First phase (Lighting)
     if (updatingPhase == ChunksUpdatePhase::UPDATE_LIGHTING) {
         for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance)) {
             if (chunk->state < LIGHTS_BUILT) {
                 ChunkPos chunkPos = {chunk->X, chunk->Z};
-                if (!canPerformFor(chunkPos, LIGHTS_PRE_BUILDING)) continue;
+                if (!canPerformFor(chunkPos, LIGHTS_BUILDING)) continue;
                 processingChunksCount += 1;
                 ThreadPool::get_instance().enqueue([chunkPos, this, &processingChunksCount = processingChunksCount]() {
                     ChunksUpdater::get_instance().update_light(chunkPos);

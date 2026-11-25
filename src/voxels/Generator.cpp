@@ -17,7 +17,7 @@ void Generator::generate_at(int x, int z)
 }
 
 void Generator::generate_ambient(int x, int z) {
-    Chunk* chunk = Engine::pChunkMap->get(x, z);
+    sptr<Chunk> chunk = Engine::pChunkMap->get(x, z);
     if (!chunk) return;
     std::lock_guard<std::mutex> lock(chunk->mtx);
 
@@ -58,7 +58,7 @@ void Generator::terrain_with_caves(int x, int y, int z){
     int Y = y;
     int Z = z * CHUNK_W;
 
-    Chunk* chunk = Engine::pChunkMap->get(x, z);
+    sptr<Chunk> chunk = Engine::pChunkMap->get(x, z);
     if (!chunk) return;
     std::lock_guard<std::mutex> lock(chunk->mtx);
     chunk->X = x;
@@ -195,7 +195,7 @@ void Generator::perlin_noise_3d(int x, int y, int z){
     int Y = y;
     int Z = z * CHUNK_W;
 
-    Chunk* chunk = Engine::pChunkMap->get(x, z);
+    sptr<Chunk> chunk = Engine::pChunkMap->get(x, z);
     if (!chunk) return;
     std::lock_guard<std::mutex> lock(chunk->mtx);
     chunk->X = x;
@@ -224,7 +224,7 @@ void Generator::perlin_noise_2d(int x, int y, int z){
     int Y = y * CHUNK_H;
     int Z = z * CHUNK_W;
 
-    Chunk* chunk = Engine::pChunkMap->get(x, z);
+    sptr<Chunk> chunk = Engine::pChunkMap->get(x, z);
     if (!chunk) return;
     chunk->X = x;
     chunk->Y = y;

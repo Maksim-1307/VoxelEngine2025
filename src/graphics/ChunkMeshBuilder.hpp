@@ -21,7 +21,7 @@ class ChunkMeshBuilder {
 public:
     ChunkMeshBuilder (){}
 
-    sptr<Mesh> buildMesh(Chunk& chunk);
+    sptr<Mesh> buildMesh(sptr<Chunk> chunk);
 
     uint16_t packRGBS(uint8_t a, uint8_t b, uint8_t c, uint8_t d) {
         return (a & 0xF) << 12 | (b & 0xF) << 8 | (c & 0xF) << 4 | (d & 0xF);
@@ -63,7 +63,7 @@ private:
     int _x, _y, _z;
     int _face;
     int chunkX, chunkY, chunkZ;
-    Chunk* chunk;
+    sptr<Chunk> chunk;
 
     // Caching voxels of chunks 
     const voxel* currD;

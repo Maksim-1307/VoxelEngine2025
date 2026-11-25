@@ -39,10 +39,10 @@ public:
         return firstBuffer->get(mx, my, mz);
     }
 
-    // unsafe! 
-    T** get_volume(){
-        return this->firstBuffer->get_data();
-    }
+    // // unsafe! 
+    // T** get_volume(){
+    //     return this->firstBuffer->get_data();
+    // }
 
     void set_out_callback(std::function<T*(int, int, int)> callback) {
         this->outCallback = callback;

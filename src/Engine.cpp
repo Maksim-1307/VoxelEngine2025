@@ -97,9 +97,9 @@ void Engine::init()
     Engine::pLighting = new Lighting(*Engine::pChunkMap);
     
     // Set up
-    std::function<Chunk *(int, int)> gen_func = [](int x, int z) -> Chunk* 
+    std::function<sptr<Chunk>(int, int)> gen_func = [](int x, int z) -> sptr<Chunk>
     { 
-        Chunk* chunk = new Chunk();
+        sptr<Chunk> chunk = make_sptr<Chunk>();
         chunk->X = x;
         chunk->Y = 0;
         chunk->Z = z;

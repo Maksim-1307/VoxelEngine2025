@@ -61,7 +61,6 @@ class Engine {
         static Texture* pTerrainTexture;
         static Text* pText;
         static Text* pFpsText;
-        static Chunk* pChunk;
         static AreaMap2D* pChunkMap;
         static Generator* pGenerator;
         static VoxelStorage* pVoxelStorage;

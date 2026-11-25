@@ -23,7 +23,7 @@ void LightSolver::add(int x, int y, int z, light emission){
     int ix = x & 15;
     int iz = z & 15;
 
-    Chunk* chunk = chunks.get(cx, cz);
+    sptr<Chunk> chunk = chunks.get(cx, cz);
     if (chunk == nullptr)
         return;
 
@@ -81,7 +81,7 @@ void LightSolver::remove(int x, int y, int z) {
     int ix = x & 15;
     int iz = z & 15;
 
-    Chunk* chunk = chunks.get(cx, cz);
+    sptr<Chunk> chunk = chunks.get(cx, cz);
     if (chunk == nullptr)
         return;
 
@@ -121,7 +121,7 @@ void LightSolver::solve(){
 
             int cx = (x >= 0) ? (x >> 4) : (x - 15) / 16;
             int cz = (z >= 0) ? (z >> 4) : (z - 15) / 16;
-            Chunk* chunk = chunks.get(cx, cz);
+            sptr<Chunk> chunk = chunks.get(cx, cz);
 
             if (!chunk) continue;
 
@@ -199,7 +199,7 @@ void LightSolver::solve(){
 
             int cx = (x >= 0) ? (x >> 4) : (x - 15) / 16;
             int cz = (z >= 0) ? (z >> 4) : (z - 15) / 16;
-            Chunk* chunk = chunks.get(cx, cz);
+            sptr<Chunk> chunk = chunks.get(cx, cz);
 
             if (!chunk) continue;
 

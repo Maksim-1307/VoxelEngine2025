@@ -9,8 +9,8 @@
 class WorldLoadingIndicator
 {
 public:
-    WorldLoadingIndicator(Array2D<Chunk*>* chunks);
-    void update(Array2D<Chunk*>* chunks);
+    WorldLoadingIndicator(Array2D<sptr<Chunk>>* chunks);
+    void update(Array2D<sptr<Chunk>>* chunks);
     void draw();
 
     Texture* texture;
@@ -30,6 +30,6 @@ private:
     };
     sptr<Mesh> mesh;
     MeshRenderer* renderer;
-    Array2D<Chunk*>* chunks;
+    Array2D<sptr<Chunk>>* chunks;
     std::vector<unsigned char> textureData;
 };

@@ -29,7 +29,7 @@ class VoxelStorage{
             int blockY = get_block_coord(y, CHUNK_H);
             int blockZ = get_block_coord(z, CHUNK_W);
 
-            Chunk* ch = chunksMap->get(chunkX, chunkZ);
+            sptr<Chunk> ch = chunksMap->get(chunkX, chunkZ);
             if (ch == nullptr) {
                 // std::cout << "ERROR: Chunk out of bounds at " << chunkX << " " << chunkY << " " << chunkZ << "\n";
                 return {0, 0};

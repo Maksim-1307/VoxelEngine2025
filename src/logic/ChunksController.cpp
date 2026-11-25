@@ -56,7 +56,7 @@ void ChunksController::update() {
 
     // Zero phase (generation)
     if (updatingPhase == ChunksUpdatePhase::GENERATE_TERRAIN) {
-        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance+2)) { // Implement iterator for all chunks
+        for (sptr<Chunk> chunk : Engine::pChunkMap->chunks_in_radius(distance+2)) { // Implement iterator for all chunks
             if (chunk->state < TERRAIN_GENERATED) {
                 ChunkPos chunkPos = {chunk->X, chunk->Z};
                 if (!canPerformFor(chunkPos, TERRAIN_GENERATION)) continue;
@@ -73,7 +73,7 @@ void ChunksController::update() {
 
     // Ambient generation phase
     if (updatingPhase == ChunksUpdatePhase::GENERATE_AMBIENT) {
-        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance+2)) { // Implement iterator for all chunks
+        for (sptr<Chunk> chunk : Engine::pChunkMap->chunks_in_radius(distance+2)) { // Implement iterator for all chunks
             if (chunk->state < STRUCTURES_GENERATED) {
                 ChunkPos chunkPos = {chunk->X, chunk->Z};
                 if (!canPerformFor(chunkPos, STRUCTURES_GENERATION)) continue;
@@ -90,7 +90,7 @@ void ChunksController::update() {
 
     // First phase (Pre-Lighting)
     if (updatingPhase == ChunksUpdatePhase::UPDATE_PRE_LIGHTING) {
-        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance+2)) {
+        for (sptr<Chunk> chunk : Engine::pChunkMap->chunks_in_radius(distance+2)) {
             if (chunk->state < LIGHTS_PRE_BUILT) {
                 ChunkPos chunkPos = {chunk->X, chunk->Z};
                 if (!canPerformFor(chunkPos, LIGHTS_PRE_BUILDING)) continue;
@@ -107,7 +107,7 @@ void ChunksController::update() {
 
     // Second phase (Lighting)
     if (updatingPhase == ChunksUpdatePhase::UPDATE_LIGHTING) {
-        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance+2)) {
+        for (sptr<Chunk> chunk : Engine::pChunkMap->chunks_in_radius(distance+2)) {
             if (chunk->state < LIGHTS_BUILT) {
                 ChunkPos chunkPos = {chunk->X, chunk->Z};
                 if (!canPerformFor(chunkPos, LIGHTS_BUILDING)) continue;
@@ -124,7 +124,7 @@ void ChunksController::update() {
 
     // Last phase (Mesh building)
     if (updatingPhase == ChunksUpdatePhase::UPDATE_MESH) {
-        for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance+2)) {
+        for (sptr<Chunk> chunk : Engine::pChunkMap->chunks_in_radius(distance+2)) {
             if (chunk->state < MESH_BUILT && chunk->state >= LIGHTS_BUILT) {
                 ChunkPos chunkPos = {chunk->X, chunk->Z};
                 if (!canPerformFor(chunkPos, MESH_BUILDING)) continue;
@@ -149,14 +149,14 @@ void ChunksController::load_around(glm::ivec2 center) {
     int distance = Settings::LOAD_DISTANCE;
 
     for (int p = 1; p <= distance; p++) {
-        for (Chunk* chunk : Engine::pChunkMap->padding_chunks(p)) {
+        for (sptr<Chunk> chunk : Engine::pChunkMap->padding_chunks(p)) {
             if (chunk->state < STRUCTURES_GENERATED) {
                 Engine::pGenerator->generate_ambient(chunk->X, chunk->Z);
             }
         }
     }
     for (int p = 2; p <= distance; p++) {
-        for (Chunk* chunk : Engine::pChunkMap->padding_chunks(p)) {
+        for (sptr<Chunk> chunk : Engine::pChunkMap->padding_chunks(p)) {
             if (chunk->state < LIGHTS_PRE_BUILT) {
                 Engine::pLighting->prebuildSkyLight(chunk);
             }
@@ -165,7 +165,7 @@ void ChunksController::load_around(glm::ivec2 center) {
     // padding() only returns ring perimeters, so the exact center chunk is
     // never prepared above. Handle it explicitly, otherwise its worker task
     // exits early on the state guard and it never becomes VISIBLE.
-    if (Chunk* centerChunk = Engine::pChunkMap->get(center.x, center.y)) {
+    if (sptr<Chunk> centerChunk = Engine::pChunkMap->get(center.x, center.y)) {
         if (centerChunk->state < STRUCTURES_GENERATED) {
             Engine::pGenerator->generate_ambient(centerChunk->X, centerChunk->Z);
         }
@@ -173,7 +173,7 @@ void ChunksController::load_around(glm::ivec2 center) {
             Engine::pLighting->prebuildSkyLight(centerChunk);
         }
     }
-    for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance-2)) {
+    for (sptr<Chunk> chunk : Engine::pChunkMap->chunks_in_radius(distance-2)) {
         if (chunk->state < VISIBLE) {
         } 
     }
@@ -183,7 +183,7 @@ void ChunksController::load_around(glm::ivec2 center) {
 void ChunksController::draw_chunks() {
     // glm::ivec2 center = this->camPos;
     int distance = Settings::LOAD_DISTANCE;
-    for (Chunk* chunk : Engine::pChunkMap->chunks_in_radius(distance-1)) {
+    for (sptr<Chunk> chunk : Engine::pChunkMap->chunks_in_radius(distance-1)) {
 
         if (chunk->pendingMesh) {
             chunk->renderer = make_uptr<MeshRenderer>(std::move(chunk->pendingMesh), MeshType::MESH3D);
@@ -203,7 +203,7 @@ void ChunksController::draw_chunks() {
     }
 }
 
-std::vector<Chunk*> ChunksController::get_loaded_chunks() {
+std::vector<sptr<Chunk>> ChunksController::get_loaded_chunks() {
     return Engine::pChunkMap->chunks_in_radius(Settings::LOAD_DISTANCE-1);
 }
 
@@ -212,17 +212,17 @@ std::vector<Chunk*> ChunksController::get_loaded_chunks() {
 bool ChunksController::canPerformFor(ChunkPos pos, ChunkUpdateOperation operation) {
     int x = pos.x;
     int z = pos.z;
-    Chunk* chunk = Engine::pChunkMap->get(x, z);
+    sptr<Chunk> chunk = Engine::pChunkMap->get(x, z);
     if (!chunk) return false;
     if (operation == TERRAIN_GENERATION && chunk->state == INITIALIZED) return true;
     if (operation == MESH_BUILDING && chunk->state == LIGHTS_BUILT) return true;
     ChunkState min_neighbors_state = VISIBLE;
-    std::array<Chunk*, 8> neighbors;
+    std::array<sptr<Chunk>, 8> neighbors;
     int i = 0;
     for (int dx = -1; dx <= 1; dx++) {
         for (int dz = -1; dz <= 1; dz++) {
             if (dx == 0 && dz == 0) continue;
-            Chunk* n = Engine::pChunkMap->get(x + dx, z + dz);
+            sptr<Chunk> n = Engine::pChunkMap->get(x + dx, z + dz);
             if (!n) return false;
             neighbors[i++] = n;
             if (n->state < min_neighbors_state) min_neighbors_state = n->state;

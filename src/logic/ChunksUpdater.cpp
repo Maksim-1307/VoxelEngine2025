@@ -8,7 +8,7 @@ std::mutex ChunksUpdater::trees_mutex;
 void ChunksUpdater::update_pre_light(ChunkPos chunkPos) {
     int x = chunkPos.first();
     int z = chunkPos.second();
-    Chunk* chunk = Engine::pChunkMap->get(x, z);
+    sptr<Chunk> chunk = Engine::pChunkMap->get(x, z);
     if (!chunk) return;
     chunk->isQueued = true;
 
@@ -34,7 +34,7 @@ void ChunksUpdater::update_pre_light(ChunkPos chunkPos) {
 void ChunksUpdater::update_light(ChunkPos chunkPos) {
     int x = chunkPos.first();
     int z = chunkPos.second();
-    Chunk* chunk = Engine::pChunkMap->get(x, z);
+    sptr<Chunk> chunk = Engine::pChunkMap->get(x, z);
     if (!chunk) return;
     chunk->isQueued = true;
 
@@ -64,7 +64,7 @@ void ChunksUpdater::update_light(ChunkPos chunkPos) {
 void ChunksUpdater::update_mesh(ChunkPos chunkPos) {
     int x = chunkPos.first();
     int z = chunkPos.second();
-    Chunk* chunk = Engine::pChunkMap->get(x, z);
+    sptr<Chunk> chunk = Engine::pChunkMap->get(x, z);
     if (!chunk) return;
     chunk->isQueued = true;
     std::unique_lock chunkLock(chunk->mtx);
@@ -78,7 +78,7 @@ void ChunksUpdater::update_mesh(ChunkPos chunkPos) {
         sptr<Mesh> mesh;
         {
             ChunkMeshBuilder builder;
-            mesh = builder.buildMesh(*chunk);
+            mesh = builder.buildMesh(chunk);
         }
         if (!mesh) return;
         chunk->pendingMesh = std::move(mesh);

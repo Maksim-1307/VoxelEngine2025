@@ -4,9 +4,10 @@
 #include <shared_mutex>
 #include "Array2D.hpp"
 #include "Iterator.hpp"
-#include "../voxels/Chunk.hpp"
 #include <functional>
 #include <vector>
+#include "../voxels/Chunk.hpp"
+#include "../logic/pointers.hpp"
 
 class AreaMap2D
 {
@@ -14,8 +15,8 @@ public:
     AreaMap2D(int radius)
     {
         size = radius * 2 + 1; 
-        firstBuffer = new Array2D<Chunk*>(size, size);
-        secondBuffer = new Array2D<Chunk*>(size, size);
+        firstBuffer = new Array2D<sptr<Chunk>>(size, size);
+        secondBuffer = new Array2D<sptr<Chunk>>(size, size);
         for (int i = 0; i < size*size; i++) {
             firstBuffer->get_data()[i] = nullptr;
             secondBuffer->get_data()[i] = nullptr;
@@ -31,7 +32,7 @@ public:
         delete secondBuffer;
     }
 
-    Chunk* get(int x, int z) {
+    sptr<Chunk> get(int x, int z) {
         // std::shared_lock lock(mtx);
         int mx = x - offsetX + size/2;  
         int mz = z - offsetZ + size/2;
@@ -42,13 +43,13 @@ public:
         return firstBuffer->get(mx, mz);
     }
 
-    // unsafe!
-    Chunk** get_volume(){
-        // std::shared_lock lock(mtx);
-        return this->firstBuffer->get_data();
-    }
+    // // unsafe!
+    // sptr<Chunk>* get_volume(){
+    //     // std::shared_lock lock(mtx);
+    //     return this->firstBuffer->get_data();
+    // }
 
-    void set_out_callback(std::function<Chunk*(int, int)> callback) {
+    void set_out_callback(std::function<sptr<Chunk>(int, int)> callback) {
         this->outCallback = callback;
     }
 
@@ -58,7 +59,7 @@ public:
             for (int z = 0; z < size; z++) {
                 int wx = x - size/2 + offsetX;
                 int wz = z - size/2 + offsetZ;
-                Chunk* newObj = outCallback(wx, wz);
+                sptr<Chunk> newObj = outCallback(wx, wz);
                 secondBuffer->set(x, z, newObj);
             }
         }
@@ -70,7 +71,7 @@ public:
 
         if (dx == 0 && dz == 0) return;
 
-        std::vector<Chunk*> to_delete;
+        std::vector<sptr<Chunk>> to_delete;
 
         for (int i = 0; i < size*size; i++) {
             secondBuffer->get_data()[i] = nullptr;
@@ -97,15 +98,15 @@ public:
 
         std::swap(firstBuffer, secondBuffer);
 
-        for (int x = 0; x < size; x++) {
-            for (int z = 0; z < size; z++) {
-                Chunk* item = secondBuffer->get(x, z);
-                if (item != nullptr) {
-                    // std::lock_guard lock(item->mtx);
-                    // delete item;
-                }
-            }
-        }   
+        // for (int x = 0; x < size; x++) {
+        //     for (int z = 0; z < size; z++) {
+        //         sptr<Chunk> item = secondBuffer->get(x, z);
+        //         if (item != nullptr) {
+        //             // std::lock_guard lock(item->mtx);
+        //             // delete item;
+        //         }
+        //     }
+        // }   
     }
 
     bool is_inside(int x, int z) {
@@ -115,25 +116,25 @@ public:
         return in_bounds(mx, mz);
     }
     
-    std::vector<Chunk*> padding_chunks(int level){
-        return Iterator<Chunk*>::padding(this->firstBuffer, level);
+    std::vector<sptr<Chunk>> padding_chunks(int level){
+        return Iterator<sptr<Chunk>>::padding(this->firstBuffer, level);
     }
-    std::vector<Chunk*> chunks_in_radius(int radius) {
-        return Iterator<Chunk*>::in_radius(this->firstBuffer, radius);
+    std::vector<sptr<Chunk>> chunks_in_radius(int radius) {
+        return Iterator<sptr<Chunk>>::in_radius(this->firstBuffer, radius);
     }
 
-    Array2D<Chunk*>* get_chunks() {
+    Array2D<sptr<Chunk>>* get_chunks() {
         return this->firstBuffer;
     }
 
     int size;
 
 // private:
-    Array2D<Chunk*>* firstBuffer;
-    Array2D<Chunk*>* secondBuffer;
+    Array2D<sptr<Chunk>>* firstBuffer;
+    Array2D<sptr<Chunk>>* secondBuffer;
     int offsetX = 0, offsetZ = 0;
     
-    std::function<Chunk*(int, int)> outCallback;
+    std::function<sptr<Chunk>(int, int)> outCallback;
 
     bool in_bounds(int x, int z) const {
         return x >= 0 && z >= 0 && x < size && z < size;

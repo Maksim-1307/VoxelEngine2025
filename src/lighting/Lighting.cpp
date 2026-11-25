@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <queue>
 
-std::queue<Chunk*> Lighting::preBuildQueue;
 std::mutex Lighting::lightingMtx;
 
 Lighting::Lighting(AreaMap2D& chunks) 
@@ -14,24 +13,24 @@ Lighting::Lighting(AreaMap2D& chunks)
 
 Lighting::~Lighting() = default;
 
-void Lighting::clear(){
+// void Lighting::clear(){
 
-    Chunk** chunks = Engine::pChunkMap->get_volume();
-    int size = Engine::pChunkMap->size;
+//     Chunk** chunks = Engine::pChunkMap->get_volume();
+//     int size = Engine::pChunkMap->size;
 
-    for (int x = 0; x < size; x++) {
-        for (int z = 0; z < size; z++) {
-            Chunk* chunk = Engine::pChunkMap->firstBuffer->get(x, z);
-            if (!chunk) continue;
-            chunk->lightmap.clear();
-            Engine::pLighting->prebuildSkyLight(chunk);
-        }
-    }
+//     for (int x = 0; x < size; x++) {
+//         for (int z = 0; z < size; z++) {
+//             Chunk* chunk = Engine::pChunkMap->firstBuffer->get(x, z);
+//             if (!chunk) continue;
+//             chunk->lightmap.clear();
+//             Engine::pLighting->prebuildSkyLight(chunk);
+//         }
+//     }
 
-}
+// }
 
 
-void Lighting::prebuildSkyLight(Chunk* chunk){
+void Lighting::prebuildSkyLight(sptr<Chunk> chunk){
     
     if (!chunk) return;
 
@@ -62,14 +61,14 @@ void Lighting::buildSkyLight(int cx, int cz) {
 
     std::lock_guard<std::mutex> lock(lightingMtx);
 
-    Chunk* chunk = Engine::pChunkMap->get(cx, cz);
+    sptr<Chunk> chunk = Engine::pChunkMap->get(cx, cz);
     if (chunk == nullptr) {
         return;
     }
 
     bool update_neighbors = !chunk->update_caused_by_neighbor;
 
-    std::array<Chunk*, 8> neighboring_chunks;
+    std::array<sptr<Chunk>, 8> neighboring_chunks;
     neighboring_chunks[0] = Engine::pChunkMap->get(cx+1, cz);
     neighboring_chunks[1] = Engine::pChunkMap->get(cx-1, cz);
     neighboring_chunks[2] = Engine::pChunkMap->get(cx, cz+1);
@@ -98,7 +97,7 @@ void Lighting::buildSkyLight(int cx, int cz) {
     }
 
     // Seed cross-border propagation with adjacent chunks' border light
-    Chunk* neighbor;
+    sptr<Chunk> neighbor;
     // -X
     neighbor = Engine::pChunkMap->get(cx-1, cz);
     if (neighbor && neighbor->state >= LIGHTS_PRE_BUILT) {
@@ -181,7 +180,7 @@ void Lighting::buildSkyLight(int cx, int cz) {
     if (update_neighbors) {
         for (int i = 0; i < 8; i++) {
             if (need_update[i] || true) {
-                Chunk* neighbor = neighboring_chunks[i];
+                sptr<Chunk> neighbor = neighboring_chunks[i];
                 if (!neighbor) continue;
                 // std::lock_guard<std::mutex> neighborLock(neighbor->mtx); // makes very slow, deadlock probably
                 if (neighbor->state > LIGHTS_BUILT) {
@@ -219,7 +218,7 @@ void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
 
     std::lock_guard<std::mutex> lock(lightingMtx);
 
-    Chunk* chunk = Engine::pChunkMap->get(cx, cz);
+    sptr<Chunk> chunk = Engine::pChunkMap->get(cx, cz);
     if (chunk == nullptr) {
         return;
     }

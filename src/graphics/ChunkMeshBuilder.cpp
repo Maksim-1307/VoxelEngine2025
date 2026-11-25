@@ -1,7 +1,7 @@
 #include "ChunkMeshBuilder.hpp"
 #include "src/Engine.hpp"
 
-sptr<Mesh> ChunkMeshBuilder::buildMesh(Chunk &chunk)
+sptr<Mesh> ChunkMeshBuilder::buildMesh(sptr<Chunk> chunk)
 {
 
     Profiler t("buildMesh");
@@ -11,15 +11,15 @@ sptr<Mesh> ChunkMeshBuilder::buildMesh(Chunk &chunk)
     vertices.reserve(5000);
     indices.reserve(2000);
 
-    this->chunk = &chunk;
+    this->chunk = chunk;
     int X = this->chunk->X;
     int Y = this->chunk->Y;
     int Z = this->chunk->Z;
 
-    Chunk* nxChunk = Engine::pChunkMap->get(X-1, Z);
-    Chunk* pxChunk = Engine::pChunkMap->get(X+1, Z);
-    Chunk* nzChunk = Engine::pChunkMap->get(X, Z-1);
-    Chunk* pzChunk = Engine::pChunkMap->get(X, Z+1);
+    sptr<Chunk> nxChunk = Engine::pChunkMap->get(X-1, Z);
+    sptr<Chunk> pxChunk = Engine::pChunkMap->get(X+1, Z);
+    sptr<Chunk> nzChunk = Engine::pChunkMap->get(X, Z-1);
+    sptr<Chunk> pzChunk = Engine::pChunkMap->get(X, Z+1);
 
     if (!nxChunk || !pxChunk || !nzChunk || !pzChunk) {
         throw std::runtime_error(
@@ -35,7 +35,7 @@ sptr<Mesh> ChunkMeshBuilder::buildMesh(Chunk &chunk)
     // );
 
     // caching
-    this->currD = chunk.get_raw_data();
+    this->currD = chunk->get_raw_data();
     this->nxD = nxChunk->get_raw_data();
     this->pxD = pxChunk->get_raw_data();
     this->nzD = nzChunk->get_raw_data();

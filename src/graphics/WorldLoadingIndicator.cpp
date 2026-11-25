@@ -1,6 +1,6 @@
 #include "WorldLoadingIndicator.hpp"
 
-WorldLoadingIndicator::WorldLoadingIndicator(Array2D<Chunk*>* chunks) {
+WorldLoadingIndicator::WorldLoadingIndicator(Array2D<sptr<Chunk>>* chunks) {
     mesh = make_sptr<Mesh>(std::move(vertices), std::move(indices));
     renderer = new MeshRenderer(std::move(mesh), MeshType::SPRITE2D);
     this->chunks = chunks;
@@ -9,7 +9,6 @@ WorldLoadingIndicator::WorldLoadingIndicator(Array2D<Chunk*>* chunks) {
 }
 
 unsigned char* generateCheckerboardData(int width, int height) {
-    // Выделяем память для данных (3 байта на пиксель: RGB)
     unsigned char* data = new unsigned char[width * height * 3];
     
     for (int y = 0; y < height; ++y) {
@@ -17,12 +16,10 @@ unsigned char* generateCheckerboardData(int width, int height) {
             int index = (y * width + x) * 3;
             
             if ((x + y) % 2 == 0) {
-                // Красный пиксель: R=255, G=0, B=0
                 data[index] = 255;     // R
                 data[index + 1] = 0;   // G
                 data[index + 2] = 0;   // B
             } else {
-                // Зеленый пиксель: R=0, G=255, B=0
                 data[index] = 0;       // R
                 data[index + 1] = 255; // G
                 data[index + 2] = 0;   // B
@@ -34,7 +31,7 @@ unsigned char* generateCheckerboardData(int width, int height) {
 }
 
 
-void WorldLoadingIndicator::update(Array2D<Chunk*>* chunks) {
+void WorldLoadingIndicator::update(Array2D<sptr<Chunk>>* chunks) {
 
     this->chunks = chunks;
     int width = chunks->getSizeX();
@@ -44,7 +41,7 @@ void WorldLoadingIndicator::update(Array2D<Chunk*>* chunks) {
     
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            Chunk* chunk = chunks->get(x, y);
+            sptr<Chunk> chunk = chunks->get(x, y);
             
             if (chunk == nullptr) {
                 textureData.push_back(255); // R

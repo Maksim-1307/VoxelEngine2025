@@ -36,12 +36,12 @@ class ChunksController {
         void update();
         void set_distance(int distance);
         void draw_chunks();
-        std::vector<Chunk*> get_loaded_chunks();
+        std::vector<sptr<Chunk>> get_loaded_chunks();
     private:
         void load_around(glm::ivec2 center);
         bool firstLoad = true;
 
-        std::queue<Chunk*> handleQueue;
+        std::queue<sptr<Chunk>> handleQueue;
         ChunksUpdatePhase updatingPhase = ChunksUpdatePhase::GENERATE_TERRAIN;
         std::atomic<int> processingChunksCount{0};
         AreaMap2D *chunkMap;

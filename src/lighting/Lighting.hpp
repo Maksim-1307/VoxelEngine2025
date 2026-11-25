@@ -13,10 +13,10 @@
 
 class Lighting {
 
-    AreaMap2D<Chunk>& chunks;
+    AreaMap2D& chunks;
     std::unique_ptr<LightSolver> solver;
 public:
-    Lighting(AreaMap2D<Chunk>& chunks);
+    Lighting(AreaMap2D& chunks);
     ~Lighting();
 
     void clear();

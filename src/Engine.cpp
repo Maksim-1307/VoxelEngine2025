@@ -19,7 +19,7 @@ Canvas *Engine::pCanvas = nullptr;
 Texture *Engine::pTerrainTexture = nullptr;
 Text *Engine::pText = nullptr;
 Text *Engine::pFpsText = nullptr;
-AreaMap2D<Chunk>* Engine::pChunkMap = nullptr;
+AreaMap2D* Engine::pChunkMap = nullptr;
 Generator *Engine::pGenerator = nullptr;
 VoxelStorage* Engine::pVoxelStorage = nullptr;
 ChunksController* Engine::pChunksController = nullptr;
@@ -91,7 +91,7 @@ void Engine::init()
     
     // World
     Engine::pGenerator = new Generator();
-    Engine::pChunkMap = new AreaMap2D<Chunk>(Settings::LOAD_DISTANCE + 1);
+    Engine::pChunkMap = new AreaMap2D(Settings::LOAD_DISTANCE + 1);
 
     // Lighting
     Engine::pLighting = new Lighting(*Engine::pChunkMap);

@@ -16,9 +16,9 @@ struct lightentry {
 class LightSolver {
     std::queue<lightentry> addqueue;
     std::queue<lightentry> remqueue;
-    AreaMap2D<Chunk>& chunks;
+    AreaMap2D& chunks;
 public:
-    LightSolver(AreaMap2D<Chunk>& chunks);
+    LightSolver(AreaMap2D& chunks);
 
     void add(int x, int y, int z);
     void add(int x, int y, int z, light value);

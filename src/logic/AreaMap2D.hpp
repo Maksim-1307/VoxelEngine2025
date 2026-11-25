@@ -4,18 +4,18 @@
 #include <shared_mutex>
 #include "Array2D.hpp"
 #include "Iterator.hpp"
+#include "../voxels/Chunk.hpp"
 #include <functional>
 #include <vector>
 
-template <class T>
 class AreaMap2D
 {
 public:
     AreaMap2D(int radius)
     {
         size = radius * 2 + 1; 
-        firstBuffer = new Array2D<T*>(size, size);
-        secondBuffer = new Array2D<T*>(size, size);
+        firstBuffer = new Array2D<Chunk*>(size, size);
+        secondBuffer = new Array2D<Chunk*>(size, size);
         for (int i = 0; i < size*size; i++) {
             firstBuffer->get_data()[i] = nullptr;
             secondBuffer->get_data()[i] = nullptr;
@@ -24,14 +24,14 @@ public:
 
     ~AreaMap2D() {
         for (int i = 0; i < size*size; i++) {
-            delete firstBuffer->get_data()[i];
-            delete secondBuffer->get_data()[i];
+            // delete firstBuffer->get_data()[i];
+            // delete secondBuffer->get_data()[i];
         }
         delete firstBuffer;
         delete secondBuffer;
     }
 
-    T* get(int x, int z) {
+    Chunk* get(int x, int z) {
         // std::shared_lock lock(mtx);
         int mx = x - offsetX + size/2;  
         int mz = z - offsetZ + size/2;
@@ -43,12 +43,12 @@ public:
     }
 
     // unsafe!
-    T** get_volume(){
+    Chunk** get_volume(){
         // std::shared_lock lock(mtx);
         return this->firstBuffer->get_data();
     }
 
-    void set_out_callback(std::function<T*(int, int)> callback) {
+    void set_out_callback(std::function<Chunk*(int, int)> callback) {
         this->outCallback = callback;
     }
 
@@ -58,7 +58,7 @@ public:
             for (int z = 0; z < size; z++) {
                 int wx = x - size/2 + offsetX;
                 int wz = z - size/2 + offsetZ;
-                T* newObj = outCallback(wx, wz);
+                Chunk* newObj = outCallback(wx, wz);
                 secondBuffer->set(x, z, newObj);
             }
         }
@@ -70,7 +70,7 @@ public:
 
         if (dx == 0 && dz == 0) return;
 
-        std::vector<T*> to_delete;
+        std::vector<Chunk*> to_delete;
 
         for (int i = 0; i < size*size; i++) {
             secondBuffer->get_data()[i] = nullptr;
@@ -99,9 +99,10 @@ public:
 
         for (int x = 0; x < size; x++) {
             for (int z = 0; z < size; z++) {
-                T* item = secondBuffer->get(x, z);
+                Chunk* item = secondBuffer->get(x, z);
                 if (item != nullptr) {
-                    delete item;
+                    // std::lock_guard lock(item->mtx);
+                    // delete item;
                 }
             }
         }   
@@ -114,25 +115,25 @@ public:
         return in_bounds(mx, mz);
     }
     
-    std::vector<T*> padding_chunks(int level){
-        return Iterator<T*>::padding(this->firstBuffer, level);
+    std::vector<Chunk*> padding_chunks(int level){
+        return Iterator<Chunk*>::padding(this->firstBuffer, level);
     }
-    std::vector<T*> chunks_in_radius(int radius) {
-        return Iterator<T*>::in_radius(this->firstBuffer, radius);
+    std::vector<Chunk*> chunks_in_radius(int radius) {
+        return Iterator<Chunk*>::in_radius(this->firstBuffer, radius);
     }
 
-    Array2D<T*>* get_chunks() {
+    Array2D<Chunk*>* get_chunks() {
         return this->firstBuffer;
     }
 
     int size;
 
 // private:
-    Array2D<T*>* firstBuffer;
-    Array2D<T*>* secondBuffer;
+    Array2D<Chunk*>* firstBuffer;
+    Array2D<Chunk*>* secondBuffer;
     int offsetX = 0, offsetZ = 0;
     
-    std::function<T*(int, int)> outCallback;
+    std::function<Chunk*(int, int)> outCallback;
 
     bool in_bounds(int x, int z) const {
         return x >= 0 && z >= 0 && x < size && z < size;

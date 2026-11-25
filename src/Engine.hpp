@@ -62,7 +62,7 @@ class Engine {
         static Text* pText;
         static Text* pFpsText;
         static Chunk* pChunk;
-        static AreaMap2D<Chunk>* pChunkMap;
+        static AreaMap2D* pChunkMap;
         static Generator* pGenerator;
         static VoxelStorage* pVoxelStorage;
         static ChunksController* pChunksController;

@@ -7,7 +7,7 @@
 std::queue<Chunk*> Lighting::preBuildQueue;
 std::mutex Lighting::lightingMtx;
 
-Lighting::Lighting(AreaMap2D<Chunk>& chunks) 
+Lighting::Lighting(AreaMap2D& chunks) 
   : chunks(chunks) {
     solver = std::make_unique<LightSolver>(chunks);
 }
@@ -182,6 +182,7 @@ void Lighting::buildSkyLight(int cx, int cz) {
         for (int i = 0; i < 8; i++) {
             if (need_update[i] || true) {
                 Chunk* neighbor = neighboring_chunks[i];
+                if (!neighbor) continue;
                 // std::lock_guard<std::mutex> neighborLock(neighbor->mtx); // makes very slow, deadlock probably
                 if (neighbor->state > LIGHTS_BUILT) {
                     neighbor->state = LIGHTS_BUILT;

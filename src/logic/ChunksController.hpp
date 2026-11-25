@@ -28,7 +28,7 @@ enum ChunkUpdateOperation {
 
 class ChunksController {
     public:
-        ChunksController(AreaMap2D<Chunk> *chunkMap, Camera *camera) : chunkMap(chunkMap), camera(camera) {
+        ChunksController(AreaMap2D *chunkMap, Camera *camera) : chunkMap(chunkMap), camera(camera) {
             chunkMap->fill();
             this->update();
             this->load_around(this->camPos);
@@ -44,7 +44,7 @@ class ChunksController {
         std::queue<Chunk*> handleQueue;
         ChunksUpdatePhase updatingPhase = ChunksUpdatePhase::GENERATE_TERRAIN;
         std::atomic<int> processingChunksCount{0};
-        AreaMap2D<Chunk> *chunkMap;
+        AreaMap2D *chunkMap;
         Camera* camera;
         glm::ivec2 camPos;
         

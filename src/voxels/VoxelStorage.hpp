@@ -15,7 +15,7 @@
 class VoxelStorage{
     public:
 
-        VoxelStorage(AreaMap2D<Chunk> *chunksMap)
+        VoxelStorage(AreaMap2D *chunksMap)
             : chunksMap(chunksMap) 
         {};
 
@@ -129,7 +129,7 @@ class VoxelStorage{
         }
         return result;
     }
-    AreaMap2D<Chunk>* chunksMap;
+    AreaMap2D* chunksMap;
 
 };
    

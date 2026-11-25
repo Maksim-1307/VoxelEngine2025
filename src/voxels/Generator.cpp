@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <mutex>
 
 #define STB_PERLIN_IMPLEMENTATION
 #include "include/stb_perlin.h" 
@@ -17,6 +18,8 @@ void Generator::generate_at(int x, int z)
 
 void Generator::generate_ambient(int x, int z) {
     Chunk* chunk = Engine::pChunkMap->get(x, z);
+    if (!chunk) return;
+    std::lock_guard<std::mutex> lock(chunk->mtx);
 
     if (chunk->state != TERRAIN_GENERATED) {
         std::cout << "WARNING: generate_ambient is called on chunk with a state other than TERRAIN_GENERATED\n";
@@ -56,6 +59,8 @@ void Generator::terrain_with_caves(int x, int y, int z){
     int Z = z * CHUNK_W;
 
     Chunk* chunk = Engine::pChunkMap->get(x, z);
+    if (!chunk) return;
+    std::lock_guard<std::mutex> lock(chunk->mtx);
     chunk->X = x;
     chunk->Y = y;
     chunk->Z = z;
@@ -191,6 +196,8 @@ void Generator::perlin_noise_3d(int x, int y, int z){
     int Z = z * CHUNK_W;
 
     Chunk* chunk = Engine::pChunkMap->get(x, z);
+    if (!chunk) return;
+    std::lock_guard<std::mutex> lock(chunk->mtx);
     chunk->X = x;
     chunk->Y = y;
     chunk->Z = z;
@@ -218,6 +225,7 @@ void Generator::perlin_noise_2d(int x, int y, int z){
     int Z = z * CHUNK_W;
 
     Chunk* chunk = Engine::pChunkMap->get(x, z);
+    if (!chunk) return;
     chunk->X = x;
     chunk->Y = y;
     chunk->Z = z;

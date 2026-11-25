@@ -2,7 +2,7 @@
 
 #include "src/Engine.hpp"
 
-LightSolver::LightSolver(AreaMap2D<Chunk>& chunks)
+LightSolver::LightSolver(AreaMap2D& chunks)
     : chunks(chunks)
 {
 }

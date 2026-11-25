@@ -48,7 +48,10 @@ class VoxelStorage{
             int blockY = get_block_coord(y, CHUNK_H);
             int blockZ = get_block_coord(z, CHUNK_W);
 
-            chunksMap->get(chunkX, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
+            sptr<Chunk> ch = chunksMap->get(chunkX, chunkZ);
+            if (ch == nullptr) return;
+
+            ch->set_voxel(blockX, blockY, blockZ, vox);
         };
 
         bool set_voxel_soft(
@@ -68,7 +71,10 @@ class VoxelStorage{
             int blockY = get_block_coord(y, CHUNK_H);
             int blockZ = get_block_coord(z, CHUNK_W);
 
-            return chunksMap->get(chunkX, chunkZ)->lightmap.get(blockX, blockY, blockZ);
+            sptr<Chunk> ch = chunksMap->get(chunkX, chunkZ);
+            if (ch == nullptr) return {0};
+
+            return ch->lightmap.get(blockX, blockY, blockZ);
 
         };
 
@@ -82,7 +88,10 @@ class VoxelStorage{
             int blockY = get_block_coord(y, CHUNK_H);
             int blockZ = get_block_coord(z, CHUNK_W);
 
-            return chunksMap->get(chunkX, chunkZ)->lightmap.get(blockX, blockY, blockZ, channel);
+            sptr<Chunk> ch = chunksMap->get(chunkX, chunkZ);
+            if (ch == nullptr) return 0;
+
+            return ch->lightmap.get(blockX, blockY, blockZ, channel);
 
         };
 
@@ -97,7 +106,10 @@ class VoxelStorage{
             int blockY = get_block_coord(y, CHUNK_H);
             int blockZ = get_block_coord(z, CHUNK_W);
 
-            chunksMap->get(chunkX, chunkZ)->lightmap.setS(blockX, blockY, blockZ, value);
+            sptr<Chunk> ch = chunksMap->get(chunkX, chunkZ);
+            if (ch == nullptr) return;
+
+            ch->lightmap.setS(blockX, blockY, blockZ, value);
 
         };
 

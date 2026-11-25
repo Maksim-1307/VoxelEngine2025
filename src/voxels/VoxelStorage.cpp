@@ -20,9 +20,12 @@ bool VoxelStorage::set_voxel_soft(
     if (blockY < 0 || blockY >= CHUNK_H || !chunksMap->is_inside(chunkX, chunkZ))
         return false;
 
-    chunksMap->get(chunkX, chunkZ)->set_voxel(blockX, blockY, blockZ, vox);
-    chunksMap->get(chunkX, chunkZ)->state = MODIFIED;
-    chunksMap->get(chunkX, chunkZ)->update_caused_by_neighbor = false;
+    sptr<Chunk> chunk = chunksMap->get(chunkX, chunkZ);
+    if (chunk == nullptr) return false;
+
+    chunk->set_voxel(blockX, blockY, blockZ, vox);
+    chunk->state = MODIFIED;
+    chunk->update_caused_by_neighbor = false;
 
     if (triggerCallbacks) {
         BlockUpdater::get_instance().on_block_set(x, y, z);
@@ -34,10 +37,15 @@ bool VoxelStorage::set_voxel_soft(
         BlockUpdater::get_instance().on_block_set(x, y, z+1);
     }
 
-    if (blockX == 0)         chunksMap->get(chunkX-1, chunkZ)->state = MODIFIED;
-    if (blockX == CHUNK_W-1) chunksMap->get(chunkX+1, chunkZ)->state = MODIFIED;
-    if (blockZ == 0)         chunksMap->get(chunkX, chunkZ-1)->state = MODIFIED;
-    if (blockZ == CHUNK_W-1) chunksMap->get(chunkX, chunkZ+1)->state = MODIFIED;
+    auto mark_modified = [this](int cx, int cz) {
+        sptr<Chunk> neighbor = chunksMap->get(cx, cz);
+        if (neighbor != nullptr) neighbor->state = MODIFIED;
+    };
+
+    if (blockX == 0)         mark_modified(chunkX-1, chunkZ);
+    if (blockX == CHUNK_W-1) mark_modified(chunkX+1, chunkZ);
+    if (blockZ == 0)         mark_modified(chunkX, chunkZ-1);
+    if (blockZ == CHUNK_W-1) mark_modified(chunkX, chunkZ+1);
 
     // for (int dx = -1; dx <= 1; dx++) {
     //     for (int dz = -1; dz <= 1; dz++) {

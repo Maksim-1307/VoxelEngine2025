@@ -72,13 +72,15 @@ void Engine::init()
     new Block("dry_bush", BlockModel::GRASS, {{1, 3}});
     new Block("sand", BlockModel::SOLID, {{2, 3}});
     new Block("water", BlockModel::FOLIAGE, {{3, 3}});
-    new Block("snow", BlockModel::SNOW, {{1, 0}});
+    new Block("snow", BlockModel::SNOW, {{4, 3}});
+    new Block("snowed_grass", BlockModel::SOLID, {{4, 3}, {4, 2}, {0, 1}});
 
     if (Settings::BLOCKS_BEHAVIOR) {
         BlockUpdater::get_instance().register_block_behaviour(10, BlockBehaviour::tall_grass);
         BlockUpdater::get_instance().register_block_behaviour(12, BlockBehaviour::sand);
         BlockUpdater::get_instance().register_block_behaviour(11, BlockBehaviour::dry_bush);
         BlockUpdater::get_instance().register_block_behaviour(3, BlockBehaviour::grass);
+        BlockUpdater::get_instance().register_block_behaviour(14, BlockBehaviour::snow);
         if (Settings::FALLING_LEAVES) BlockUpdater::get_instance().register_block_behaviour(1, BlockBehaviour::dirt);
         if (Settings::FALLING_LEAVES) BlockUpdater::get_instance().register_block_behaviour(5, BlockBehaviour::leaves);
     }

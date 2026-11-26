@@ -45,7 +45,25 @@ void Mouse::update(float deltaTime) {
                 int bx = std::floor(result.position.x);
                 int by = std::floor(result.position.y);
                 int bz = std::floor(result.position.z);
+                // Temporary for snow (КОСТЫЛЬ, переделать)
+                if (State::PLACING_VOXEL.id == 14) {
+                    voxel placing_in_vox = Engine::pVoxelStorage->get_voxel(bx, by, bz);
+                    if (placing_in_vox.id == 14) {
+                        uint8_t snow_lvl = placing_in_vox.state;
+                        snow_lvl += 1;
+                        voxel updated_snow = {
+                            placing_in_vox.id, 
+                            snow_lvl
+                        };
+                        Engine::pVoxelStorage->set_voxel_soft(bx, by, bz, updated_snow);
+                        Engine::pLighting->onBlockSet(bx, by, bz, State::PLACING_VOXEL.id);
+                    } else {
+                        Engine::pVoxelStorage->set_voxel_soft(bx, by, bz, State::PLACING_VOXEL);
+                    }
+                } else {
+                //
                 Engine::pVoxelStorage->set_voxel_soft(bx, by, bz, State::PLACING_VOXEL);
+                }
                 Engine::pLighting->onBlockSet(bx, by, bz, State::PLACING_VOXEL.id);
             }
             pressTimeRight = 0;

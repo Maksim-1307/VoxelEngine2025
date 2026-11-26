@@ -25,7 +25,7 @@ BlockBehaviour BlockBehaviour::dry_bush {
             Engine::pVoxelStorage->set_voxel_soft(context.x, context.y, context.z, {0, 0});
             return;
         }
-        if (context.y >= CHUNK_H) {
+        if (context.y >= CHUNK_H-1) {
             return;
         }
         voxel below = Engine::pVoxelStorage->get_voxel(context.x, context.y-1, context.z);
@@ -59,6 +59,15 @@ BlockBehaviour BlockBehaviour::sand {
 };
 
 BlockBehaviour BlockBehaviour::grass {
+    .on_block_set = [](BlockBehaviourContext context) {
+        if (context.y >= CHUNK_H-1) {
+            return;
+        }
+        voxel above = Engine::pVoxelStorage->get_voxel(context.x, context.y+1, context.z);
+        if (above.id == 14) {
+            Engine::pVoxelStorage->set_voxel_soft(context.x, context.y, context.z, {15, 0});
+        }
+    },
     .on_random_tick = [](BlockBehaviourContext context) {
         if (context.y >= CHUNK_H-1) return;
         voxel above = Engine::pVoxelStorage->get_voxel(context.x, context.y+1, context.z);
@@ -98,5 +107,28 @@ BlockBehaviour BlockBehaviour::dirt {
         if (!hasGrassNearby) return;
 
         Engine::pVoxelStorage->set_voxel_soft(context.x, context.y, context.z, {3, 0}, false);
+    }
+};
+
+BlockBehaviour BlockBehaviour::snow {
+    .on_block_set = [](BlockBehaviourContext context) {
+        if (context.y <= 0) {
+            return;
+        }
+        voxel current = Engine::pVoxelStorage->get_voxel(context.x, context.y, context.z);
+        int y = context.y;
+        while (y > 0) {
+            voxel below = Engine::pVoxelStorage->get_voxel(context.x, y-1, context.z);
+            Block& belowBlock = Block::getBlockByVoxelId(below.id);
+            if (belowBlock.getBlockModel() == BlockModel::SOLID) {
+                break;
+            }
+            y--;
+        }
+        if (y == context.y) {
+            return;
+        }
+        Engine::pVoxelStorage->set_voxel_soft(context.x, y, context.z, current, false);
+        Engine::pVoxelStorage->set_voxel_soft(context.x, context.y, context.z, {0, 0}, true);
     }
 };

@@ -64,6 +64,9 @@ sptr<Mesh> ChunkMeshBuilder::buildMesh(sptr<Chunk> chunk)
                     case BlockModel::GRASS:
                         GrassModel(_x, _y, _z);
                         break;
+                    case BlockModel::SNOW:
+                        SnowModel(_x, _y, _z);
+                        break;
                     default:
                         break;
                 }
@@ -199,6 +202,108 @@ void ChunkMeshBuilder::GrassModel(int x, int y, int z)
     vertex(1.0f-d + offX, 0.0f, d + offZ, uv.x, uv.y);
 
     index(3, 1, 0, 3, 2, 1);
+}
+
+
+void ChunkMeshBuilder::SnowModel(int x, int y, int z) {
+    std::array<bool, 6> openedFaces = opened_around(x, y, z);
+    voxel vox = get_voxel_fast(x, y, z);
+    Block& block = Block::getBlockByVoxelId(vox.id);
+    int state = (int)vox.state % 8; // height of snow: 0 - 7
+    float h = (state+1) / 8.0f;
+
+    // Sow much does current snow level differ from neighbors
+    std::array<float, 4> dh;
+    std::array<std::pair<int, int>, 4> directions = {{
+        { 1, 0}, // X+
+        {-1, 0}, // X-
+        {0,  1}, // Z+
+        {0, -1}  // Z-
+    }};
+    for (int i = 0; i < 4; i++) {
+        int dx = directions[i].first;
+        int dz = directions[i].second;
+        voxel n_vox = get_voxel_fast(x+dx, y, z+dz);
+        Block& n_block = Block::getBlockByVoxelId(n_vox.id);
+        float n_h = (n_vox.state+1) / 8.0f;
+        if (n_block.getBlockModel() == block.getBlockModel()) {
+            dh[i] = h - n_h;
+            // Same height same block - dont draw face
+            if (dh[i] <= 0.0f) dh[i] = -1.0f;
+        } else {
+            dh[i] = 0.0f;
+        }
+    }
+
+    for (int face = 0; face < 6; face++)
+    {
+        if (openedFaces[face])
+        {
+            size_t UVx = std::get<0>(block.getUV(face));
+            size_t UVy = std::get<1>(block.getUV(face));
+            glm::vec2 uv = glm::vec2((float)UVx / ATLAS_SIZE, (float)UVy / ATLAS_SIZE);
+            _face = face;
+            switch (face)
+            {
+            // X+
+            case 0:
+                if (dh[0] < 0) continue;
+                vertex(1.0f, dh[0], 0.0f, uv.x + 1.0f / ATLAS_SIZE, uv.y + dh[0] / ATLAS_SIZE);
+                vertex(1.0f, dh[0], 1.0f, uv.x,                     uv.y + dh[0] / ATLAS_SIZE);
+                vertex(1.0f, h,     1.0f, uv.x,                     uv.y + h / ATLAS_SIZE);
+                vertex(1.0f, h,     0.0f, uv.x + 1.0f / ATLAS_SIZE, uv.y + h / ATLAS_SIZE);
+                break;
+            // X-
+            case 1:
+                if (dh[1] < 0) continue;
+                vertex(0.0f, dh[1], 0.0f, uv.x + 1.0f / ATLAS_SIZE, uv.y + dh[1] / ATLAS_SIZE);
+                vertex(0.0f, dh[1], 1.0f, uv.x,                     uv.y + dh[1] / ATLAS_SIZE);
+                vertex(0.0f, h,     1.0f, uv.x,                     uv.y + h / ATLAS_SIZE);
+                vertex(0.0f, h,     0.0f, uv.x + 1.0f / ATLAS_SIZE, uv.y + h / ATLAS_SIZE);
+                break;
+            // Y+
+            case 2:
+                vertex(0.0f, h, 0.0f, uv.x,                     uv.y);
+                vertex(0.0f, h, 1.0f, uv.x,                     uv.y + 1.0f / ATLAS_SIZE);
+                vertex(1.0f, h, 1.0f, uv.x + 1.0f / ATLAS_SIZE, uv.y + 1.0f / ATLAS_SIZE);
+                vertex(1.0f, h, 0.0f, uv.x + 1.0f / ATLAS_SIZE, uv.y);
+                break;
+            // Y-
+            case 3:
+                vertex(0.0f, 0.0f, 0.0f, uv.x,                     uv.y);
+                vertex(0.0f, 0.0f, 1.0f, uv.x,                     uv.y + 1.0f / ATLAS_SIZE);
+                vertex(1.0f, 0.0f, 1.0f, uv.x + 1.0f / ATLAS_SIZE, uv.y + 1.0f / ATLAS_SIZE);
+                vertex(1.0f, 0.0f, 0.0f, uv.x + 1.0f / ATLAS_SIZE, uv.y);
+                break;
+            // Z+
+            case 4:
+                if (dh[2] < 0) continue;
+                vertex(0.0f, dh[2], 1.0f, uv.x,                     uv.y + dh[2] / ATLAS_SIZE);
+                vertex(0.0f, h,     1.0f, uv.x,                     uv.y + h / ATLAS_SIZE);
+                vertex(1.0f, h,     1.0f, uv.x + 1.0f / ATLAS_SIZE, uv.y + h / ATLAS_SIZE);
+                vertex(1.0f, dh[2], 1.0f, uv.x + 1.0f / ATLAS_SIZE, uv.y + dh[2] / ATLAS_SIZE);
+                break;
+            // Z-
+            case 5:
+                if (dh[3] < 0) continue;
+                vertex(0.0f, dh[3], 0.0f, uv.x,                     uv.y + dh[3] / ATLAS_SIZE);
+                vertex(0.0f, h,     0.0f, uv.x,                     uv.y + h / ATLAS_SIZE);
+                vertex(1.0f, h,     0.0f, uv.x + 1.0f / ATLAS_SIZE, uv.y + h / ATLAS_SIZE);
+                vertex(1.0f, dh[3], 0.0f, uv.x + 1.0f / ATLAS_SIZE, uv.y + dh[3] / ATLAS_SIZE);
+                break;
+            }
+
+            switch (face)
+            {
+            case 0: case 3: case 4:
+                index(3, 1, 0, 3, 2, 1);
+                break;
+            case 1: case 2: case 5:
+                index(0, 1, 3, 1, 2, 3);
+                break;
+            }
+        }
+    }
 }
 
 std::array<bool, 6> ChunkMeshBuilder::opened_around(int x, int y, int z)

@@ -72,6 +72,7 @@ void Engine::init()
     new Block("dry_bush", BlockModel::GRASS, {{1, 3}});
     new Block("sand", BlockModel::SOLID, {{2, 3}});
     new Block("water", BlockModel::FOLIAGE, {{3, 3}});
+    new Block("snow", BlockModel::SNOW, {{1, 0}});
 
     if (Settings::BLOCKS_BEHAVIOR) {
         BlockUpdater::get_instance().register_block_behaviour(10, BlockBehaviour::tall_grass);

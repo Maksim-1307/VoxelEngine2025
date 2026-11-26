@@ -18,6 +18,10 @@ Block::Block(
             this->opened_faces = {1, 1, 1, 1, 1, 1};
             this->lightPassing = true;
             break;
+        case BlockModel::SNOW:
+            this->opened_faces = {1, 1, 1, 0, 1, 1};
+            this->lightPassing = true;
+            break;
         case BlockModel::SOLID:
             this->opened_faces = {0, 0, 0, 0, 0, 0};
             break;
@@ -104,6 +108,10 @@ const std::vector<AABB> Block::getAABBs(int x, int y, int z, IteractionType type
             } else {
                 return {};
             }
+        case BlockModel::SNOW: {
+            float h = (vox.state % 8 + 1) / 8.0f;
+            return {AABB(glm::vec3(1.0f, h, 1.0f))};
+        }
         default:
             return {};
     }

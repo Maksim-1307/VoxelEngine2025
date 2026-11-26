@@ -25,6 +25,7 @@ bool VoxelStorage::set_voxel_soft(
 
     auto lightPropsSame = [](voxel v1, voxel v2) {
         if (v1.id == v2.id) return true;
+        if (v1.id == 0 || v2.id == 0) return false;
         Block& b1 = Block::getBlockByVoxelId(v1.id);
         Block& b2 = Block::getBlockByVoxelId(v2.id);
         return b1.emissive == b2.emissive &&

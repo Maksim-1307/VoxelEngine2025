@@ -1,5 +1,5 @@
 #pragma once
 
 enum class BlockModel{
-    AIR, SOLID, FOLIAGE, GRASS
+    AIR, SOLID, FOLIAGE, GRASS, SNOW
 };

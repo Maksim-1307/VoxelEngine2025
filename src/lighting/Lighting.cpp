@@ -177,7 +177,7 @@ void Lighting::buildSkyLight(int cx, int cz) {
     need_update[6] = need_update[1] || need_update[2]; // X- Z+
     need_update[7] = need_update[1] || need_update[3]; // X- Z-
 
-    if (update_neighbors) {
+    if (update_neighbors || true) {
         for (int i = 0; i < 8; i++) {
             if (need_update[i] || true) {
                 sptr<Chunk> neighbor = neighboring_chunks[i];

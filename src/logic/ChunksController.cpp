@@ -237,24 +237,6 @@ bool ChunksController::canPerformFor(ChunkPos pos, ChunkUpdateOperation operatio
             return (chunk->state >= TERRAIN_GENERATED) && (min_neighbors_state >= TERRAIN_GENERATED);
         case LIGHTS_PRE_BUILDING:
             // Don't pre-build light if at least one neighbor or itself is not structures generated yet
-            // if (chunk->state >= STRUCTURES_GENERATED) {
-            //     std::cout << "a == true\n";
-            // } else {
-            //     std::cout << "a == false\n";
-            // }
-            // if (min_neighbors_state >= STRUCTURES_GENERATED) {
-            //     std::cout << "b == true\n";
-            //     std::cout << (int)min_neighbors_state << "\n";
-            // } else {
-            //     std::cout << "b == false\n";
-            //     std::cout << (int)(chunk->state) << "\n";
-            // }
-            // if ((chunk->state >= STRUCTURES_GENERATED) && (min_neighbors_state >= STRUCTURES_GENERATED)) {
-            //     std::cout << "a && b == true\n";
-            // } else {
-            //     std::cout << "a && b == false\n";
-            // }
-            // std::cout << "\n\n";
             return (chunk->state >= STRUCTURES_GENERATED) && (min_neighbors_state >= STRUCTURES_GENERATED);
         case LIGHTS_BUILDING:
             // Don't build light without pre-building for neighbors end itself
@@ -266,15 +248,4 @@ bool ChunksController::canPerformFor(ChunkPos pos, ChunkUpdateOperation operatio
             return false;
     }
     return false;
-    /*
-    
-    x TERRAIN_GENERATION, // if current is INITIALIZED
-    - STRUCTURES_GENERATION, // if current is TERRAIN_GENERATED and neighbors at are least TERRAIN_GENERATED
-    - LIGHTS_PRE_BUILDING, // if current and neighbors are at least STRUCTURES_GENERATED
-    - LIGHTS_BUILDING, // if current and neighbors are at least LIGHTS_PRE_BUILT or MODIFIED 
-    - MESH_BUILDING // current at least LIGHTS BUILT 
-    
-    */
-
-
 }

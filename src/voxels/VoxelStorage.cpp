@@ -23,8 +23,26 @@ bool VoxelStorage::set_voxel_soft(
     sptr<Chunk> chunk = chunksMap->get(chunkX, chunkZ);
     if (chunk == nullptr) return false;
 
+    auto lightPropsSame = [](voxel v1, voxel v2) {
+        if (v1.id == v2.id) return true;
+        Block& b1 = Block::getBlockByVoxelId(v1.id);
+        Block& b2 = Block::getBlockByVoxelId(v2.id);
+        return b1.emissive == b2.emissive &&
+               b1.emission == b2.emission &&
+               b1.lightPassing == b2.lightPassing;
+    };
+
+    voxel v_old = chunk->get_voxel(blockX, blockY, blockZ);
     chunk->set_voxel(blockX, blockY, blockZ, vox);
-    chunk->state = MODIFIED;
+
+    if (lightPropsSame(v_old, vox)) {
+        // if light props same cause re-meshing only
+        chunk->state = LIGHTS_BUILT;
+    } else {
+        // full update otherwise
+        chunk->state = MODIFIED;
+    }
+
     chunk->update_caused_by_neighbor = false;
 
     if (triggerCallbacks) {
@@ -39,7 +57,8 @@ bool VoxelStorage::set_voxel_soft(
 
     auto mark_modified = [this](int cx, int cz) {
         sptr<Chunk> neighbor = chunksMap->get(cx, cz);
-        if (neighbor != nullptr) neighbor->state = MODIFIED;
+        // causes re-meshing
+        if (neighbor != nullptr && neighbor->state > LIGHTS_BUILT) neighbor->state = LIGHTS_BUILT;
     };
 
     if (blockX == 0)         mark_modified(chunkX-1, chunkZ);

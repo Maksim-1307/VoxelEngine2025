@@ -51,8 +51,9 @@ void ChunksUpdater::update_light(ChunkPos chunkPos) {
         // Engine::pLighting->prebuildSkyLight(chunk);
         
         if (Settings::RECURSIVE_LIGHTING) {
-            Engine::pLighting->onChunkLoaded(chunk->X, chunk->Z, true);
-            Engine::pLighting->buildSkyLight(chunk->X, chunk->Z);
+            Lighting lighting(*Engine::pChunkMap);
+            lighting.onChunkLoaded(chunk->X, chunk->Z, true);
+            lighting.buildSkyLight(chunk->X, chunk->Z);
         }
         chunk->state = LIGHTS_BUILT;
     } catch (...) {

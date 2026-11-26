@@ -183,6 +183,8 @@ void Engine::game_loop()
         Engine::pInputController->update(static_cast<float>(frameTime));
         Engine::pPlayer->update();
 
+        Engine::pChunksController->update();// ?
+
         accumulator += frameTime;
         while (accumulator >= TICK_RATE) {
             Engine::pPlayer->prevPosition = Engine::pPlayer->hitbox->position;
@@ -202,9 +204,7 @@ void Engine::tick(double deltaTime)
     Time::tick();
     Sky::update();
     Physics::step(static_cast<float>(deltaTime));
-    Engine::pChunksController->update();
     Engine::pWorldLoadingIndicator->update(Engine::pChunkMap->get_chunks());
-    ChunksUpdater::get_instance().update();
     FocusOutline::instance().update();
 }
 

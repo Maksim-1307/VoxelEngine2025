@@ -43,6 +43,7 @@ class ChunksController {
 
         std::queue<sptr<Chunk>> handleQueue;
         ChunksUpdatePhase updatingPhase = ChunksUpdatePhase::GENERATE_TERRAIN;
+        int phase_bias = 0;
         std::atomic<int> processingChunksCount{0};
         AreaMap2D *chunkMap;
         Camera* camera;

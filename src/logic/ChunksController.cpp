@@ -29,7 +29,6 @@ void ChunksController::update() {
         case ChunksUpdatePhase::WAIT_FOR_TERRAIN:
         case ChunksUpdatePhase::WAIT_FOR_AMBIENT:
         case ChunksUpdatePhase::WAIT_FOR_PRE_LIGHTING:
-        case ChunksUpdatePhase::WAIT_FOR_LIGHTING:
         case ChunksUpdatePhase::WAIT_FOR_MESH:
             // If all chunks already processed - moving to the next phase
             if (processingChunksCount == 0) {
@@ -40,6 +39,8 @@ void ChunksController::update() {
             } else {
                 // std::cout << "count: " << processingChunksCount << std::endl;
             }
+            break;
+        case ChunksUpdatePhase::WAIT_FOR_LIGHTING:
             break;
         case ChunksUpdatePhase::GENERATE_TERRAIN:
         case ChunksUpdatePhase::GENERATE_AMBIENT:
@@ -106,20 +107,42 @@ void ChunksController::update() {
     }
 
     // Second phase (Lighting)
-    if (updatingPhase == ChunksUpdatePhase::UPDATE_LIGHTING) {
-        for (sptr<Chunk> chunk : Engine::pChunkMap->chunks_in_radius(distance+2)) {
-            if (chunk->state < LIGHTS_BUILT) {
-                ChunkPos chunkPos = {chunk->X, chunk->Z};
-                if (!canPerformFor(chunkPos, LIGHTS_BUILDING)) continue;
-                processingChunksCount += 1;
-                ThreadPool::get_instance().enqueue([chunkPos, this, &processingChunksCount = processingChunksCount]() {
-                    ChunksUpdater::get_instance().update_light(chunkPos);
-                    // Decrement counter once the chunk is processed
-                    processingChunksCount.fetch_sub(1, std::memory_order_relaxed);
-                });
+    if (updatingPhase == ChunksUpdatePhase::UPDATE_LIGHTING || updatingPhase == ChunksUpdatePhase::WAIT_FOR_LIGHTING) {
+        if (processingChunksCount == 0) {
+            for (sptr<Chunk> chunk : Engine::pChunkMap->gridTraversing(phase_bias)) {
+                if (chunk->state < LIGHTS_BUILT) {
+                    ChunkPos chunkPos = {chunk->X, chunk->Z};
+                    if (!canPerformFor(chunkPos, LIGHTS_BUILDING)) continue;
+                    processingChunksCount += 1;
+                    ThreadPool::get_instance().enqueue([chunkPos, this, &processingChunksCount = processingChunksCount]() {
+                        ChunksUpdater::get_instance().update_light(chunkPos);
+                        // Decrement counter once the chunk is processed
+                        processingChunksCount.fetch_sub(1, std::memory_order_relaxed);
+                    });
+                }
             }
+            phase_bias += 1;
+            if (phase_bias > 8) {
+                updatingPhase = UPDATE_MESH;
+                phase_bias = 0;
+            }
+        } else if (processingChunksCount < 0) {
+            std::cout << "ERROR: negative value of processingChunksCount" << std::endl;
         }
-        updatingPhase = ChunksUpdatePhase::WAIT_FOR_LIGHTING;
+
+        // for (sptr<Chunk> chunk : Engine::pChunkMap->gridTraversing(0)) {
+        //     if (chunk->state < LIGHTS_BUILT) {
+        //         ChunkPos chunkPos = {chunk->X, chunk->Z};
+        //         if (!canPerformFor(chunkPos, LIGHTS_BUILDING)) continue;
+        //         processingChunksCount += 1;
+        //         ThreadPool::get_instance().enqueue([chunkPos, this, &processingChunksCount = processingChunksCount]() {
+        //             ChunksUpdater::get_instance().update_light(chunkPos);
+        //             // Decrement counter once the chunk is processed
+        //             processingChunksCount.fetch_sub(1, std::memory_order_relaxed);
+        //         });
+        //     }
+        // }
+        // updatingPhase = ChunksUpdatePhase::WAIT_FOR_LIGHTING;
     }
 
     // Last phase (Mesh building)

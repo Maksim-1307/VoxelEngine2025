@@ -75,6 +75,41 @@ public:
         }
         return entries;
     }
+
+    /*
+    Traverses matrix so that distance between elements is 2:
+
+    |X| | |X| | |X| ...
+    | | | | | | | | 
+    | | | | | | | | 
+    |X| | |X| | |X| 
+    | | | | | | | | 
+    | | | | | | | | 
+    |X| | |X| | |X| 
+    ...
+
+    Bias defines position in 3x3 cell:
+    |0|1|2|
+    |3|4|5|
+    |6|7|8|
+    */
+    static std::vector<T> gridTraversing(Array2D<T>* matrix, int bias) {
+        if (bias > 8) {
+            throw std::invalid_argument("Argument error: bias must be from 0 to 8!");
+        }
+        std::vector<T> entries;
+        int width = matrix->getSizeX();
+        int height = matrix->getSizeY();
+        int x_0 = bias % 3;
+        int y_0 = bias / 3;
+        for (int x = x_0; x < width; x += 3) {
+            for (int y = y_0; y < height; y += 3) {
+                entries.push_back(matrix->get(x, y));
+            }
+        }
+        return entries;
+    }
+
     // from edge to center
     static std::vector<T> to_center(Array2D<T>* matrix, int level);
     // static std::vector<T> from_center(Array2D<T>* matrix);

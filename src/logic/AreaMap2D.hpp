@@ -122,6 +122,15 @@ public:
     std::vector<sptr<Chunk>> chunks_in_radius(int radius) {
         return Iterator<sptr<Chunk>>::in_radius(this->firstBuffer, radius);
     }
+    std::vector<sptr<Chunk>> gridTraversing(int bias) {
+        // return Iterator<sptr<Chunk>>::gridTraversing(this->firstBuffer, bias);
+        std::vector<sptr<Chunk>> entries;
+        for (int b = 0; b <= 8; b++) {
+            std::vector<sptr<Chunk>> traversing = Iterator<sptr<Chunk>>::gridTraversing(this->firstBuffer, b);
+            entries.insert(entries.end(), traversing.begin(), traversing.end());
+        }
+        return entries;
+    }
 
     Array2D<sptr<Chunk>>* get_chunks() {
         return this->firstBuffer;

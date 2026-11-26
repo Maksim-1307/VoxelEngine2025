@@ -59,7 +59,7 @@ void Lighting::buildSkyLight(int cx, int cz) {
 
     Profiler p("buildSkyLight");
 
-    std::lock_guard<std::mutex> lock(lightingMtx);
+    // std::lock_guard<std::mutex> lock(lightingMtx);
 
     sptr<Chunk> chunk = Engine::pChunkMap->get(cx, cz);
     if (chunk == nullptr) {
@@ -216,7 +216,7 @@ void Lighting::onChunkLoaded(int cx, int cz, bool expand) {
 
     Profiler p ("onChunkLoaded");
 
-    std::lock_guard<std::mutex> lock(lightingMtx);
+    // std::lock_guard<std::mutex> lock(lightingMtx);
 
     sptr<Chunk> chunk = Engine::pChunkMap->get(cx, cz);
     if (chunk == nullptr) {

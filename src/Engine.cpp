@@ -183,7 +183,9 @@ void Engine::game_loop()
         Engine::pInputController->update(static_cast<float>(frameTime));
         Engine::pPlayer->update();
 
-        Engine::pChunksController->update();// ?
+        // Update each frame (not tick) because chunk update delay depends on how fast
+        // we update the phase
+        Engine::pChunksController->update();
 
         accumulator += frameTime;
         while (accumulator >= TICK_RATE) {

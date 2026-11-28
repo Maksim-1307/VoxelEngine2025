@@ -40,7 +40,7 @@ Window::Window(WindowArgs args)
     2 and more: (monitor frequency / n) fps limit 
     negative: adaptive vsync
     */
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
     glewExperimental = GL_TRUE;
     GLenum gl_err = glewInit();

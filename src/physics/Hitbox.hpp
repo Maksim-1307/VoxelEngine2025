@@ -16,7 +16,8 @@ public:
 
     bool isGrounded = false;
     bool isFloating = false;
-    float gravityFactor = 1.5f;
+    float gravityFactor = 1.0f;
+    float stepheight = 1.05f;
 
     glm::vec3 position;
     glm::vec3 halfSize;

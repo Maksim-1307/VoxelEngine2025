@@ -23,6 +23,8 @@ void Physics::step(float deltaTime) {
         movement = resolveCollisions(*hitbox, movement);
         hitbox->position += movement;
 
+        float lifting = 0;
+
         // Push hitbox out of terrain if still colliding after movement
         if (isColliding(hitbox->position, hitbox->halfSize)) {
             const float pushStep = 0.05f;
@@ -45,8 +47,11 @@ void Physics::step(float deltaTime) {
 glm::vec3 Physics::resolveCollisions(Hitbox& hitbox, const glm::vec3& movement) {
     glm::vec3 result = movement;
 
-    result.x = resolveAxis(hitbox, result, 0);
-    result.z = resolveAxis(hitbox, result, 2);
+    float lifting_x = 0.0f;
+    float lifting_z = 0.0f;
+
+    result.x = resolveAxis(hitbox, result, 0, &lifting_x);
+    result.z = resolveAxis(hitbox, result, 2, &lifting_z);
     result.y = resolveAxis(hitbox, result, 1);
 
     // Binary search fallback for corner cases:
@@ -67,10 +72,12 @@ glm::vec3 Physics::resolveCollisions(Hitbox& hitbox, const glm::vec3& movement) 
         result = safe;
     }
 
+    float lifting = std::max(lifting_x, lifting_z);
+    if (lifting && hitbox.isGrounded) result.y += (lifting + 0.2f);
     return result;
 }
 
-float Physics::resolveAxis(Hitbox& hitbox, const glm::vec3& movement, int axis) {
+float Physics::resolveAxis(Hitbox& hitbox, const glm::vec3& movement, int axis, float* lifting) {
     float proposedMove = axis == 0 ? movement.x : (axis == 1 ? movement.y : movement.z);
     if (proposedMove == 0) return 0;
     
@@ -79,10 +86,10 @@ float Physics::resolveAxis(Hitbox& hitbox, const glm::vec3& movement, int axis) 
     else if (axis == 1) testPos.y += proposedMove;
     else testPos.z += proposedMove;
     
-    if (!isColliding(testPos, hitbox.halfSize)) {
+    if (!isColliding(testPos, hitbox.halfSize, lifting)) {
         return proposedMove;
     }
-    
+
     hitbox.isGrounded = (axis == 1 && proposedMove < 0);
     
     if (axis == 0) hitbox.velocity.x = 0;
@@ -92,7 +99,7 @@ float Physics::resolveAxis(Hitbox& hitbox, const glm::vec3& movement, int axis) 
     return 0;
 }
 
-bool Physics::isColliding(const glm::vec3& center, const glm::vec3& halfSize) {
+bool Physics::isColliding(const glm::vec3& center, const glm::vec3& halfSize, float* lifting) {
     glm::vec3 min = center - halfSize;
     glm::vec3 max = center + halfSize;
 
@@ -100,14 +107,16 @@ bool Physics::isColliding(const glm::vec3& center, const glm::vec3& halfSize) {
     float dY = (max.y - min.y) / 10;
     float dZ = (max.z - min.z) / 10;
 
-    for (float x = min.x; x <= max.x; x += dX) {
-        for (float y = min.y; y <= max.y; y += dY) {
+    for (float y = max.y; y >= min.y; y -= dY) {
+        for (float x = min.x; x <= max.x; x += dX) {
             for (float z = min.z; z <= max.z; z += dZ) {
-                if (Engine::pTerrain->get_material_at(x, y, z) == PhysicsMaterial::SOLID) return true;
+                if (Engine::pTerrain->get_material_at(x, y, z) == PhysicsMaterial::SOLID) {
+                    if (lifting != nullptr) *lifting = y - min.y;
+                    return true;
+                }
             }
         }
     }
-
     return false;
 }
 

@@ -284,6 +284,10 @@ void Generator::generate_tree(int x, int y, int z) {
     Engine::pVoxelStorage->set_voxel(x, y - 1, z, {1, 0}); 
     
     Engine::pVoxelStorage->set_voxel(x, crown_start_y + 2, z, {5, 0}); // Foliage
+    Engine::pVoxelStorage->set_voxel(x-1, crown_start_y + 2, z, {5, 0});
+    Engine::pVoxelStorage->set_voxel(x+1, crown_start_y + 2, z, {5, 0});
+    Engine::pVoxelStorage->set_voxel(x, crown_start_y + 2, z-1, {5, 0});
+    Engine::pVoxelStorage->set_voxel(x, crown_start_y + 2, z+1, {5, 0});
 }
 
 void Generator::generate_grass(int x, int y, int z) {
